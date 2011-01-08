@@ -12,18 +12,18 @@
 SCRIPT_NAME='Aurget'
 SCRIPT_DESCRIPTION='A simple pacman-like interface to the AUR'
 SCRIPT_AUTHOR='Patrick Brisbin <pbrisbin@gmail.com>'
-SCRIPT_VERSION='3.2.2'
-SCRIPT_DATE='12/17/2010'
+SCRIPT_VERSION='3.2.4'
+SCRIPT_DATE='1/7/2011'
 
 # }}}
 
 # script utilities {{{
 display() { echo -e "${colorB}:: ${colorW}$*${nocolor}"; }
 
-warn() { echo -e "${colorY}warning: ${nocolor}$*"; }
+warn() { echo -e "${colorY}warning: ${nocolor}$*" >&2; }
 
 errorout() { 
-  echo -e "${colorR}error: ${nocolor}$*"
+  echo -e "${colorR}error: ${nocolor}$*" >&2
 
   [[ -d "$tmpdir" ]] && rm -r "$tmpdir"
 
@@ -712,12 +712,13 @@ set_defaults() {
 
 # source_config {{{
 source_config() {
-  local config
+  local config _sourced=false
 
   # global config file
   config='/etc/aurgetrc'
   if [[ -r "$config" ]]; then
     . "$config" || errorout "$config: invalid configuration"
+    _sourced=true
   fi
 
   # try xdg directory
@@ -725,6 +726,7 @@ source_config() {
     config="$XDG_CONFIG_HOME/aurgetrc"
     if [[ -f "$config" ]]; then
       . "$config" || errorout "$config: invalid configuration"
+      _sourced=true
     fi
   fi
 
@@ -732,6 +734,11 @@ source_config() {
   config="$HOME/.aurgetrc"
   if [[ -r "$config" ]]; then
     . "$config" || errorout "$config: invalid configuration"
+    _sourced=true
+  fi
+
+  if ! $_sourced; then
+    warn 'no config found, this could get weird...'
   fi
 }
 
