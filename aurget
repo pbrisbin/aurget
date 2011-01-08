@@ -631,7 +631,8 @@ setup_targets() {
       echo -n "${list_names[i]}-${list_versions[i]} "
     done
 
-    prompt "\n\nProceed with installation" && process_targets
+    prompt "\n\nProceed with installation" || clean_exit
+    process_targets
   else
     errorout 'no targets specified (use -h for help)'
   fi
