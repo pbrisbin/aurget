@@ -1,6 +1,8 @@
 post_install() {
   cat << EOF
 
+Note: aurget now uses a global config located at /etc/aurgetrc.
+
 Please use the AUR with care.
 
 EOF
