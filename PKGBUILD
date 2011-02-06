@@ -1,6 +1,6 @@
 # Author: Patrick Brisbin <pbrisbin@gmail.com>
 pkgname=aurget
-pkgver=3.2.4
+pkgver=3.2.5
 pkgrel=1
 pkgdesc="A simple Pacman-like interface to the AUR"
 arch=('any')
@@ -24,6 +24,6 @@ build() {
   mkdir -p "$pkgdir/etc/bash_completion.d/"
   install -m644 ./bash_completion "$pkgdir/etc/bash_completion.d/aurget"
 }
-md5sums=('49605c284eb2e44f31651289773cfa13'
+md5sums=('dbd26c5353faa90cd5e5a236be49990c'
          '3374a830198c439af6b98c7b263f83dc'
          '5d80c86dab678cef416e079b6fe4b0a8')
