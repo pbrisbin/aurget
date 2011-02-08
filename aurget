@@ -205,7 +205,7 @@ prompt_to_edit() {
   pkgbuild="$1"; shift
   reason="${*:-sourcing for deps}"
 
-  [[ ! -f "$pkgbuild" ]] && errorout 'pkgbuild not found'
+  [[ ! -f "$pkgbuild" ]] && errorout "$pkgbuild: file not found."
 
   # default is to prompt
   case "${edit_pkgbuilds:-prompt}" in
@@ -436,7 +436,8 @@ build_package() {
   local dep="$1" pkgbuild
 
   display 'Building package...'
-  pkgbuild="$(find "$_srcdir/" -name 'PKGBUILD' -print -quit)"
+  #pkgbuild="$(find "$_srcdir/" -name 'PKGBUILD' -print -quit)"
+  pkgbuild="$_srcdir/PKGBUILD"
   prompt_to_edit "$pkgbuild" 'building package' || continue
 
   # explicitly set env vars b/c we don't know if they came from makepkg.conf
