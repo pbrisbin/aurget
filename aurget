@@ -73,13 +73,6 @@ prompt() {
 # uses eval to process --option=value type arguments
 runtime_flag() { eval ${1/--/}; }
 
-# prints one array element per line
-#print_array() {
-#  local x
-#
-#  for x in "$@"; do echo $x; done
-#}
-
 # check for development
 is_devel() { echo "$1" | grep -q -- "$development_regex"; }
 
@@ -522,12 +515,6 @@ dep_check() {
     n=${#all_deps[@]}
 
     for name in "${args[@]}" "${all_deps[@]}"; do
-
-#      echo '--->'
-#      echo looping through:
-#      print_array ${args[@]} ${all_deps[@]}
-#      echo + currently on $name
-
       # keep args out of deps so error messages are more sane
       if ! source_for_deps "$name"; then
         # assume it's a pacman dep for now
@@ -537,7 +524,6 @@ dep_check() {
 
         # filter satasfied deps, clear versioning
         depends=( $(pacman -T -- ${depends[@]} ${makedepends[@]}) )
-        #depends=( $(print_array "${depends[@]}" | sed -e 's/=.*//' -e 's/>.*//' -e 's/<.*//') )
         depends=( "${depends[@]%>*}" )
         depends=( "${depends[@]%=*}" )
         depends=( "${depends[@]%<*}" )
@@ -547,14 +533,6 @@ dep_check() {
 
         # track unsatisfied deps
         [[ ${#depends[@]} -ne 0 ]] && all_deps+=( "${depends[@]}" )
-
-#        echo ++ depends found as
-#        print_array ${depends[@]}
-#        echo +++ planning to install
-#        print_array ${aur_deps[@]}
-#        print_array ${args[@]}
-#        echo '<---'
-
       fi
     done
 
