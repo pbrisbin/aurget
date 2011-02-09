@@ -431,10 +431,14 @@ build_package() {
   display 'Building package...'
   #pkgbuild="$(find "$_srcdir/" -name 'PKGBUILD' -print -quit)"
   pkgbuild="$_srcdir/PKGBUILD"
-  prompt_to_edit "$pkgbuild" 'building package' || continue
+  if ! prompt_to_edit "$pkgbuild" 'building package'; then
+    try_discard "$_srcdir" 
+    continue
+  fi
 
   # explicitly set env vars b/c we don't know if they came from makepkg.conf
-  pushd "${pkgbuild%/*}" &>/dev/null || errorout 'failed to change directory'
+  #pushd "${pkgbuild%/*}" &>/dev/null || errorout 'failed to change directory'
+  pushd "$_srcdir" &>/dev/null || errorout 'failed to change directory'
 
   # if we fail building, errorout on dep or just return 1 on
   # non-dep
