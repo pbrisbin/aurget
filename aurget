@@ -255,6 +255,7 @@ print_pkgbuild() {
 
   for name in "${args[@]}"; do
     $multiple && display "$name/PKGBUILD ==>"
+    # todo: fix for new url scheme
     url="$aur_pkgs/$(url_encode "$name/$name")/PKGBUILD"
     wget -q -O - "$url" 2>/dev/null || ret=1
     $multiple && echo
@@ -498,6 +499,7 @@ source_for_deps() {
   [[ -f "$pkgbuild" ]] && continue
 
   # if this errors, we know it's not aur-available so return 1
+  # todo: fix for new url scheme
   if ! wget -q -O "$pkgbuild" "$aur/packages/$(url_encode "$1/$1")/PKGBUILD"; then
     touch "$pkgbuild"
     return 1
