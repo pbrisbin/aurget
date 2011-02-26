@@ -7,6 +7,7 @@ arch=('any')
 url="http://pbrisbin.com/posts/$pkgname/"
 license="GPL" 
 backup=(etc/aurgetrc)
+depends=('bash' 'pacman' 'coreutils' 'wget' 'sed' 'grep' 'gawk' )
 conflicts=('aurget-git' 'aurget-jordz')
 install=aurget.install
 source=($pkgname aurgetrc bash_completion)
@@ -24,6 +25,6 @@ build() {
   mkdir -p "$pkgdir/etc/bash_completion.d/"
   install -m644 ./bash_completion "$pkgdir/etc/bash_completion.d/aurget"
 }
-md5sums=('dbd26c5353faa90cd5e5a236be49990c'
+md5sums=('d69cb7708e8fc7ec4864b956bedfab64'
          '3374a830198c439af6b98c7b263f83dc'
          '5d80c86dab678cef416e079b6fe4b0a8')
