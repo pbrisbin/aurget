@@ -18,12 +18,12 @@ SCRIPT_DATE='1/8/2011'
 # }}}
 
 # script utilities {{{
-display() { echo -e "${colorB}:: ${colorW}$*${nocolor}"; }
+display() { env printf "${colorB}:: ${colorW}$*${nocolor}\n"; }
 
-warn() { echo -e "${colorY}warning: ${nocolor}$*" >&2; }
+warn() { env printf "${colorY}warning: ${nocolor}$*\n" >&2; }
 
 errorout() { 
-  echo -e "${colorR}error: ${nocolor}$*" >&2
+  env printf "${colorR}error: ${nocolor}$*\n" >&2
 
   [[ -d "$tmpdir" ]] && rm -r "$tmpdir"
 
@@ -317,21 +317,21 @@ search_aur() {
 
     # FYI: http://old.nabble.com/echo-interrupted-by-SIGCHLD-from-a-dying-coprocess-td28028050.html
     case "$search_mode" in
-      quiet)  echo "$Name" 2>/dev/null ;;
+      quiet)  env printf "$Name\n" 2>/dev/null ;;
 
       info)   [[ "$OutOfDate" =~ ^(1|OutOfDate)$ ]] && outofdate="${colorR}Yes${nocolor}" || outofdate='No'
-              echo -e "${colorW}Repository \t: ${colorM}aur${nocolor}"              2>/dev/null
-              echo -e "${colorW}Name \t\t: $Name${nocolor}"                         2>/dev/null
-              echo -e "${colorW}Version \t: ${colorG}$Version${nocolor}"            2>/dev/null
-              echo -e "${colorW}URL \t\t: ${colorC}${URL//\\\///}${nocolor}"        2>/dev/null
-              echo -e "${colorW}Out of date \t: ${nocolor}$outofdate"               2>/dev/null
-              echo -e "${colorW}Description \t: ${nocolor}${Description//\\\///}\n" 2>/dev/null ;;
+              env printf "${colorW}Repository \t: ${colorM}aur${nocolor}\n"              2>/dev/null
+              env printf "${colorW}Name \t\t: $Name${nocolor}\n"                         2>/dev/null
+              env printf "${colorW}Version \t: ${colorG}$Version${nocolor}\n"            2>/dev/null
+              env printf "${colorW}URL \t\t: ${colorC}${URL//\\\///}${nocolor}\n"        2>/dev/null
+              env printf "${colorW}Out of date \t: ${nocolor}$outofdate\n"               2>/dev/null
+              env printf "${colorW}Description \t: ${nocolor}${Description//\\\///}\n\n" 2>/dev/null ;;
 
       search) [[ "$OutOfDate" =~ ^(1|OutOfDate)$ ]] && outofdate="${colorR}[out of date]${nocolor}" || outofdate=''
-              echo -en "${colorM}aur/${colorW}$Name"  2>/dev/null
-              echo -en " ${colorG}$Version${nocolor}" 2>/dev/null
-              echo -e  " $outofdate"                  2>/dev/null
-              echo -e  "    ${Description//\\\///}"   2>/dev/null ;;
+              env printf "${colorM}aur/${colorW}$Name"  2>/dev/null
+              env printf " ${colorG}$Version${nocolor}" 2>/dev/null
+              env printf " $outofdate\n"                  2>/dev/null
+              env printf "    ${Description//\\\///}\n"   2>/dev/null ;;
 
       *)      errorout 'invalid search_mode'
     esac
@@ -611,7 +611,7 @@ setup_targets() {
     echo -en "\n${colorY}Targets (${#list_names[@]}):${nocolor} "
 
     for ((i=0; i<${#list_names[@]}; i++)); do
-      echo -n "${list_names[i]}-${list_versions[i]} "
+      env printf "${list_names[i]}-${list_versions[i]} "
     done
 
     prompt "\n\nProceed with installation" || clean_exit
