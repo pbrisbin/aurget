@@ -255,9 +255,12 @@ print_pkgbuild() {
 
   for name in "${args[@]}"; do
     $multiple && display "$name/PKGBUILD ==>"
-    # todo: fix for new url scheme
     url="$aur_pkgs/$(url_encode "$name/$name")/PKGBUILD"
-    wget -q -O - "$url" 2>/dev/null || ret=1
+    if ! wget -q -O - "$url" 2>/dev/null; then
+      url="$aur_pkgs/$(url_encode "$name")/PKGBUILD"
+      # new url scheme
+      wget -q -O - "$url" 2>/dev/null || ret=1
+    fi
     $multiple && echo
   done
 
@@ -499,10 +502,12 @@ source_for_deps() {
   [[ -f "$pkgbuild" ]] && continue
 
   # if this errors, we know it's not aur-available so return 1
-  # todo: fix for new url scheme
   if ! wget -q -O "$pkgbuild" "$aur/packages/$(url_encode "$1/$1")/PKGBUILD"; then
-    touch "$pkgbuild"
-    return 1
+    # new url scheme
+    if ! wget -q -O "$pkgbuild" "$aur/packages/$(url_encode "$1")/PKGBUILD"; then
+      touch "$pkgbuild"
+      return 1
+    fi
   else
     prompt_to_edit "$pkgbuild" 'sourcing for deps' && source_pkgbuild "$pkgbuild" || continue
   fi
