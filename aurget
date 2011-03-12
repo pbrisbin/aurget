@@ -12,8 +12,8 @@
 SCRIPT_NAME='Aurget'
 SCRIPT_DESCRIPTION='A simple pacman-like interface to the AUR'
 SCRIPT_AUTHOR='Patrick Brisbin <pbrisbin@gmail.com>'
-SCRIPT_VERSION='3.2.5'
-SCRIPT_DATE='1/8/2011'
+SCRIPT_VERSION='3.2.7'
+SCRIPT_DATE='3/12/2011'
 
 # }}}
 
@@ -508,9 +508,9 @@ source_for_deps() {
       touch "$pkgbuild"
       return 1
     fi
-  else
-    prompt_to_edit "$pkgbuild" 'sourcing for deps' && source_pkgbuild "$pkgbuild" || continue
   fi
+
+  prompt_to_edit "$pkgbuild" 'sourcing for deps' && source_pkgbuild "$pkgbuild" || continue
 }
 
 # }}}
