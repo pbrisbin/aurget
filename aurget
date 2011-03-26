@@ -33,6 +33,8 @@ errorout() {
 dieonlock() {
   cat << EOF
 
+   Lock file found at $lock_file.
+
    Another aurget process is currently running. Please wait until it has
    finished.
 
