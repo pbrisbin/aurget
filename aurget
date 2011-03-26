@@ -88,8 +88,6 @@ is_devel() { echo "$1" | grep -q -- "$development_regex"; }
 
 # clear our temp dir
 clear_temp() {
-  tmpdir='/tmp/aurget'
-
   [[ -d "$tmpdir" ]] && rm -r "$tmpdir"
   mkdir -p "$tmpdir"
 }
@@ -654,11 +652,6 @@ process_targets() {
 
 # }}}
 
-# clean_entrance {{{
-clean_entrance() { set_lock_file; clear_temp; }
-
-# }}}
-
 # set_defaults {{{
 set_defaults() {
   # just true/false and non-config options
@@ -891,7 +884,11 @@ aur='http://aur.archlinux.org'
 aur_srch="$aur/rpc.php?type=search&arg="
 aur_info="$aur/rpc.php?type=info&arg="
 aur_pkgs="$aur/packages"
-lock_file='/tmp/aurget.lock'
+
+tmpdir='/tmp/aurget'
+lock_file="$tmpdir/aurget.lock"
+
+clear_temp
 
 (
   flock -n 9 || dieonlock
