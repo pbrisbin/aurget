@@ -27,8 +27,16 @@ errorout() {
 
   [[ -d "$tmpdir" ]] && rm -r "$tmpdir"
 
-  set_lock_file -r
+  exit 1
+}
 
+dieonlock() {
+  cat << EOF
+
+   Another aurget process is currently running. Please wait until it has
+   finished.
+
+EOF
   exit 1
 }
 
@@ -75,32 +83,6 @@ runtime_flag() { eval ${1/--/}; }
 
 # check for development
 is_devel() { echo "$1" | grep -q -- "$development_regex"; }
-
-# set or remove our lock file
-set_lock_file() {
-  local lock_file='/tmp/aurget.lock'
-
-  if [[ "$1" = '-r' ]]; then
-    if [[ -f "$lock_file" ]]; then
-      rm "$lock_file" || errorout 'error removing lock file'
-    fi
-
-    return 0
-  fi
-
-  if [[ -f "$lock_file" ]]; then
-    cat << EOF
-
- $lock_file exists. if you're certain that no other aurget
- process is running, remove this file and try again.
-
-EOF
-  exit 1
-
-  fi
-
-  touch "$lock_file" || errorout 'error setting lock file'
-}
 
 # clear our temp dir
 clear_temp() {
@@ -893,8 +875,6 @@ main() {
 
 # clean_exit {{{
 clean_exit() { 
-  set_lock_file -r
-
   [[ -d "$tmpdir" ]] && rm -r "$tmpdir"
 
   exit ${1:-0}
@@ -909,14 +889,16 @@ aur='http://aur.archlinux.org'
 aur_srch="$aur/rpc.php?type=search&arg="
 aur_info="$aur/rpc.php?type=info&arg="
 aur_pkgs="$aur/packages"
+lock_file='/tmp/aurget.lock'
 
-clean_entrance
-
-set_defaults
-source_config
-source_makepkg
-parse_options "$@"
-main
+(
+  flock -n 9 || dieonlock
+  set_defaults
+  source_config
+  source_makepkg
+  parse_options "$@"
+  main
+) 9>"$lock_file"
 
 clean_exit
 
