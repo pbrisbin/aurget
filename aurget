@@ -417,7 +417,7 @@ build_package() {
   display 'Building package...'
   #pkgbuild="$(find "$_srcdir/" -name 'PKGBUILD' -print -quit)"
   pkgbuild="$_srcdir/PKGBUILD"
-  if ! prompt_to_edit "$pkgbuild" 'building package'; then
+  if ! prompt_to_edit "$pkgbuild" "building $Name"; then
     try_discard "$_srcdir" 
     continue
   fi
@@ -492,7 +492,7 @@ source_for_deps() {
     fi
   fi
 
-  prompt_to_edit "$pkgbuild" 'sourcing for deps' && source_pkgbuild "$pkgbuild" || continue
+  prompt_to_edit "$pkgbuild" "sourcing $1 for deps" && source_pkgbuild "$pkgbuild" || continue
 }
 
 # }}}
