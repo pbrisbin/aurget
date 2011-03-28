@@ -877,6 +877,32 @@ clean_exit() {
 
 # }}}
 
+# boot_strap {{{
+boot_strap() {
+  [[ "$1" != 'bootstrap' ]] && return
+
+  cat << EOF
+
+  Boot-strapping aurget...
+
+  Once built, please use pacman to install the package in this 
+  directory.
+
+EOF
+
+  clear_temp
+  set_defaults
+
+  args=( 'aurget' )
+  sync_mode='build'
+  makepkg='makepkg'
+  build_directory="$tmpdir/bootstrap"
+
+  source_makepkg
+  setup_targets
+}
+# }}}
+
 # clean up if we catch signals
 trap 'clean_exit 1' TERM HUP QUIT INT
 
@@ -887,6 +913,8 @@ aur_pkgs="$aur/packages"
 
 tmpdir='/tmp/aurget'
 lock_file="$tmpdir/aurget.lock"
+
+boot_strap "$1"
 
 clear_temp
 
