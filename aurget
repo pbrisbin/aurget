@@ -188,7 +188,7 @@ prompt_to_edit() {
     prompt) prompt "edit PKGBUILD before $reason" || return 0 ;;
   esac
 
-  $editor $pkgbuild || errorout 'problem editing PKGBUILD'
+  $editor "$pkgbuild" || errorout 'problem editing PKGBUILD'
   prompt "continue $reason"
 }
 
@@ -198,7 +198,7 @@ prompt_to_edit() {
 source_pkgbuild() {
   local pkgbuild="$1"
 
-  [[ ! -f $pkgbuild ]] && errorout 'pkgbuild not found'
+  [[ ! -f "$pkgbuild" ]] && errorout 'pkgbuild not found'
 
   # source pkgbuild variables
   source <(awk '/^build.*(.*)|^function.*build.*(.*)/{exit};1' "$pkgbuild")
