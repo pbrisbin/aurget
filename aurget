@@ -682,27 +682,25 @@ set_defaults() {
 source_config() {
   local config _sourced=false
 
-  # global config file
+  # global config file is always sourced
   config='/etc/aurgetrc'
   if [[ -r "$config" ]]; then
     . "$config" || errorout "$config: invalid configuration"
     _sourced=true
   fi
 
-  # try xdg directory
-  if [[ -n "$XDG_CONFIG_HOME" ]]; then
-    config="$XDG_CONFIG_HOME/aurgetrc"
-    if [[ -f "$config" ]]; then
-      . "$config" || errorout "$config: invalid configuration"
-      _sourced=true
-    fi
-  fi
-
-  # user config file
-  config="$HOME/.aurgetrc"
+  # try xdg directory first
+  config="${XDG_CONFIG_HOME:-$HOME/.config}/aurgetrc"
   if [[ -r "$config" ]]; then
     . "$config" || errorout "$config: invalid configuration"
     _sourced=true
+  else
+    # use home dot-file
+    config="$HOME/.aurgetrc"
+    if [[ -r "$config" ]]; then
+      . "$config" || errorout "$config: invalid configuration"
+      _sourced=true
+    fi
   fi
 
   if ! $_sourced; then
