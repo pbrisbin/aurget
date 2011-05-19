@@ -275,24 +275,21 @@ search_aur() {
   [[ "$search_mode" = 'print' ]] && print_pkgbuild "${args[@]}"
 
   # continue with other searches
-  local awkscript results term name Name Version Description URL URLPath OutOfDate
+  local awkscript results term Name Version Description URL URLPath OutOfDate
 
   term="${args[*]}"
 
-  # do we need exact match or not?
-  [[ "$search_mode" = 'info' ]] && name="\"$term\"" || name=''
-
   awkscript='
-  /Name":|var/      { printf "%s", $3 }
-  /Version":/       { printf "|%s", $3 }
-  /Description":/   { printf "|%s", $3 }
-  /URL":/           { printf "|%s", $3 }
-  /URLPath":/       { printf "|%s", $3 }
-  /OutOfDate":/     { printf "|%s\n", $3 }
+  /Name":/        { printf "%s", $3 }
+  /Version":/     { printf "|%s", $3 }
+  /Description":/ { printf "|%s", $3 }
+  /URL":/         { printf "|%s", $3 }
+  /URLPath":/     { printf "|%s", $3 }
+  /OutOfDate":/   { printf "|%s\n", $3 }
   '
 
   # parse JSON data
-  results="$(wget -q -O - "${aur_srch}$(url_encode "$term")" | awk -F'"' -v RS='","' -v var="$name" "$awkscript")"
+  results="$(wget -q -O - "${aur_srch}$(url_encode "$term")" | awk -F'"' -v RS='","' "$awkscript")"
 
   # no results
   [[ -z "$results" ]] && clean_exit 1
@@ -300,6 +297,7 @@ search_aur() {
   # sed-parse that file
   while IFS='|' read -r Name Version Description URL URLPath OutOfDate; do
     [[ -z "$Name" ]] && continue
+    [[ "$search_mode" = 'info' ]] && [[ "$Name" != "$term" ]] && continue
 
     # FYI: http://old.nabble.com/echo-interrupted-by-SIGCHLD-from-a-dying-coprocess-td28028050.html
     case "$search_mode" in
