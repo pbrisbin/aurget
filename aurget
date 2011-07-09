@@ -173,14 +173,12 @@ EOF
 
 # prompt_to_edit {{{
 prompt_to_edit() {
-  #$prompt_to_edit || return 0
-
   local pkgbuild reason
   
   pkgbuild="$1"; shift
   reason="${*:-sourcing for deps}"
 
-  [[ ! -f "$pkgbuild" ]] && errorout "$pkgbuild: file not found."
+  [[ ! -f "$pkgbuild" ]] && errorout "$Name: no PKGBUILD found"
 
   # default is to prompt
   case "${edit_pkgbuilds:-prompt}" in
@@ -413,16 +411,18 @@ build_package() {
   local dep="$1" pkgbuild
 
   display 'Building package...'
-  #pkgbuild="$(find "$_srcdir/" -name 'PKGBUILD' -print -quit)"
-  pkgbuild="$_srcdir/PKGBUILD"
-  if ! prompt_to_edit "$pkgbuild" "building $Name"; then
+  pushd "$_srcdir" &>/dev/null || errorout 'failed to change directory'
+
+  if [[ -f "/etc/customizepkg.d/$Name" ]]; then
+    display 'Calling customizepkg...'
+    customizepkg --modify || warn 'customizepkg had a problem'
+  fi
+
+  if ! prompt_to_edit 'PKGBUILD' "building $Name"; then
+    popd &>/dev/null
     try_discard "$_srcdir" 
     continue
   fi
-
-  # explicitly set env vars b/c we don't know if they came from makepkg.conf
-  #pushd "${pkgbuild%/*}" &>/dev/null || errorout 'failed to change directory'
-  pushd "$_srcdir" &>/dev/null || errorout 'failed to change directory'
 
   # if we fail building, errorout on dep or just return 1 on
   # non-dep
