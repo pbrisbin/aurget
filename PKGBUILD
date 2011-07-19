@@ -1,6 +1,6 @@
 # Author: Patrick Brisbin <pbrisbin@gmail.com>
 pkgname=aurget
-pkgver=3.2.8
+pkgver=3.2.9
 pkgrel=1
 pkgdesc="A simple Pacman-like interface to the AUR"
 arch=('any')
@@ -10,6 +10,7 @@ backup=(etc/aurgetrc)
 conflicts=('aurget-git' 'aurget-jordz')
 install=aurget.install
 source=($pkgname aurgetrc bash_completion)
+optdepends=('customizepkg: for auto-customizing packages')
 
 # todo: empty build(), use package()
 build() { 
@@ -25,5 +26,8 @@ build() {
   install -m644 ./bash_completion "$pkgdir/etc/bash_completion.d/aurget"
 }
 md5sums=('84ae25212b9b0a49c6a0e86153d7be06'
+         '3374a830198c439af6b98c7b263f83dc'
+         '5d80c86dab678cef416e079b6fe4b0a8')
+md5sums=('e3ead2f59638d00c07d63340a9e78578'
          '3374a830198c439af6b98c7b263f83dc'
          '5d80c86dab678cef416e079b6fe4b0a8')
