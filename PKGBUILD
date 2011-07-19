@@ -25,9 +25,6 @@ build() {
   mkdir -p "$pkgdir/etc/bash_completion.d/"
   install -m644 ./bash_completion "$pkgdir/etc/bash_completion.d/aurget"
 }
-md5sums=('84ae25212b9b0a49c6a0e86153d7be06'
-         '3374a830198c439af6b98c7b263f83dc'
-         '5d80c86dab678cef416e079b6fe4b0a8')
-md5sums=('e3ead2f59638d00c07d63340a9e78578'
+md5sums=('ad78617fc3409352c00fc95586408640'
          '3374a830198c439af6b98c7b263f83dc'
          '5d80c86dab678cef416e079b6fe4b0a8')
