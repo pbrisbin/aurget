@@ -293,7 +293,7 @@ search_aur() {
   [[ -z "$results" ]] && clean_exit 1
 
   # sed-parse that file
-  while IFS='|' read -r Name Version Description URL URLPath OutOfDate; do
+  while IFS='|' read -r Name Version Description URL OutOfDate URLPath; do
     [[ -z "$Name" ]] && continue
     [[ "$search_mode" = 'info' ]] && [[ "$Name" != "$term" ]] && continue
 
