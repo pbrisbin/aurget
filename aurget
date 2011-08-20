@@ -282,8 +282,8 @@ search_aur() {
   /Version":/     { printf "|%s", $3 }
   /Description":/ { printf "|%s", $3 }
   /URL":/         { printf "|%s", $3 }
-  /URLPath":/     { printf "|%s", $3 }
-  /OutOfDate":/   { printf "|%s\n", $3 }
+  /OutOfDate":/   { printf "|%s", $3 }
+  /URLPath":/     { printf "|%s\n", $3 }
   '
 
   # parse JSON data
