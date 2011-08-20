@@ -12,8 +12,8 @@
 SCRIPT_NAME='Aurget'
 SCRIPT_DESCRIPTION='A simple pacman-like interface to the AUR'
 SCRIPT_AUTHOR='Patrick Brisbin <pbrisbin@gmail.com>'
-SCRIPT_VERSION='3.2.9'
-SCRIPT_DATE='7/19/2011'
+SCRIPT_VERSION='3.2.10'
+SCRIPT_DATE='8/20/2011'
 
 # }}}
 
