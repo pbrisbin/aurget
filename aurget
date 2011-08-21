@@ -332,7 +332,7 @@ upgrade() {
       $devels && args+=("$name")
     else
       # available version 
-      versN="$(wget -q -O - "${aur_info}$(url_encode "$name")" | grep -Fv -- '"No result found"' | sed -e 's/.*"Version":"\([^"]*\)".*/\1/g')"
+      versN="$(wget -q -O - "${aur_info}$(url_encode "$name")" | grep -Fv -- '"No results found"' | sed -e 's/.*"Version":"\([^"]*\)".*/\1/g')"
       [[ -z "$versN" ]] && continue
 
       # check against ignores
