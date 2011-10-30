@@ -171,14 +171,25 @@ EOF
 
 # }}}
 
+prompted=()
+
 # prompt_to_edit {{{
 prompt_to_edit() {
   local pkgbuild reason
-  
+
   pkgbuild="$1"; shift
   reason="${*:-sourcing for deps}"
 
   [[ ! -f "$pkgbuild" ]] && errorout "$Name: no PKGBUILD found"
+
+  # if we prompted for sourcing, don't prompt again afterwards
+  for package in "${prompted[@]}"; do
+    if [[ $package == $Name ]]; then
+      return 0
+    fi
+  done
+
+  prompted=($prompted $Name)
 
   # default is to prompt
   case "${edit_pkgbuilds:-prompt}" in
@@ -488,7 +499,7 @@ source_for_deps() {
     fi
   fi
 
-  prompt_to_edit "$pkgbuild" "sourcing $1 for dependencies" && source_pkgbuild "$pkgbuild" || continue
+  Name="$1" prompt_to_edit "$pkgbuild" "sourcing $1 for dependencies" && source_pkgbuild "$pkgbuild" || continue
 }
 
 # }}}
