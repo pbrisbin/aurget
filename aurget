@@ -183,11 +183,11 @@ prompt_to_edit() {
   # default is to prompt
   case "${edit_pkgbuilds:-prompt}" in
     never)  return 0 ;;
-    prompt) prompt "edit PKGBUILD before $reason" || return 0 ;;
+    prompt) prompt "Edit PKGBUILD before $reason" || return 0 ;;
   esac
 
   $editor "$pkgbuild" || errorout 'problem editing PKGBUILD'
-  prompt "continue $reason"
+  prompt "Continue $reason"
 }
 
 # }}}
@@ -488,7 +488,7 @@ source_for_deps() {
     fi
   fi
 
-  prompt_to_edit "$pkgbuild" "sourcing $1 for deps" && source_pkgbuild "$pkgbuild" || continue
+  prompt_to_edit "$pkgbuild" "sourcing $1 for dependencies" && source_pkgbuild "$pkgbuild" || continue
 }
 
 # }}}
@@ -554,7 +554,7 @@ add_targets_to_list() {
 
   for name in "$@"; do
     if grep -Fq -- " $name " <<< " $ignore_packages "; then
-      if ! prompt "${colorB}::${colorW} $name is in ignore_packages. Install anyway${nocolor}"; then
+      if ! prompt "$name is in ignore_packages. Install anyway"; then
         warn "skipping target: $name"
         continue
       fi
@@ -562,7 +562,7 @@ add_targets_to_list() {
 
     # fetch JSON
     read -r Name Version URLPath < <(wget -q -O - "${aur_info}$(url_encode "$name")" | sed -e '/.*"Name":"\([^"]*\)".*"Version":"\([^"]*\)".*"URLPath":"\([^"]*\)".*/!d; s//\1 \2 \3/g')
-    [[ -z "$Name" ]] && errorout "'$name': package not found in AUR."
+    [[ -z "$Name" ]] && errorout "$name: package not found in AUR."
 
     # is it already up to date?
     grep -Fqx -- "$Name $Version" "$tmpdir/installed.lst" && warn "$Name-$Version is up to date -- reinstalling"
