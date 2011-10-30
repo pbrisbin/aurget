@@ -248,7 +248,7 @@ print_pkgbuild() {
     $multiple && display "$name/PKGBUILD ==>"
 
     url="$aur_pkgs/$(url_encode "${name:0:2}/$name")/PKGBUILD"
-    curl -fS "$url" 2>/dev/null || ret=1
+    curl -fsS "$url" 2>/dev/null || ret=1
 
     $multiple && echo
   done
@@ -296,7 +296,7 @@ search_aur() {
   '
 
   # parse JSON data
-  results="$(curl -fS "${aur_srch}$(url_encode "$term")" | awk -F'"' -v RS='","' "$awkscript")"
+  results="$(curl -fsS "${aur_srch}$(url_encode "$term")" | awk -F'"' -v RS='","' "$awkscript")"
 
   # no results
   [[ -z "$results" ]] && clean_exit 1
@@ -341,7 +341,7 @@ upgrade() {
       $devels && args+=("$name")
     else
       # available version 
-      versN="$(curl -fS "${aur_info}$(url_encode "$name")" | sed -e '/.*"Version":"\([^"]*\)".*/!d; s//\1/g')"
+      versN="$(curl -fsS "${aur_info}$(url_encode "$name")" | sed -e '/.*"Version":"\([^"]*\)".*/!d; s//\1/g')"
       [[ -z "$versN" ]] && continue
 
       # check against ignores
