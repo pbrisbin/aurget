@@ -385,7 +385,7 @@ download_tarball() {
   # JSON often reports a url, it'll download but won't be a tarball
   if ! grep -Fq 'gzip' <(file "$target"); then
     warn "$name: not a valid tarball, trying alternate url..."
-    wget -O "$target" "$aur_pkgs/$(url_encode "$name/$name").tar.gz" || errorout 'failed to retrieve aur sources'
+    wget -O "$target" "$aur_pkgs/$(url_encode "${name:0:2}/$name/$name").tar.gz" || errorout 'failed to retrieve aur sources'
   fi
 
   # stop here if that's how we roll
@@ -480,12 +480,9 @@ source_for_deps() {
   [[ -f "$pkgbuild" ]] && continue
 
   # if this errors, we know it's not aur-available so return 1
-  if ! wget -q -O "$pkgbuild" "$aur/packages/$(url_encode "$1/$1")/PKGBUILD"; then
-    # new url scheme
-    if ! wget -q -O "$pkgbuild" "$aur/packages/$(url_encode "$1")/PKGBUILD"; then
-      touch "$pkgbuild"
-      return 1
-    fi
+  if ! wget -q -O "$pkgbuild" "$aur/packages/$(url_encode "${1:0:2}/$1")/PKGBUILD"; then
+    touch "$pkgbuild"
+    return 1
   fi
 
   prompt_to_edit "$pkgbuild" "sourcing $1 for deps" && source_pkgbuild "$pkgbuild" || continue
