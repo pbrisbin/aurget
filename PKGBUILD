@@ -10,7 +10,7 @@ backup=(etc/aurgetrc)
 conflicts=('aurget-git' 'aurget-jordz')
 install=aurget.install
 source=($pkgname aurgetrc bash_completion)
-depends=('sudo')
+depends=('sudo' 'curl')
 optdepends=('customizepkg: for auto-customizing packages')
 
 # todo: empty build(), use package()

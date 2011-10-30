@@ -248,7 +248,7 @@ print_pkgbuild() {
     $multiple && display "$name/PKGBUILD ==>"
 
     url="$aur_pkgs/$(url_encode "${name:0:2}/$name")/PKGBUILD"
-    wget -q -O - "$url" 2>/dev/null || ret=1
+    curl -fS "$url" 2>/dev/null || ret=1
 
     $multiple && echo
   done
@@ -296,7 +296,7 @@ search_aur() {
   '
 
   # parse JSON data
-  results="$(wget -q -O - "${aur_srch}$(url_encode "$term")" | awk -F'"' -v RS='","' "$awkscript")"
+  results="$(curl -fS "${aur_srch}$(url_encode "$term")" | awk -F'"' -v RS='","' "$awkscript")"
 
   # no results
   [[ -z "$results" ]] && clean_exit 1
@@ -341,7 +341,7 @@ upgrade() {
       $devels && args+=("$name")
     else
       # available version 
-      versN="$(wget -q -O - "${aur_info}$(url_encode "$name")" | sed -e '/.*"Version":"\([^"]*\)".*/!d; s//\1/g')"
+      versN="$(curl -fS "${aur_info}$(url_encode "$name")" | sed -e '/.*"Version":"\([^"]*\)".*/!d; s//\1/g')"
       [[ -z "$versN" ]] && continue
 
       # check against ignores
@@ -391,12 +391,12 @@ download_tarball() {
   display 'Retrieving source tarball from AUR...'
   target="$build_directory/$name.tar.gz"
   url="${aur}$(url_encode "${url//\\\///}")"
-  wget -O "$target" "$url" || errorout 'failed to retrieve aur sources'
+  curl -f#o "$target" "$url" || errorout 'failed to retrieve aur sources'
 
   # JSON often reports a url, it'll download but won't be a tarball
   if ! grep -Fq 'gzip' <(file "$target"); then
     warn "$name: not a valid tarball, trying alternate url..."
-    wget -O "$target" "$aur_pkgs/$(url_encode "$name/$name").tar.gz" || errorout 'failed to retrieve aur sources'
+    curl -f#o "$target" "$aur_pkgs/$(url_encode "$name/$name").tar.gz" || errorout 'failed to retrieve aur sources'
   fi
 
   # stop here if that's how we roll
@@ -491,9 +491,9 @@ source_for_deps() {
   [[ -f "$pkgbuild" ]] && continue
 
   # if this errors, we know it's not aur-available so return 1
-  if ! wget -q -O "$pkgbuild" "$aur/packages/$(url_encode "$1/$1")/PKGBUILD"; then
+  if ! curl -fso "$pkgbuild" "$aur/packages/$(url_encode "$1/$1")/PKGBUILD"; then
     # new url scheme
-    if ! wget -q -O "$pkgbuild" "$aur/packages/$(url_encode "$1")/PKGBUILD"; then
+    if ! curl -fso "$pkgbuild" "$aur/packages/$(url_encode "$1")/PKGBUILD"; then
       touch "$pkgbuild"
       return 1
     fi
