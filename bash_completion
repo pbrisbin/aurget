@@ -18,6 +18,7 @@ _aurget() {
   # get short executable too
   aurget=$(basename "$aurget_exec")
 
+
   # valid long options
   longopts='--devel --deps --nodeps --edit --noedit \
             --discard --nodiscard --nocolor --noconfirm'
@@ -27,6 +28,11 @@ _aurget() {
            --devel --deps --nodeps --edit --noedit --discard \
            --nodiscard --nocolor --noconfirm --ignore --mopt \
            --popt --version --help'
+
+  if [[ $(id -u) -eq 0 ]]; then
+    aurget_exec+=' --asroot'
+    longopts+=' --asroot'
+  fi
 
   case "$prev" in
     # complete with all opts
