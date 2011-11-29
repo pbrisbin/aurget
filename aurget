@@ -171,8 +171,6 @@ EOF
 
 # }}}
 
-prompted=()
-
 # prompt_to_edit {{{
 prompt_to_edit() {
   local pkgbuild reason
