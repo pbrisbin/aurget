@@ -276,16 +276,22 @@ search_aur() {
   term="${args[*]}"
 
   awkscript='
-  /Name":/        { printf "%s", $3 }
-  /Version":/     { printf "|%s", $3 }
-  /Description":/ { printf "|%s", $3 }
-  /URL":/         { printf "|%s", $3 }
-  /OutOfDate":/   { printf "|%s", $3 }
-  /URLPath":/     { printf "|%s\n", $3 }
+  function unstring(str) {
+    sub(/[^:]+:/, "", str)
+    gsub(/\\\"/, "\"", str)
+    return substr(str, 2, length(str) - 1)
+  }
+
+  /Name":/        { printf "%s",    unstring($0) }
+  /Version":/     { printf "|%s",   unstring($0) }
+  /Description":/ { printf "|%s",   unstring($0) }
+  /URL":/         { printf "|%s",   unstring($0) }
+  /OutOfDate":/   { printf "|%s",   unstring($0) }
+  /URLPath":/     { printf "|%s\n", unstring($0) }
   '
 
   # parse JSON data
-  results="$(curl -fsS "${aur_srch}$(url_encode "$term")" | awk -F'"' -v RS='","' "$awkscript")"
+  results="$(curl -fsS "${aur_srch}$(url_encode "$term")" | awk -F '[^\\\\]"' -v RS='","' "$awkscript")"
 
   # no results
   [[ -z "$results" ]] && clean_exit 1
