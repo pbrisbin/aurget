@@ -908,7 +908,7 @@ aur_srch="$aur/rpc.php?type=search&arg="
 aur_info="$aur/rpc.php?type=info&arg="
 aur_pkgs="$aur/packages"
 
-tmpdir='/tmp/aurget'
+tmpdir="${TMPDIR:-/tmp}/aurget"
 lock_file="$tmpdir/aurget.lock"
 
 boot_strap "$1"
