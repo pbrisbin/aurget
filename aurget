@@ -225,21 +225,27 @@ try_discard() {
 
 # print_pkgbuild {{{
 print_pkgbuild() {
-  local multiple=false ret=0 url
+  local multiple=1
+  local ret=0
+  local url=''
+  # storing number of arguments, prevent multiple C calls
+  local args_num=${#args[@]}
 
-  # no args returns 1
-  [[ ${#args[@]} -eq 0 ]] && clean_exit 1
-
-  # more than one means print names and whitespace
-  [[ ${#args[@]} -gt 1 ]] && multiple=true
+  if ((args_num > 0)); then
+    # more than one means print names and whitespace
+    multiple=0
+  else
+  # no args means true, return 1
+    clean_exit 1
+  fi
 
   for name in "${args[@]}"; do
-    $multiple && display "$name/PKGBUILD ==>"
+    ((multiple)) && display "$name/PKGBUILD ==>"
 
     url="$aur_pkgs/$(url_encode "${name:0:2}/$name")/PKGBUILD"
     curl -fsS "$url" 2>/dev/null || ret=1
 
-    $multiple && echo
+    ((multiple)) && echo
   done
 
   # finally, exit
@@ -926,4 +932,39 @@ clear_temp
 
 clean_exit
 
-# vim:foldmethod=marker foldmarker={{{,}}}
+# TODO: boolean types don't exist in bash, replace with shangai integers:
+#
+# errors=1; if ((errors)); then ...; fi
+# NOT
+# errors=false; if [[ $errors == true ]]; then...; fi
+# 
+# * denotes completion:
+#
+# * 228	  local multiple=false ret=0 url
+# * 234	  [[ ${#args[@]} -gt 1 ]] && multiple=true
+#   506	  while true; do
+#   656	  # just true/false and non-config options
+#   657	  discard_sources=true
+#   658	  dont_discard_devels=true
+#   659	  resolve_dependencies=false
+#   660	  remove_makedepends=false
+#   661	  devels=false
+#   662	  noconfirm=false
+#   663	  rebuild=false
+#   664	  asroot=false
+#   682	  local config _sourced=false
+#   688	    _sourced=true
+#   695	    _sourced=true
+#   701	      _sourced=true
+#   745	  local _opmode='' donocolor=false
+#   772	      --nocolor)     donocolor=true                         ;;
+#   773	      --noconfirm)   noconfirm=true                         ;;
+#   774	      --rebuild)     rebuild=true                           ;;
+#   775	      --asroot)      asroot=true                            ;;
+#   776	      --devel)       devels=true                            ;;
+#   777	      --deps)        resolve_dependencies=true              ;;
+#   778	      --nodeps)      resolve_dependencies=false             ;;
+#   781	      --discard)     discard_sources=true                   ;;
+#   782	      --nodiscard)   discard_sources=false                  ;;
+#   802	  [[ "$sync_mode" != 'install' ]] && resolve_dependencies=false
+# vim:foldmethod=marker foldmarker={{{,}}} ts=2 sw=2 sts=2
