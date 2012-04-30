@@ -207,7 +207,7 @@ source_pkgbuild() {
 # try_discard {{{
 try_discard() {
   # we never discard sources
-  $discard_sources || return
+  ((discard_sources)) || return
 
   # we keep devels and this is a devel package
   $dont_discard_devels && is_devel ${1##*/} && return
@@ -636,7 +636,7 @@ process_targets() {
     # check in the cache
     pkg="$(find_pkg "$Name" "$Version")"
 
-    if ! $rebuild && [[ -n "$pkg" ]] && [[ "$sync_mode" = 'install' ]] && ! is_devel "$pkg"; then
+    if ! ((rebuild)) && [[ -n "$pkg" ]] && [[ "$sync_mode" = 'install' ]] && ! is_devel "$pkg"; then
       # use cached package
       display "Installing cached $pkg..."
     else
@@ -662,7 +662,7 @@ process_targets() {
 # set_defaults {{{
 set_defaults() {
   # just true/false and non-config options
-  discard_sources=true
+  discard_sources=0
   dont_discard_devels=true
   resolve_dependencies=false
   remove_makedepends=1
@@ -786,8 +786,8 @@ parse_options() {
       --nodeps)      resolve_dependencies=false             ;;
       --edit)        edit_pkgbuilds='always'                ;;
       --noedit)      edit_pkgbuilds='never'                 ;;
-      --discard)     discard_sources=true                   ;;
-      --nodiscard)   discard_sources=false                  ;;
+      --discard)     discard_sources=0                      ;;
+      --nodiscard)   discard_sources=1                      ;;
       --*=*)         runtime_flag "$1"                      ;;
       -*)            message                                ;;
       *)             args+=("$1")                           ;;
@@ -941,7 +941,6 @@ clean_exit
 # errors=false; if [[ $errors == true ]]; then...; fi
 # 
 #   512	  while true; do
-#   665	  discard_sources=true
 #   666	  dont_discard_devels=true
 #   667	  resolve_dependencies=false
 #   669	  devels=false
@@ -958,7 +957,5 @@ clean_exit
 #   784	      --devel)       devels=true                            ;;
 #   785	      --deps)        resolve_dependencies=true              ;;
 #   786	      --nodeps)      resolve_dependencies=false             ;;
-#   789	      --discard)     discard_sources=true                   ;;
-#   790	      --nodiscard)   discard_sources=false                  ;;
 #   810	  [[ "$sync_mode" != 'install' ]] && resolve_dependencies=false
 # vim:foldmethod=marker foldmarker={{{,}}} ts=2 sw=2 sts=2
