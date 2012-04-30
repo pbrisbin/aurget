@@ -66,7 +66,7 @@ prompt() {
 
   echo -en "$*? [Y/n] "
 
-  if $noconfirm; then
+  if ((noconfirm)); then
     echo 'Y'
     return 0
   else
@@ -210,7 +210,7 @@ try_discard() {
   ((discard_sources)) || return
 
   # we keep devels and this is a devel package
-  $dont_discard_devels && is_devel ${1##*/} && return
+  ((dont_discard_devels)) && is_devel ${1##*/} && return
 
   # use find -delete incase the built package is still in the directory
   #display "Discarding sources..."
@@ -339,7 +339,7 @@ upgrade() {
   display 'Starting AUR upgrade...'
   while read -r name vers; do
     if is_devel $name; then
-      $devels && args+=("$name")
+      ((devels)) && args+=("$name")
     else
       # available version 
       versN="$(curl -fsS "${aur_info}$(url_encode "$name")" | sed -e '/.*"Version":"\([^"]*\)".*/!d; s//\1/g')"
@@ -509,7 +509,7 @@ dep_check() {
   local dep all_deps pac_deps
   all_deps=(); aur_deps=(); pac_deps=() mk_deps=()
 
-  while true; do
+  while ((1)); do
     n=${#all_deps[@]}
 
     for name in "${args[@]}" "${all_deps[@]}"; do
@@ -592,7 +592,7 @@ add_targets_to_list() {
 setup_targets() {
   [[ "${#args[@]}" -eq 0 ]] && errorout 'no targets specified (use -h for help)'
 
-  $resolve_dependencies && dep_check
+  ((resolve_dependencies)) && dep_check
 
   list_names=(); list_versions=(); list_urls=(); list_deps=()
   pacman -Qm > "$tmpdir/installed.lst"
@@ -663,13 +663,13 @@ process_targets() {
 set_defaults() {
   # just true/false and non-config options
   discard_sources=0
-  dont_discard_devels=true
-  resolve_dependencies=false
+  dont_discard_devels=0
+  resolve_dependencies=1
   remove_makedepends=1
-  devels=false
-  noconfirm=false
+  devels=1
+  noconfirm=1
   rebuild=1
-  asroot=false
+  asroot=1
   search_mode='search'
 
   # default to no color
@@ -687,30 +687,30 @@ set_defaults() {
 
 # source_config {{{
 source_config() {
-  local config _sourced=false
+  local config _sourced=1
 
   # global config file is always sourced
   config='/etc/aurgetrc'
   if [[ -r "$config" ]]; then
     . "$config" || errorout "$config: invalid configuration"
-    _sourced=true
+    _sourced=0
   fi
 
   # try xdg directory first
   config="${XDG_CONFIG_HOME:-$HOME/.config}/aurgetrc"
   if [[ -r "$config" ]]; then
     . "$config" || errorout "$config: invalid configuration"
-    _sourced=true
+    _sourced=0
   else
     # use home dot-file
     config="$HOME/.aurgetrc"
     if [[ -r "$config" ]]; then
       . "$config" || errorout "$config: invalid configuration"
-      _sourced=true
+      _sourced=0
     fi
   fi
 
-  if ! $_sourced; then
+  if ! ((_sourced)); then
     warn 'no config found, this could get weird...'
   fi
 }
@@ -750,7 +750,7 @@ source_makepkg() {
 
 # parse_options {{{
 parse_options() {
-  local _opmode='' donocolor=false
+  local _opmode='' donocolor=1
 
   # global var, used by main
   opmode=''
@@ -777,13 +777,13 @@ parse_options() {
       --ignore)      shift; ignore_packages+=" $1"          ;;
       --mopt)        shift; mopts+=" $1"                    ;;
       --popt)        shift; popts+=" $1"                    ;;
-      --nocolor)     donocolor=true                         ;;
-      --noconfirm)   noconfirm=true                         ;;
+      --nocolor)     donocolor=0                            ;;
+      --noconfirm)   noconfirm=0                            ;;
       --rebuild)     rebuild=0                              ;;
-      --asroot)      asroot=true                            ;;
-      --devel)       devels=true                            ;;
-      --deps)        resolve_dependencies=true              ;;
-      --nodeps)      resolve_dependencies=false             ;;
+      --asroot)      asroot=0                               ;;
+      --devel)       devels=0                               ;;
+      --deps)        resolve_dependencies=0                 ;;
+      --nodeps)      resolve_dependencies=1                 ;;
       --edit)        edit_pkgbuilds='always'                ;;
       --noedit)      edit_pkgbuilds='never'                 ;;
       --discard)     discard_sources=0                      ;;
@@ -807,7 +807,7 @@ parse_options() {
   [[ "$search_mode"    =~ ^(search|info|quiet|print)$ ]] || errorout 'invalid search mode specified'
 
   # no dep checking unless installing
-  [[ "$sync_mode" != 'install' ]] && resolve_dependencies=false
+  [[ "$sync_mode" != 'install' ]] && resolve_dependencies=1
 
   # (re)set user binaries
   pacman="${pacman_command:-sudo pacman -U}"
@@ -820,14 +820,14 @@ parse_options() {
 
   # prevent root unless desired
   if [[ $(id -u) -eq 0 ]]; then
-    $asroot || errorout 'You must pass --asroot to allow running aurget as root (not recommended).'
+    ((asroot)) || errorout 'You must pass --asroot to allow running aurget as root (not recommended).'
 
     # fixes for root
     pacman="${pacman/sudo /}"
     mopts+=' --asroot'
   fi
 
-  if $noconfirm; then
+  if ((noconfirm)); then
     # change some things to go along with --noconfirm
     grep -Fqw -- '--noconfirm' <<< "$popts" || popts+=' --noconfirm'
     grep -Fqw -- '--noconfirm' <<< "$mopts" || mopts+=' --noconfirm'
@@ -835,12 +835,12 @@ parse_options() {
   fi
 
   # if resolving deps, tell makepkg so
-  if $resolve_dependencies; then
+  if ((resolve_dependencies)); then
     grep -Fqw -- '--syncdeps' <<< "$mopts" || mopts+=' --syncdeps'
   fi
 
   # thanks falconindy
-  if $donocolor || [[ ! -t 1 ]]; then
+  if ((donocolor)) || [[ ! -t 1 ]]; then
     # disable pacman color
     pacman="${pacman/pacman-color/pacman}"
 
@@ -934,28 +934,4 @@ clear_temp
 
 clean_exit
 
-# TODO: boolean types don't exist in bash, replace with shangai integers:
-#
-# errors=1; if ((errors)); then ...; fi
-# NOT
-# errors=false; if [[ $errors == true ]]; then...; fi
-# 
-#   512	  while true; do
-#   666	  dont_discard_devels=true
-#   667	  resolve_dependencies=false
-#   669	  devels=false
-#   670	  noconfirm=false
-#   672	  asroot=false
-#   690	  local config _sourced=false
-#   696	    _sourced=true
-#   703	    _sourced=true
-#   709	      _sourced=true
-#   753	  local _opmode='' donocolor=false
-#   780	      --nocolor)     donocolor=true                         ;;
-#   781	      --noconfirm)   noconfirm=true                         ;;
-#   783	      --asroot)      asroot=true                            ;;
-#   784	      --devel)       devels=true                            ;;
-#   785	      --deps)        resolve_dependencies=true              ;;
-#   786	      --nodeps)      resolve_dependencies=false             ;;
-#   810	  [[ "$sync_mode" != 'install' ]] && resolve_dependencies=false
 # vim:foldmethod=marker foldmarker={{{,}}} ts=2 sw=2 sts=2
