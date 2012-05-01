@@ -18,45 +18,57 @@ SCRIPT_DATE='11/9/2011'
 # }}}
 
 # script utilities {{{
-display() { echo -e "${colorB}:: ${colorW}$*${nocolor}"; }
+display() {
+  echo -e "${colorB}:: ${colorW}$*${nocolor}"
+}
 
-warn() { echo -e "${colorY}warning: ${nocolor}$*" >&2; }
+warn() {
+  echo -e "${colorY}warning: ${nocolor}$*" >&2
+}
 
 errorout() { 
   echo -e "${colorR}error: ${nocolor}$*" >&2
 
-  [[ -d "$tmpdir" ]] && rm -r "$tmpdir"
+  if [[ -d "$tmpdir" ]]; then
+    rm -r "$tmpdir"
+  fi
 
   exit 1
 }
 
 dieonlock() {
   cat << EOF
-
    Lock file found at $lock_file.
 
    Another aurget process is currently running. Please wait until it has
    finished.
-
 EOF
+
   exit 1
 }
 
 builderror() { 
-  local pkg="$1" src="$2" dep="$3" msg
+  local pkg="$1"
+  local src="$2"
+  local dep="$3"
+  local msg=''
 
   msg="notice: $pkg failed while building, remove source files ($src)"
 
   # $src must be nonzero so we don't attempt to rm -rf /*
-  prompt "$msg" && [[ -n "$src" ]] && rm -rf "$src/"*
+  if prompt "$msg"; then
+    # string is not null
+    if [[ -n "$src" ]]; then
+      rm -rf "$src/"*
+    fi
+  fi
 
   # if it's a dep we need to errorout entirely
-  if [[ $dep -eq 1 ]]; then
+  if ((dep == 1)); then
     errorout "dependency package $pkg failed to build. unable to continue."
-
   # otherwise, warn but continue
   else
-    warn "package $pkg failed to build and won't be installed."
+    warn "package $pkg failed to build and cannot be installed."
   fi
 }
 
@@ -353,12 +365,13 @@ upgrade() {
 
       # use vercmp
       check=$(vercmp "$vers" "$versN")
-      [[ $check -gt 0 ]] && warn "$name: local ($vers) is newer than aur ($versN)"
-      [[ $check -lt 0 ]] && args+=("$name")
+      ((check > 0)) && warn "$name: local ($vers) is newer than aur ($versN)"
+      ((check < 0)) && args+=("$name")
     fi
   done < <(pacman -Qm)
 
-  [[ ${#args[@]} -ne 0 ]] && setup_targets || echo ' there is nothing to do'
+  local args_len=${#args[@]}
+  ((args_len > 0)) && setup_targets || echo ' there is nothing to do'
 }
 
 # }}} 
@@ -467,12 +480,13 @@ build_package() {
 
 # install_package {{{
 install_package() {
-  local pkg="$1" dep="$2"
+  local pkg="$1"
+  local dep="$2"
 
   display 'Installing package...'
 
   if [[ -f "$pkg" ]]; then
-    if [[ $dep -eq 1 ]]; then
+    if ((dep == 1 )); then
       $pacman --asdep $popts "$pkg" || errorout 'failed installing the package'
     else
       $pacman $popts "$pkg" || errorout 'failed installing the package'
@@ -530,15 +544,20 @@ dep_check() {
         mk_deps+=( "${makedepends[@]}" )
 
         # track unsatisfied deps
-        [[ ${#depends[@]} -ne 0 ]] && all_deps+=( "${depends[@]}" )
+        local depends_len=${#depends[@]}
+        ((depends_len > 0)) && all_deps+=( "${depends[@]}" )
       fi
     done
 
     # if we found no more deps this round, we can stop
-    [[ ${#all_deps[@]} -eq $n ]] && break
+    local all_deps_len=${#all_deps[@]}
+    if ((all_deps_len == n )); then
+      break
+    fi
   done
 
-  if [[ "${#pac_deps[@]}" -ne 0 ]]; then
+  local pac_deps_len=${#pac_deps[@]}
+  if (( pac_deps_len > 0 )); then
     # check a list quickly for availability
     while IFS=\' read -r _ dep _; do
       # check only the error cases as a possible provides
@@ -590,7 +609,10 @@ add_targets_to_list() {
 
 # setup_targets {{{
 setup_targets() {
-  [[ "${#args[@]}" -eq 0 ]] && errorout 'no targets specified (use -h for help)'
+  local args_len=${#args[@]}
+  if ((args_len == 0)); then
+    errorout 'no targets specified (use -h for help)'
+  fi
 
   ((resolve_dependencies)) && dep_check
 
@@ -601,10 +623,11 @@ setup_targets() {
   add_targets_to_list 1 "${aur_deps[@]}"
   add_targets_to_list 0 "${args[@]}"
 
-  if [[ ${#list_names[@]} -ne 0 ]]; then
+  local list_names_len=${#list_names[@]}
+  if ((list_names_len > 0)); then
     echo -en "\n${colorY}Targets (${#list_names[@]}):${nocolor} "
 
-    for ((i=0; i<${#list_names[@]}; i++)); do
+    for ((i=0; i<$list_names_len; i++)); do
       echo -n "${list_names[i]}-${list_versions[i]} "
     done
 
@@ -823,7 +846,8 @@ parse_options() {
   development_regex=${development_regex:-.*-git$\|.*-hg$\|.*-svn$\|.*-darcs$\|.*-cvs$\|.*-bzr$}
 
   # prevent root unless desired
-  if [[ $(id -u) -eq 0 ]]; then
+  local id_int=$(id -u)
+  if ((id_int == 0)); then
     ((asroot)) || errorout 'You must pass --asroot to allow running aurget as root (not recommended).'
 
     # fixes for root
