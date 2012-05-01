@@ -39,15 +39,15 @@ package_directory=
 build_directory=
 
 #
-# if true, aurget will discard source files after building a package.
+# if 0 (true), aurget will discard source files after building a package.
 ###
-discard_sources=true
+discard_sources=0
 
 #
-# if true, aurget will not discard sources of development packages as
+# if 0 (true), aurget will not discard sources of development packages as
 # defined by development_regex regardless of the above setting.
 ###
-dont_discard_devels=true
+dont_discard_devels=0
 
 #
 # this regex is matched against package names to determine if a package
@@ -57,12 +57,12 @@ dont_discard_devels=true
 development_regex='.*-git$\|.*-hg$\|.*-svn$\|.*-darcs$\|.*-cvs$\|.*-bzr$'
 
 #
-# set this to true and aurget will remove all makedepends that were
+# set this to 0 (true) and aurget will remove all makedepends that were
 # installed as part of the operation as the last step in said operation.
 # this option will be deprecated soon as makepkg can now handle this
 # itself.
 ###
-remove_makedepends=false
+remove_makedepends=1
 
 #
 # the default sync mode is the one used when -S or -Su is called without
@@ -78,9 +78,9 @@ sync_mode='install'
 edit_pkgbuilds='prompt'
 
 #
-# if true, aurget will automatically resolve dependencies.
+# if 0 (true), aurget will automatically resolve dependencies.
 ###
-resolve_dependencies=false
+resolve_dependencies=1
 
 #
 # a space separated list of package names to be ignored. please quote
