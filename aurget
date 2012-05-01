@@ -711,7 +711,8 @@ source_config() {
   fi
 
   if ! ((_sourced)); then
-    warn 'no config found, this could get weird...'
+    warn 'no configuration file found...'
+    exit 1
   fi
 }
 
@@ -789,13 +790,16 @@ parse_options() {
       --discard)     discard_sources=0                      ;;
       --nodiscard)   discard_sources=1                      ;;
       --*=*)         runtime_flag "$1"                      ;;
-      -*)            message                                ;;
+      -*)            echo "unknown option: '$1'"; exit 1    ;;
       *)             args+=("$1")                           ;;
     esac
     shift
 
     # show help if multiple -S* commands are passed
-    [[ -n "$_opmode" ]] && [[ "$_opmode" != "$opmode" ]] && message
+    if [[ -n "$_opmode" ]] && [[ "$_opmode" != "$opmode" ]]; then
+      echo 'Too many arguments for -S, see aurget -h' >%2
+      exit 1
+    fi
   done
 
   # grab possible args after --
