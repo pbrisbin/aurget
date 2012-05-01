@@ -78,7 +78,7 @@ sync_mode='install'
 edit_pkgbuilds='prompt'
 
 #
-# if 1 (true), aurget will automatically resolve dependencies.
+# if 0 (true), aurget will automatically resolve dependencies.
 ###
 resolve_dependencies=1
 
