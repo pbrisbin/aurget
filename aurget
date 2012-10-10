@@ -564,7 +564,7 @@ add_targets_to_list() {
     fi
 
     # fetch JSON
-    read -r Name Version URLPath < <(wget -q -O - "${aur_info}$(url_encode "$name")" | sed -e '/.*"Name":"\([^"]*\)".*"Version":"\([^"]*\)".*"URLPath":"\([^"]*\)".*/!d; s//\1 \2 \3/g')
+    read -r Name Version URLPath < <(curl -s "${aur_info}$(url_encode "$name")" | sed -e '/.*"Name":"\([^"]*\)".*"Version":"\([^"]*\)".*"URLPath":"\([^"]*\)".*/!d; s//\1 \2 \3/g')
     [[ -z "$Name" ]] && errorout "$name: package not found in AUR."
 
     # is it already up to date?
