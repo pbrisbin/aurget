@@ -501,7 +501,7 @@ dep_check() {
   echo 'resolving dependencies...'
 
   local dep all_deps pac_deps
-  all_deps=(); aur_deps=(); pac_deps=() mk_deps=()
+  all_deps=(); aur_deps=(); pac_deps=(); mk_deps=()
 
   while true; do
     n=${#all_deps[@]}
