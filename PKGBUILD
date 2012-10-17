@@ -5,18 +5,17 @@ pkgrel=1
 pkgdesc="A simple Pacman-like interface to the AUR"
 arch=('any')
 url="http://pbrisbin.com/posts/$pkgname/"
-license="GPL"
+license=('GPL')
 backup=(etc/aurgetrc)
 conflicts=('aurget-git' 'aurget-jordz')
-install=aurget.install
+install=$pkgname.install
 source=($pkgname aurgetrc bash_completion)
 depends=('sudo' 'curl' 'ca-certificates')
 optdepends=('customizepkg: for auto-customizing packages')
 
-# todo: empty build(), use package()
-build() {
+package() {
   # install script
-  install -Dm755 $pkgname "$pkgdir/usr/bin/$pkgname" || return 1
+  install -Dm755 $pkgname "$pkgdir/usr/bin/$pkgname"
 
   # add rc file
   install -Dm644 aurgetrc "$pkgdir/etc/aurgetrc"
