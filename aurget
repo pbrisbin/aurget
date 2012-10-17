@@ -22,7 +22,7 @@ display() { echo -e "${colorB}:: ${colorW}$*${nocolor}"; }
 
 warn() { echo -e "${colorY}warning: ${nocolor}$*" >&2; }
 
-errorout() { 
+errorout() {
   echo -e "${colorR}error: ${nocolor}$*" >&2
 
   [[ -d "$tmpdir" ]] && rm -r "$tmpdir"
@@ -42,7 +42,7 @@ EOF
   exit 1
 }
 
-builderror() { 
+builderror() {
   local pkg="$1" src="$2" dep="$3" msg
 
   msg="notice: $pkg failed while building, remove source files ($src)"
@@ -159,7 +159,7 @@ version_info() {
   cat << EOF
 
   $SCRIPT_NAME: $SCRIPT_DESCRIPTION
-  
+
   author:      $SCRIPT_AUTHOR
   version:     $SCRIPT_VERSION
   last update: $SCRIPT_DATE
@@ -335,7 +335,7 @@ upgrade() {
     if is_devel $name; then
       $devels && args+=("$name")
     else
-      # available version 
+      # available version
       versN="$(curl -fsS "${aur_info}$(url_encode "$name")" | sed -e '/.*"Version":"\([^"]*\)".*/!d; s//\1/g')"
       [[ -z "$versN" ]] && continue
 
@@ -355,7 +355,7 @@ upgrade() {
   [[ ${#args[@]} -ne 0 ]] && setup_targets || echo ' there is nothing to do'
 }
 
-# }}} 
+# }}}
 
 # find_pkg {{{
 find_pkg() {
@@ -424,7 +424,7 @@ build_package() {
 
   if ! prompt_to_edit 'PKGBUILD' "building $Name"; then
     popd &>/dev/null
-    try_discard "$_srcdir" 
+    try_discard "$_srcdir"
     continue
   fi
 
@@ -712,7 +712,7 @@ source_config() {
 # source_makepkg {{{
 source_makepkg() {
   local IFS=':' conf confs _PKGDEST
- 
+
   # todo: preserve a PKGDEST environment variable?
 
   # source these in order
@@ -866,7 +866,7 @@ main() {
 # }}}
 
 # clean_exit {{{
-clean_exit() { 
+clean_exit() {
   [[ -d "$tmpdir" ]] && rm -r "$tmpdir"
 
   exit ${1:-0}
@@ -882,7 +882,7 @@ boot_strap() {
 
   Boot-strapping aurget...
 
-  Once built, please use pacman to install the package in this 
+  Once built, please use pacman to install the package in this
   directory.
 
 EOF
