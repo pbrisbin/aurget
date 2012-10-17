@@ -10,7 +10,7 @@ backup=(etc/aurgetrc)
 conflicts=('aurget-git' 'aurget-jordz')
 install=$pkgname.install
 source=($pkgname aurgetrc bash_completion)
-depends=('sudo' 'curl' 'ca-certificates')
+depends=('sudo')
 optdepends=('customizepkg: for auto-customizing packages')
 
 package() {
