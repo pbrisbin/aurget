@@ -200,6 +200,11 @@ source_pkgbuild() {
 
   # source pkgbuild variables
   source <(awk '/^build.*(.*)|^function.*build.*(.*)/{exit};1' "$pkgbuild")
+
+  # this should always be defined by makepkg.conf. apparently it can
+  # also be overridden in PKGBUILDs. only at this point will we default
+  # it if not set.
+  PKGEXT="${PKGEXT:-.pkg.tar.gz}"
 }
 
 # }}}
@@ -214,7 +219,7 @@ try_discard() {
 
   # use find -delete incase the built package is still in the directory
   #display "Discarding sources..."
-  #find "$1" -depth ! -name "${1##*/}*$pkgext" -delete 2>/dev/null
+  #find "$1" -depth ! -name "${1##*/}*$PKGEXT" -delete 2>/dev/null
 
   # turns out, the built package is _always_ in the directory
   display 'Discarding sources...'
@@ -362,11 +367,11 @@ find_pkg() {
   local name="$1" version="$2"
 
   # try full path
-  pkg="$package_directory/$name-$version-${CARCH}$pkgext"
+  pkg="$package_directory/$name-$version-${CARCH}$PKGEXT"
 
   if [[ ! -f "$pkg" ]]; then
     # try any packages
-    pkg="$package_directory/$name-$version-any$pkgext"
+    pkg="$package_directory/$name-$version-any$PKGEXT"
   fi
 
   if [[ ! -f "$pkg" ]]; then
@@ -451,7 +456,7 @@ build_package() {
     # don't build two dev packages of the same name within the same
     # minute; this is the only way to find git/svn/etc packages' exact
     # filenames
-    pkg="$(find "$package_directory" -ctime -1 -name "$Name-*$pkgext" -print -quit)"
+    pkg="$(find "$package_directory" -ctime -1 -name "$Name-*$PKGEXT" -print -quit)"
   fi
 
   return 0
@@ -733,9 +738,6 @@ source_makepkg() {
   build_directory="${build_directory:-$source_directory}"
   build_directory="${build_directory:-$PWD}"
   [[ -d "$build_directory" ]] || mkdir -p "$build_directory"
-
-  # this will always be defined by makepkg.conf
-  pkgext="${PKGEXT:-.pkg.tar.gz}"
 }
 
 # }}}
