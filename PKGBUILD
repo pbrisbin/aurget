@@ -7,7 +7,6 @@ arch=('any')
 url="http://pbrisbin.com/posts/$pkgname/"
 license=('GPL')
 backup=(etc/aurgetrc)
-conflicts=('aurget-git' 'aurget-jordz')
 install=$pkgname.install
 source=($pkgname aurgetrc bash_completion)
 depends=('sudo')
