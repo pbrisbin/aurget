@@ -21,7 +21,7 @@ package() {
   install -Dm644 aurgetrc "$pkgdir/etc/aurgetrc"
 
   # add completion file
-  install -Dm644 ./bash_completion "$pkgdir/etc/bash_completion.d/aurget"
+  install -Dm644 bash_completion "$pkgdir/etc/bash_completion.d/aurget"
 }
 md5sums=('da42c106cb47ad747d56a64973aac79c'
          '3374a830198c439af6b98c7b263f83dc'
