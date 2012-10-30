@@ -18,7 +18,6 @@ _aurget() {
   # get short executable too
   aurget=$(basename "$aurget_exec")
 
-
   # valid long options
   longopts='--devel --deps --nodeps --edit --noedit \
             --discard --nodiscard --nocolor --noconfirm'
@@ -36,16 +35,16 @@ _aurget() {
 
   case "$prev" in
     # complete with all opts
-    *$aurget) COMPREPLY=( $(compgen -W "$allopts" -- $cur) ) ;;
+    *$aurget) COMPREPLY=($(compgen -W "$allopts" -- $cur)) ;;
 
-    # don't complete boyond these
+    # don't complete beyond these
     -h|-v|--@(help|version|ignore|@(m|p)opt)) return 0 ;;
 
     # complete with long opts
-    -S*u*|--*) COMPREPLY=( $(compgen -W "$longopts" -- $cur) ) ;;
+    -S*u*|--*) COMPREPLY=($(compgen -W "$longopts" -- $cur)) ;;
 
     # complete with package search
-    -S*) COMPREPLY=( $(compgen -W "$($aurget_exec -Ssq $cur)" -- $cur ) ) ;;
+    -S*) COMPREPLY=($(compgen -W "$($aurget_exec -Ssq $cur)" -- $cur)) ;;
   esac
 
   # restore the previous nullglob setting
