@@ -509,21 +509,21 @@ dep_check() {
       # keep args out of deps so error messages are more sane
       if ! source_for_deps "$name"; then
         # assume it's a pacman dep for now
-        grep -Fq -- " $name " <<< " ${args[@]} " || pac_deps+=( "$name" )
+        grep -Fq -- " $name " <<< " ${args[@]} " || pac_deps+=("$name")
       else
-        grep -Fq -- " $name " <<< " ${args[@]} " || aur_deps=( "$name" "${aur_deps[@]}" )
+        grep -Fq -- " $name " <<< " ${args[@]} " || aur_deps=("$name" "${aur_deps[@]}")
 
         # filter satasfied deps, clear versioning
-        depends=( $(pacman -T -- ${depends[@]} ${makedepends[@]}) )
-        depends=( "${depends[@]%>*}" )
-        depends=( "${depends[@]%=*}" )
-        depends=( "${depends[@]%<*}" )
+        depends=($(pacman -T -- ${depends[@]} ${makedepends[@]}))
+        depends=("${depends[@]%>*}")
+        depends=("${depends[@]%=*}")
+        depends=("${depends[@]%<*}")
 
         # store make depends for later removal
-        mk_deps+=( "${makedepends[@]}" )
+        mk_deps+=("${makedepends[@]}")
 
         # track unsatisfied deps
-        ((${#depends[@]} > 0)) && all_deps+=( "${depends[@]}" )
+        ((${#depends[@]} > 0)) && all_deps+=("${depends[@]}")
       fi
     done
 
@@ -539,7 +539,7 @@ dep_check() {
     done < <(pacman -Si -- "${pac_deps[@]}" 2>&1 >/dev/null)
 
     # sort and unique
-    pac_deps=( $(sort -u <(printf '%s\n' "${pac_deps[@]}")) )
+    pac_deps=($(sort -u <(printf '%s\n' "${pac_deps[@]}")))
 
     echo; warn "the following (${#pac_deps[@]}) packages will be installed by pacman: ${pac_deps[@]}"; echo
   fi
@@ -889,7 +889,7 @@ EOF
   clear_temp
   set_defaults
 
-  args=( 'aurget' )
+  args=('aurget')
   sync_mode='build'
   makepkg='makepkg'
   build_directory="$tmpdir/bootstrap"
