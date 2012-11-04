@@ -22,6 +22,6 @@ package() {
   # add completion file
   install -Dm644 bash_completion "$pkgdir/etc/bash_completion.d/aurget"
 }
-md5sums=('ce72002f3ed55d8ade9427290a9a9b29'
+md5sums=('12d5b1aed0b330c2db796c39c7a3ba78'
          '3374a830198c439af6b98c7b263f83dc'
          '4f6eab247b38a7a019b5d2b6bea28252')
