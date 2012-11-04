@@ -51,9 +51,8 @@ builderror() {
   prompt "$msg" && [[ -n "$src" ]] && rm -rf "$src/"*
 
   # if it's a dep we need to errorout entirely
-  if [[ $dep -eq 1 ]]; then
+  if (($dep == 1)); then
     errorout "dependency package $pkg failed to build. unable to continue."
-
   # otherwise, warn but continue
   else
     warn "package $pkg failed to build and won't be installed."
@@ -233,10 +232,10 @@ print_pkgbuild() {
   local multiple=false ret=0 url
 
   # no args returns 1
-  [[ ${#args[@]} -eq 0 ]] && clean_exit 1
+  ((${#args[@]} == 0)) && clean_exit 1
 
   # more than one means print names and whitespace
-  [[ ${#args[@]} -gt 1 ]] && multiple=true
+  ((${#args[@]} > 1)) && multiple=true
 
   for name in "${args[@]}"; do
     $multiple && display "$name/PKGBUILD ==>"
@@ -357,7 +356,7 @@ upgrade() {
     fi
   done < <(pacman -Qm)
 
-  [[ ${#args[@]} -ne 0 ]] && setup_targets || echo ' there is nothing to do'
+  ((${#args[@]} > 0)) && setup_targets || echo ' there is nothing to do'
 }
 
 # }}}
@@ -471,7 +470,7 @@ install_package() {
   display 'Installing package...'
 
   if [[ -f "$pkg" ]]; then
-    if [[ $dep -eq 1 ]]; then
+    if (($dep == 1)); then
       $pacman --asdep $popts "$pkg" || errorout 'failed installing the package'
     else
       $pacman $popts "$pkg" || errorout 'failed installing the package'
@@ -515,29 +514,29 @@ dep_check() {
       # keep args out of deps so error messages are more sane
       if ! source_for_deps "$name"; then
         # assume it's a pacman dep for now
-        grep -Fq -- " $name " <<< " ${args[@]} " || pac_deps+=( "$name" )
+        grep -Fq -- " $name " <<< " ${args[@]} " || pac_deps+=("$name")
       else
-        grep -Fq -- " $name " <<< " ${args[@]} " || aur_deps=( "$name" "${aur_deps[@]}" )
+        grep -Fq -- " $name " <<< " ${args[@]} " || aur_deps=("$name" "${aur_deps[@]}")
 
         # filter satasfied deps, clear versioning
-        depends=( $(pacman -T -- ${depends[@]} ${makedepends[@]}) )
-        depends=( "${depends[@]%>*}" )
-        depends=( "${depends[@]%=*}" )
-        depends=( "${depends[@]%<*}" )
+        depends=($(pacman -T -- ${depends[@]} ${makedepends[@]}))
+        depends=("${depends[@]%>*}")
+        depends=("${depends[@]%=*}")
+        depends=("${depends[@]%<*}")
 
         # store make depends for later removal
-        mk_deps+=( "${makedepends[@]}" )
+        mk_deps+=("${makedepends[@]}")
 
         # track unsatisfied deps
-        [[ ${#depends[@]} -ne 0 ]] && all_deps+=( "${depends[@]}" )
+        ((${#depends[@]} > 0)) && all_deps+=("${depends[@]}")
       fi
     done
 
     # if we found no more deps this round, we can stop
-    [[ ${#all_deps[@]} -eq $n ]] && break
+    ((${#all_deps[@]} == $n)) && break
   done
 
-  if [[ "${#pac_deps[@]}" -ne 0 ]]; then
+  if ((${#pac_deps[@]} > 0)); then
     # check a list quickly for availability
     while IFS=\' read -r _ dep _; do
       # check only the error cases as a possible provides
@@ -545,7 +544,7 @@ dep_check() {
     done < <(pacman -Si -- "${pac_deps[@]}" 2>&1 >/dev/null)
 
     # sort and unique
-    pac_deps=( $(sort -u <(printf '%s\n' "${pac_deps[@]}")) )
+    pac_deps=($(sort -u <(printf '%s\n' "${pac_deps[@]}")))
 
     echo; warn "the following (${#pac_deps[@]}) packages will be installed by pacman: ${pac_deps[@]}"; echo
   fi
@@ -589,7 +588,7 @@ add_targets_to_list() {
 
 # setup_targets {{{
 setup_targets() {
-  [[ "${#args[@]}" -eq 0 ]] && errorout 'no targets specified (use -h for help)'
+  ((${#args[@]} == 0)) && errorout 'no targets specified (use -h for help)'
 
   $resolve_dependencies && dep_check
 
@@ -600,7 +599,7 @@ setup_targets() {
   add_targets_to_list 1 "${aur_deps[@]}"
   add_targets_to_list 0 "${args[@]}"
 
-  if [[ ${#list_names[@]} -ne 0 ]]; then
+  if ((${#list_names[@]} > 0)); then
     echo -en "\n${colorY}Targets (${#list_names[@]}):${nocolor} "
 
     for ((i=0; i<${#list_names[@]}; i++)); do
@@ -646,7 +645,7 @@ process_targets() {
   done
 
   # remove make depends
-  if $remove_makedepends && [[ ${#mk_deps[@]} -ne 0 ]]; then
+  if $remove_makedepends && ((${#mk_deps[@]} > 0)); then
     display 'Removing make depends...'
     for mk_dep in ${mk_deps[@]}; do
       pacman --noconfirm -R $mk_dep || warn "unable to remove makedepend $mk_dep"
@@ -813,7 +812,7 @@ parse_options() {
   development_regex=${development_regex:-.*-git$\|.*-hg$\|.*-svn$\|.*-darcs$\|.*-cvs$\|.*-bzr$}
 
   # prevent root unless desired
-  if [[ $(id -u) -eq 0 ]]; then
+  if [[ $(id -u) == 0 ]]; then
     $asroot || errorout 'You must pass --asroot to allow running aurget as root (not recommended).'
 
     # fixes for root
@@ -892,7 +891,7 @@ EOF
   clear_temp
   set_defaults
 
-  args=( 'aurget' )
+  args=('aurget')
   sync_mode='build'
   makepkg='makepkg'
   build_directory="$tmpdir/bootstrap"
