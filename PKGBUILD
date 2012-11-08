@@ -7,7 +7,6 @@ arch=('any')
 url="http://pbrisbin.com/posts/$pkgname/"
 license=('GPL')
 backup=(etc/aurgetrc)
-conflicts=('aurget-git' 'aurget-jordz')
 install=$pkgname.install
 source=($pkgname aurgetrc bash_completion)
 depends=('sudo')
@@ -21,8 +20,8 @@ package() {
   install -Dm644 aurgetrc "$pkgdir/etc/aurgetrc"
 
   # add completion file
-  install -Dm644 ./bash_completion "$pkgdir/etc/bash_completion.d/aurget"
+  install -Dm644 bash_completion "$pkgdir/etc/bash_completion.d/aurget"
 }
-md5sums=('ce72002f3ed55d8ade9427290a9a9b29'
+md5sums=('12d5b1aed0b330c2db796c39c7a3ba78'
          '3374a830198c439af6b98c7b263f83dc'
-         'c97eaedb6bfce0cc250da66348e83651')
+         '4f6eab247b38a7a019b5d2b6bea28252')
