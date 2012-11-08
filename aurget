@@ -283,7 +283,8 @@ search_aur() {
   function unstring(str) {
     sub(/[^:]+:/, "", str)
     gsub(/\\\"/, "\"", str)
-    return substr(str, 2, length(str) - 1)
+    gsub(/"$/, "", str)
+    return substr(str, 2, length(str))
   }
 
   /Name":/        { printf "%s",    unstring($0) }
@@ -295,12 +296,10 @@ search_aur() {
   '
 
   # parse JSON data
-  results="$(curl -fsS "${aur_srch}$(url_encode "$term")" | awk -F '[^\\\\]"' -v RS='","' "$awkscript")"
+  results="$(curl -fsS "${aur_srch}$(url_encode "$term")" | awk -F '[^\\\\]"' -v RS='{"|,"|"}' "$awkscript")"
 
-  # no results
   [[ -z "$results" ]] && clean_exit 1
 
-  # sed-parse that file
   while IFS='|' read -r Name Version Description URL OutOfDate URLPath; do
     [[ -z "$Name" ]] && continue
     [[ "$search_mode" = 'info' ]] && [[ "$Name" != "$term" ]] && continue
