@@ -131,6 +131,8 @@ usage: aurget [ -v | -h | -S* [ --options ] [ -- ] <arguments> ]
 
         --nocolor       disable colorized output
         --noconfirm     auto-answer y to all prompts
+        
+        --move          move built package to pacman cache
 
         --ignore '<package> <package> <...>'
                         add additional packages to be ignored
@@ -474,6 +476,10 @@ install_package() {
     else
       $pacman $popts "$pkg" || errorout 'failed installing the package'
     fi
+    if ($move_pkg); then
+      display "Moving package..."
+      sudo mv "$pkg" /var/cache/pacman/pkg || errorout 'cannot move package to cache dir'
+    fi
   else
     errorout "$pkg: package not found"
   fi
@@ -661,6 +667,7 @@ set_defaults() {
   dont_discard_devels=true
   resolve_dependencies=false
   remove_makedepends=false
+  move_pkg=false
   devels=false
   noconfirm=false
   rebuild=false
@@ -780,6 +787,7 @@ parse_options() {
       --noedit)      edit_pkgbuilds='never'                 ;;
       --discard)     discard_sources=true                   ;;
       --nodiscard)   discard_sources=false                  ;;
+      --move)        move_pkg=true                          ;;
       --*=*)         runtime_flag "$1"                      ;;
       -*)            message                                ;;
       *)             args+=("$1")                           ;;
