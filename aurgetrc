@@ -89,6 +89,18 @@ resolve_dependencies=false
 ignore_packages=
 
 #
+# command used to move built package to pacman cache. Use sudo or su
+# move_command='su -c mv'
+###
+move_command='sudo mv'
+
+#
+# pacman cache directory. Change this according to your CacheDir setting
+# in /etc/pacman.conf
+###
+pacman_cache='/var/cache/pacman/pkg'
+
+#
 # by default, aurget uses no color. uncomment to enable/customize.
 ###
 #nocolor="\e[0m"   # reset color

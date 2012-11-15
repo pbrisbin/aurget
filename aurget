@@ -478,7 +478,7 @@ install_package() {
     fi
     if ($move_pkg); then
       display "Moving package..."
-      sudo mv "$pkg" /var/cache/pacman/pkg || errorout 'cannot move package to cache dir'
+      $move_command "$pkg" $pacman_cache || errorout 'cannot move package to cache dir'
     fi
   else
     errorout "$pkg: package not found"
