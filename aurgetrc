@@ -9,7 +9,7 @@
 # automatically added when appropriate. use --popt to add any additional
 # options at runtime.
 ###
-pacman_command='sudo pacman -U'
+pacman_command='pacman -U'
 
 #
 # the exact command used to build packages. --noconfirm is required
@@ -89,10 +89,10 @@ resolve_dependencies=false
 ignore_packages=
 
 #
-# command used to move built package to pacman cache. Use sudo or su
-# move_command='su -c mv'
+# if true, aurget will try to use sudo to run commands that require
+# root permissions
 ###
-move_command='sudo mv'
+use_sudo=true
 
 #
 # pacman cache directory. Change this according to your CacheDir setting
