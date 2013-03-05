@@ -400,7 +400,7 @@ download_tarball() {
   fi
 
   # stop here if that's how we roll
-  [[ "$sync_mode" = 'download' ]] && clean_exit
+  [[ "$sync_mode" = 'download' ]] && return 1
 
   # extract
   display 'Extracting source tarball...'
@@ -411,6 +411,8 @@ download_tarball() {
 
   # specify sub-sourcedir
   _srcdir="$build_directory/$name"
+
+  return 0
 }
 
 # }}}
@@ -446,7 +448,7 @@ build_package() {
   try_discard "$_srcdir"
 
   # stop here if that's how we roll
-  [[ "$sync_mode" = 'build' ]] && clean_exit
+  [[ "$sync_mode" = 'build' ]] && return 1
 
   # look for package and any package by name
   pkg="$(find_pkg "$Name" "$Version")"
@@ -642,7 +644,7 @@ process_targets() {
       display "Installing cached $pkg..."
     else
       # download from aur, sets $pkg variable
-      download_tarball "$Name" "$URLPath"
+      download_tarball "$Name" "$URLPath" || continue
       build_package "$dep" || continue
     fi
 
