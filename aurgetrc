@@ -9,7 +9,7 @@
 # automatically added when appropriate. use --popt to add any additional
 # options at runtime.
 ###
-pacman_command='sudo pacman -U'
+pacman_command='pacman -U'
 
 #
 # the exact command used to build packages. --noconfirm is required
@@ -87,6 +87,18 @@ resolve_dependencies=false
 # the entire list
 ###
 ignore_packages=
+
+#
+# if true, aurget will try to use sudo to run commands that require
+# root permissions
+###
+use_sudo=true
+
+#
+# pacman cache directory. Change this according to your CacheDir setting
+# in /etc/pacman.conf
+###
+pacman_cache='/var/cache/pacman/pkg'
 
 #
 # by default, aurget uses no color. uncomment to enable/customize.

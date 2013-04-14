@@ -30,6 +30,18 @@ errorout() {
   exit 1
 }
 
+rootrun() {
+  if (test $UID != "0"); then
+    if $use_sudo && type -p sudo &>/dev/null; then
+      sudo "$@"
+      return $?
+    fi
+
+    printf -v cmd "%q " "$@"
+    su root -c "$cmd"
+  fi
+}
+
 dieonlock() {
   cat << EOF
 
@@ -474,13 +486,13 @@ install_package() {
 
   if [[ -f "$pkg" ]]; then
     if (($dep == 1)); then
-      $pacman --asdep $popts "$pkg" || errorout 'failed installing the package'
+      $pacman --asdeps $popts "$pkg" || errorout 'failed installing the package'
     else
       $pacman $popts "$pkg" || errorout 'failed installing the package'
     fi
     if ($move_pkg); then
       display "Moving package..."
-      sudo mv "$pkg" /var/cache/pacman/pkg || errorout 'cannot move package to cache dir'
+      rootrun mv "$pkg" $pacman_cache
     fi
   else
     errorout "$pkg: package not found"
@@ -812,7 +824,7 @@ parse_options() {
   [[ "$sync_mode" != 'install' ]] && resolve_dependencies=false
 
   # (re)set user binaries
-  pacman="${pacman_command:-sudo pacman -U}"
+  pacman="rootrun $pacman_command"
   makepkg="${makepkg_command:-makepkg --noconfirm}"
   editor="${pkgbuild_editor:-$EDITOR}"
   editor="${editor:-vi}" # a failsafe
@@ -825,7 +837,7 @@ parse_options() {
     $asroot || errorout 'You must pass --asroot to allow running aurget as root (not recommended).'
 
     # fixes for root
-    pacman="${pacman/sudo /}"
+    pacman="$pacman_command"
     mopts+=' --asroot'
   fi
 
