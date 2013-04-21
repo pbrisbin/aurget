@@ -109,7 +109,7 @@ prompt() {
 
   case "${a:-y}" in
     y|Y) return 0      ;;
-    q|Q) die "Aborted" ;;
+    q|Q) die 'aborted' ;;
     *)   return 1      ;;
   esac
 }
@@ -123,7 +123,7 @@ prompt_to_edit() {
     prompt) prompt "Edit $name's PKGBUILD before $reason" || return 0 ;;
   esac
 
-  $EDITOR "$pkgbuild" || die "your editor returns non-zero ($?). aborting."
+  $EDITOR "$pkgbuild" || die "editor returned non-zero ($?), aborting"
 
   prompt "Continue $reason"
 }
@@ -400,7 +400,7 @@ build_target() {
 
   debug "building $colorG$name${nocolor}..."
 
-  cd "$name" || die "$name: failed to change into source directory"
+  cd "$name" || die 'unable to change to source directory'
 
   if [[ -f "/etc/customizepkg.d/$name" ]]; then
     info 'Calling customizepkg...'
