@@ -20,25 +20,19 @@ _aurget() {
 
   # valid long options
   longopts='--devel --deps --nodeps --edit --noedit \
-            --discard --nodiscard --nocolor --noconfirm'
+            --discard --nodiscard --noconfirm'
 
   # all valid options
   allopts='-S -Sd -Sb -Sy -Su -Sdu -Sbu -Syu -Ss -Ssq -Sp -Si \
            --devel --deps --nodeps --edit --noedit --discard \
-           --nodiscard --nocolor --noconfirm --ignore --mopt \
-           --popt --version --help'
-
-  if [[ $(id -u) -eq 0 ]]; then
-    aurget_exec+=' --asroot'
-    longopts+=' --asroot'
-  fi
+           --nodiscard --nocolor --noconfirm --ignore --help'
 
   case "$prev" in
     # complete with all opts
     *$aurget) COMPREPLY=($(compgen -W "$allopts" -- $cur)) ;;
 
     # don't complete beyond these
-    -h|-v|--@(help|version|ignore|@(m|p)opt)) return 0 ;;
+    -h|--@(help|ignore) return 0 ;;
 
     # complete with long opts
     -S*u*|--*) COMPREPLY=($(compgen -W "$longopts" -- $cur)) ;;
