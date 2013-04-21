@@ -32,7 +32,7 @@ _aurget() {
     *$aurget) COMPREPLY=($(compgen -W "$allopts" -- $cur)) ;;
 
     # don't complete beyond these
-    -h|--@(help|ignore) return 0 ;;
+    -h|--@(help|ignore)) return 0 ;;
 
     # complete with long opts
     -S*u*|--*) COMPREPLY=($(compgen -W "$longopts" -- $cur)) ;;
