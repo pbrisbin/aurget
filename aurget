@@ -11,14 +11,14 @@ dependencies=()
 # Support {{{
 die() { error $*; exit 1; }
 
-info() { echo -e "${colorB}:: ${colorW}$*${nocolor}"; }
+info() { echo -e "${colorB}:: $colorW$*$nocolor"; }
 
-warn() { echo -e "${colorY}warning: ${nocolor}$*" >&2; }
+warn() { echo -e "${colorY}warning: $nocolor$*" >&2; }
 
-error() { echo -e "${colorR}error: ${nocolor}$*" >&2; }
+error() { echo -e "${colorR}error: $nocolor$*" >&2; }
 
 debug() {
-  $debug && echo -e "${colorW}[${colorC}DEBUG${colorW}]${nocolor} $*" >&2
+  $debug && echo -e "$colorW[${colorC}DEBUG$colorW]$nocolor $*" >&2
 }
 
 err_no_targets() {
@@ -208,9 +208,9 @@ do_search() {
   local name version description outofdate ood
 
   while IFS='|' read -r name version description _ outofdate _; do
-    (( "$outofdate" )) && ood="${colorR}[out of date]${nocolor}"
+    (( "$outofdate" )) && ood="$colorR[out of date]$nocolor"
 
-    ( echo -e "${colorM}aur/${colorW}$name ${colorG}$version${nocolor} $ood"
+    ( echo -e "${colorM}aur/$colorW$name $colorG$version$nocolor $ood"
       echo -e "    ${description//\\\///}"
     ) 2>/dev/null
   done < <(rpc_search "$*" | sort)
@@ -220,14 +220,14 @@ do_info() {
   local name version description url outofdate ood='No'
 
   while IFS='|' read -r name version description url outofdate _; do
-    (( "$outofdate" )) && ood="${colorR}Yes${nocolor}"
+    (( "$outofdate" )) && ood="${colorR}Yes$nocolor"
 
-    ( echo -e "${colorW}Repository  : ${colorM}aur${nocolor}"
-      echo -e "${colorW}Name        : $name${nocolor}"
-      echo -e "${colorW}Version     : ${colorG}$version${nocolor}"
-      echo -e "${colorW}URL         : ${colorC}${url//\\\///}${nocolor}"
-      echo -e "${colorW}Out of date : ${nocolor}$ood"
-      echo -e "${colorW}Description : ${nocolor}${description//\\\///}\n"
+    ( echo -e "${colorW}Repository  : ${colorM}aur$nocolor"
+      echo -e "${colorW}Name        : $name$nocolor"
+      echo -e "${colorW}Version     : $colorG$version$nocolor"
+      echo -e "${colorW}URL         : $colorC${url//\\\///}$nocolor"
+      echo -e "${colorW}Out of date : $nocolor$ood"
+      echo -e "${colorW}Description : $nocolor${description//\\\///}\n"
     ) 2>/dev/null
   done < <(rpc_multiinfo "$@" | sort)
 }
@@ -349,7 +349,7 @@ process_targets() {
   # global: versions[]
   # global: deps[]
 
-  echo -en "\n${colorY}Targets (${#versions[@]}):${nocolor} "
+  echo -en "\n${colorY}Targets (${#versions[@]}):$nocolor "
 
   for name; do
     version=${versions[$name]}
