@@ -75,7 +75,7 @@ aur_multiinfo_url() {
   echo "$AUR/rpc.php?type=multiinfo$params"
 }
 
-get() { debug "HTTP GET $1"; curl -fsS "$1"; }
+get() { debug "HTTP GET $1"; curl --silent --fail "$1"; }
 
 pkgbuild() { get "$(aur_packages_url $1)/PKGBUILD"; }
 
