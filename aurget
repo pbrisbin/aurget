@@ -5,15 +5,6 @@
 ###
 AUR='https://aur.archlinux.org'
 
-colorR="\e[1;31m"
-colorG="\e[1;32m"
-colorY="\e[1;33m"
-colorB="\e[1;34m"
-colorM="\e[1;35m"
-colorC="\e[1;36m"
-colorW="\e[1;37m"
-nocolor="\e[0m"
-
 arguments=()
 dependencies=()
 
@@ -36,9 +27,9 @@ err_no_targets() {
   if [[ "$opmode" == 'upgrade' ]]; then
     echo 'nothing to upgrade'
     exit 0
-  else
-    die 'no targets specified (use -h for help)'
   fi
+
+  die 'no targets specified (use -h for help)'
 }
 
 # thanks Irm
@@ -107,7 +98,7 @@ parse_rpc() {
 
 is_devel() { [[ "$1" =~ -(git|hg|svn|darcs|csv|bzr)$ ]]; }
 
-is_ignored() { echo " $ignore_packages " | grep -Fq -- " $1 "; }
+is_ignored() { [[ " $ignore_packages " =~ " $1 " ]]; }
 
 prompt() {
   local a
@@ -140,27 +131,12 @@ prompt_to_edit() {
   prompt "Continue $reason"
 }
 
-discard_sources() {
-  local name="$1"
-
-  if ! $discard_sources; then
-    debug 'keeping sources (discard false)'
-    return
-  fi
-
-  if $keep_devels && is_devel "${name##*/}"; then
-    debug 'keeping source (devel regex match)'
-    return
-  fi
-
-  info 'Discarding sources...'
-  rm -rf "./$name"
-}
-
 set_defaults() {
+  build_directory="$PWD"
   debug=false
   devels=false
   discard_sources=true
+  ignore_packages=''
   keep_devels=true
   makepkg='makepkg'
   makepkg_options='--syncdeps'
@@ -169,34 +145,47 @@ set_defaults() {
   resolve_dependencies=false
   search_mode='search'
   sync_mode='build'
+  temp_directory='/tmp/aurget'
 
   EDITOR="${EDITOR:-$VISUAL}"
   EDITOR="${EDITOR:-vi}"
+
+  colorR="\e[1;31m"
+  colorG="\e[1;32m"
+  colorY="\e[1;33m"
+  colorB="\e[1;34m"
+  colorM="\e[1;35m"
+  colorC="\e[1;36m"
+  colorW="\e[1;37m"
+  nocolor="\e[0m"
+}
+
+set_no_color() {
+  colorR=''
+  colorG=''
+  colorY=''
+  colorB=''
+  colorM=''
+  colorC=''
+  colorW=''
+  nocolor=''
+
+  makepkg_options+=' --nocolor'
 }
 
 source_config() {
   local config="${XDG_CONFIG_HOME:-$HOME/.config}/aurgetrc"
-
-  if [[ -r "$config" ]]; then
-    debug "sourcing user config ($config)"
-    source "$config"
-  fi
+  [[ -r "$config" ]] && source "$config"
 }
 
 create_temp_directory() {
-  temp_directory="${temp_directory:-/tmp/aurget}"
-
   debug "storing temporary files in $temp_directory"
-
   mkdir -p "$temp_directory" || die 'unable to create temp directory'
   rm -rf "$temp_directory"/*
 }
 
 enter_build_directory() {
-  build_directory="${build_directory:-$PWD}"
-
   debug "building in $build_directory"
-
   mkdir -p "$build_directory" || die 'unable to make build directory'
   cd "$build_directory"       || die 'unable to change to build directory'
 }
@@ -220,30 +209,19 @@ do_search() {
   local name version description outofdate ood
 
   while IFS='|' read -r name version description _ outofdate _; do
-    [[ -z "$name" ]] && continue
-
-    if [[ "$outofdate" =~ ^(1|OutOfDate)$ ]]; then
-      ood="${colorR}[out of date]${nocolor}"
-    fi
+    (( "$outofdate" )) && ood="${colorR}[out of date]${nocolor}"
 
     ( echo -e "${colorM}aur/${colorW}$name ${colorG}$version${nocolor} $ood"
       echo -e "    ${description//\\\///}"
     ) 2>/dev/null
-
   done < <(rpc_search "$*" | sort)
 }
 
 do_info() {
-  local name version description url outofdate url_path ood
+  local name version description url outofdate url_path ood='No'
 
   while IFS='|' read -r name version description url outofdate url_path; do
-    [[ -z "$name" ]] && continue
-
-    if [[ "$outofdate" =~ ^(1|OutOfDate)$ ]]; then
-      ood="${colorR}Yes${nocolor}"
-    else
-      ood='No'
-    fi
+    (( "$outofdate" )) && ood="${colorR}Yes${nocolor}"
 
     ( echo -e "${colorW}Repository  : ${colorM}aur${nocolor}"
       echo -e "${colorW}Name        : $name${nocolor}"
@@ -252,32 +230,11 @@ do_info() {
       echo -e "${colorW}Out of date : ${nocolor}$ood"
       echo -e "${colorW}Description : ${nocolor}${description//\\\///}\n"
     ) 2>/dev/null
-
   done < <(rpc_multiinfo "$@" | sort)
 }
 # }}}
 
 # Dependency handling {{{
-source_pkgbuild() {
-  local name="$1" pkgbuild="$temp_directory/${1}_PKGBUILD"
-
-  # if the PKGBUILD's present, we've already processed this and should
-  # return 1 to prevent re-processing
-  [[ -f "$pkgbuild" ]] && return 1
-
-  if ! pkgbuild "$name" > "$pkgbuild"; then
-    touch "$pkgbuild"
-    return 1
-  fi
-
-  if prompt_to_edit "$name" "$pkgbuild" "sourcing $name for dependencies"; then
-    source "$pkgbuild"
-    return 0
-  fi
-
-  return 1
-}
-
 resolve() {
   local name dep
 
@@ -296,9 +253,28 @@ resolve() {
         resolve "$dep"
       done
 
-      [[ ! " ${arguments[@]} " =~ " $name " ]] && dependencies+=( "$name" )
+      [[ ! " ${arguments[*]} " =~ " $name " ]] && dependencies+=( "$name" )
     fi
   done
+}
+
+source_pkgbuild() {
+  local name="$1" pkgbuild="$temp_directory/${1}_PKGBUILD"
+
+  if [[ ! -f "$pkgbuild" ]]; then
+    if pkgbuild "$name" > "$pkgbuild"; then
+      if prompt_to_edit "$name" "$pkgbuild" "sourcing $name for dependencies"; then
+        debug "$name: sourcing PKGBUILD"
+        source "$pkgbuild"
+        return 0
+      fi
+    fi
+  fi
+
+  debug "$name: PKGBUILD not sourced"
+
+  touch "$pkgbuild"
+  return 1
 }
 # }}}
 
@@ -319,12 +295,14 @@ available_upgrades() {
     fi
   done < <(pacman -Qm)
 
+  debug "found ${#versions[@]} foreign packages"
+
   while IFS='|' read -r name versN _; do
     vers="${versions[$name]}"
 
     read -r check < <(vercmp "$vers" "$versN")
 
-    debug "checking $name (local: $vers, available: $versN)"
+    debug "checking $name ($vers => $versN)"
 
     (( $check > 0 )) && warn "$name: local ($vers) is newer than aur ($versN)"
     (( $check < 0 )) && echo "$name"
@@ -343,9 +321,9 @@ set_targets() {
 
   (( $# )) || return
 
-  debug "setting targets for $@"
-
   info "Searching AUR..."
+
+  debug "setting targets for $@"
 
   while IFS='|' read -r name version _; do
     if is_ignored "$name"; then
@@ -406,7 +384,6 @@ process_target() {
       return 1
     fi
 
-    info 'Building package...'
     build_target "$name"
   fi
 }
@@ -415,6 +392,10 @@ build_target() {
   local name="$1" pkgbuild
 
   # global: deps[]
+
+  info 'Building package...'
+
+  debug "building $name..."
 
   cd "$name" || die "$name: failed to change into source directory"
 
@@ -433,7 +414,29 @@ build_target() {
     fi
   fi
 
+  debug "build finished"
+
   cd .. && discard_sources "$name"
+}
+
+discard_sources() {
+  local name="$1"
+
+  if ! $discard_sources; then
+    debug 'keeping sources (discard false)'
+    return
+  fi
+
+  if $keep_devels && is_devel "${name##*/}"; then
+    debug 'keeping source (devel regex match)'
+    return
+  fi
+
+  info 'Discarding sources...'
+
+  debug "discarding ./$name"
+
+  rm -rf "./$name"
 }
 # }}}
 
@@ -472,6 +475,10 @@ Usage: aurget [ -h | -S* [ --options ] [ -- ] <arguments> ]
         --discard       discard source files after building
         --nodiscard     don't discard source files after building
 
+        --nocolor       disable coloring
+
+        --noconfirm     auto-answer all prompts (passed to makepkg)
+
         --ignore <package>
                         add additional packages to be ignored
 
@@ -504,6 +511,7 @@ while [[ -n "$1" ]]; do
     -Sp|-Ssp|-Sps) opmode='search' ; search_mode='print'           ;;
     --ignore)      shift; ignore_packages+=" $1"                   ;;
     --noconfirm)   noconfirm=true; makepkg_options+=" --noconfirm" ;;
+    --nocolor)     set_no_color                                    ;;
     --devel)       devels=true                                     ;;
     --deps)        resolve_dependencies=true                       ;;
     --nodeps)      resolve_dependencies=false                      ;;
@@ -524,6 +532,8 @@ while [[ -n "$1" ]]; do
 
   shift
 done
+
+[[ ! -t 1 ]] && set_no_color
 
 if [[ "$opmode" == 'search' ]]; then
   execute_search "$search_mode" "${arguments[@]}"
