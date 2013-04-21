@@ -18,9 +18,7 @@ warn() { echo -e "${colorY}warning: ${nocolor}$*" >&2; }
 error() { echo -e "${colorR}error: ${nocolor}$*" >&2; }
 
 debug() {
-  $debug || return
-
-  echo -e "${colorW}[${colorC}DEBUG${colorW}]${nocolor} $*" >&2
+  $debug && echo -e "${colorW}[${colorC}DEBUG${colorW}]${nocolor} $*" >&2
 }
 
 err_no_targets() {
@@ -118,16 +116,15 @@ prompt() {
 
 prompt_to_edit() {
   local name="$1" pkgbuild="$2"; shift 2
-  local reason="${*:-sourcing for deps}"
-
-  [[ ! -f "$pkgbuild" ]] && die "$name: no PKGBUILD found"
+  local reason="${*:-sourcing for dependencies}"
 
   case "${edit_pkgbuilds:-prompt}" in
     never)  return 0 ;;
-    prompt) prompt "Edit PKGBUILD before $reason" || return 0 ;;
+    prompt) prompt "Edit $name's PKGBUILD before $reason" || return 0 ;;
   esac
 
-  $EDITOR "$pkgbuild" || die 'problem editing PKGBUILD'
+  $EDITOR "$pkgbuild" || die "your editor returns non-zero ($?). aborting."
+
   prompt "Continue $reason"
 }
 
@@ -203,6 +200,8 @@ execute_search() {
     quiet)  rpc_search "$*" | sort | cut -d '|' -f 1 ;;
     print)  for name; do pkgbuild "$name"; done ;;
   esac
+
+  exit 0
 }
 
 do_search() {
@@ -241,7 +240,7 @@ resolve() {
   # global: dependencies[]
 
   for name; do
-    debug "resolving $name, currently tracking ${#dependencies[@]} dependencies"
+    debug "resolving $name (resolved so far: ${#dependencies[@]})"
 
     if source_pkgbuild "$name"; then
       depends=($(pacman -T -- ${depends[@]} ${makedepends[@]}))
@@ -263,7 +262,7 @@ source_pkgbuild() {
 
   if [[ ! -f "$pkgbuild" ]]; then
     if pkgbuild "$name" > "$pkgbuild"; then
-      if prompt_to_edit "$name" "$pkgbuild" "sourcing $name for dependencies"; then
+      if prompt_to_edit "$name" "$pkgbuild"; then
         debug "$name: sourcing PKGBUILD"
         source "$pkgbuild"
         return 0
@@ -287,7 +286,7 @@ available_upgrades() {
   while read -r name version; do
     if is_devel $name; then
       if $devels; then
-        debug "including development package $name"
+        debug "upgrade available for $name (development package)"
         echo "$name"
       fi
     else
@@ -305,7 +304,11 @@ available_upgrades() {
     debug "checking $name ($vers => $versN)"
 
     (( $check > 0 )) && warn "$name: local ($vers) is newer than aur ($versN)"
-    (( $check < 0 )) && echo "$name"
+
+    if (( $check < 0 )); then
+      debug "upgrade available for $name (new version)"
+      echo "$name"
+    fi
 
   done < <(rpc_multiinfo "${!versions[@]}")
 }
@@ -321,9 +324,9 @@ set_targets() {
 
   (( $# )) || return
 
-  info "Searching AUR..."
+  info 'Searching AUR...'
 
-  debug "setting targets for $@"
+  debug "setting targets for $@ (dependency flag: $dep)"
 
   while IFS='|' read -r name version _; do
     if is_ignored "$name"; then
@@ -401,16 +404,16 @@ build_target() {
 
   if [[ -f "/etc/customizepkg.d/$name" ]]; then
     info 'Calling customizepkg...'
-    customizepkg --modify || warn 'customizepkg had a problem'
+    customizepkg --modify || warn "customizepkg returned non-zero ($?)"
   fi
 
-  if prompt_to_edit "$name" 'PKGBUILD' "building $name"; then
+  if prompt_to_edit "$name" 'PKGBUILD' 'building'; then
     if (( ${deps[$name]} )); then
       debug "executing $makepkg $makepkg_options --asdeps"
-      $makepkg $makepkg_options --asdeps || die "dependency package $name failed to build. unable to continue."
+      $makepkg $makepkg_options --asdeps || die "dependency package $name failed to build, aborting"
     else
       debug "executing $makepkg $makepkg_options"
-      $makepkg $makepkg_options || warn "package $name failed to build."
+      $makepkg $makepkg_options || warn "package $name failed to build, skipping"
     fi
   fi
 
@@ -428,13 +431,13 @@ discard_sources() {
   fi
 
   if $keep_devels && is_devel "${name##*/}"; then
-    debug 'keeping source (devel regex match)'
+    debug 'keeping sources (development package)'
     return
   fi
 
   info 'Discarding sources...'
 
-  debug "discarding ./$name"
+  debug "discarding ./${name}..."
 
   rm -rf "./$name"
 }
@@ -523,7 +526,7 @@ while [[ -n "$1" ]]; do
     -h|--help)     message; exit                                   ;;
     --)            shift; arguments+=( "$@" ); return              ;;
     -*)
-      debug "unknown option $1, treating as makepkg argument..."
+      warn "unknown option $1, treating as makepkg argument..."
       makepkg_options+=" $1"
       ;;
 
@@ -535,12 +538,7 @@ done
 
 [[ ! -t 1 ]] && set_no_color
 
-if [[ "$opmode" == 'search' ]]; then
-  execute_search "$search_mode" "${arguments[@]}"
-  exit $?
-fi
-
-create_temp_directory
+[[ "$opmode" == 'search' ]] && execute_search "$search_mode" "${arguments[@]}"
 
 if [[ "$opmode" == 'upgrade' ]]; then
   info 'Starting AUR upgrade...'
@@ -553,6 +551,8 @@ declare -A versions
 declare -A deps
 
 if $resolve_dependencies; then
+  create_temp_directory
+
   info 'Resolving dependencies...'
 
   resolve "${arguments[@]}"
