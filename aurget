@@ -64,7 +64,7 @@ aur_multiinfo_url() {
   echo "$AUR/rpc.php?type=multiinfo$params"
 }
 
-get() { debug "HTTP GET $1"; curl --silent --fail "$1"; }
+get() { debug "HTTP GET $colorM$1$nocolor"; curl --silent --fail "$1"; }
 
 pkgbuild() { get "$(aur_packages_url $1)/PKGBUILD"; }
 
@@ -176,13 +176,13 @@ source_config() {
 }
 
 create_temp_directory() {
-  debug "storing temporary files in $temp_directory"
+  debug "storing temporary files in $colorM$temp_directory$nocolor"
   mkdir -p "$temp_directory" || die 'unable to create temp directory'
   rm -rf "$temp_directory"/*
 }
 
 enter_build_directory() {
-  debug "building in $build_directory"
+  debug "building in $colorM$build_directory$nocolor"
   mkdir -p "$build_directory" || die 'unable to make build directory'
   cd "$build_directory"       || die 'unable to change to build directory'
 }
@@ -192,7 +192,7 @@ enter_build_directory() {
 execute_search() {
   local mode="$1"; shift
 
-  debug "executing search for $@ (mode: $mode)"
+  debug "executing search for $colorG$@$nocolor (mode: $colorG$mode$nocolor)"
 
   case "$mode" in
     search) do_search  "$*" ;;
@@ -240,7 +240,7 @@ resolve() {
   # global: dependencies[]
 
   for name; do
-    debug "resolving $name (resolved so far: ${#dependencies[@]})"
+    debug "resolving $colorG$name$nocolor (resolved so far: $colorG${#dependencies[@]}$nocolor)"
 
     if source_pkgbuild "$name"; then
       depends=($(pacman -T -- ${depends[@]} ${makedepends[@]}))
@@ -263,14 +263,14 @@ source_pkgbuild() {
   if [[ ! -f "$pkgbuild" ]]; then
     if pkgbuild "$name" > "$pkgbuild"; then
       if prompt_to_edit "$name" "$pkgbuild"; then
-        debug "$name: sourcing PKGBUILD"
+        debug "sourcing PKGBUILD for $colorG$name$nocolor"
         source "$pkgbuild"
         return 0
       fi
     fi
   fi
 
-  debug "$name: PKGBUILD not sourced"
+  debug "no PKGBUILD available for $colorG$name$nocolor"
 
   touch "$pkgbuild"
   return 1
@@ -286,7 +286,7 @@ available_upgrades() {
   while read -r name version; do
     if is_devel $name; then
       if $devels; then
-        debug "upgrade available for $name (development package)"
+        debug "upgrade available for $colorG$name$nocolor (development package)"
         echo "$name"
       fi
     else
@@ -294,19 +294,19 @@ available_upgrades() {
     fi
   done < <(pacman -Qm)
 
-  debug "found ${#versions[@]} foreign packages"
+  debug "found $colorG${#versions[@]}$nocolor foreign packages to check"
 
   while IFS='|' read -r name versN _; do
     vers="${versions[$name]}"
 
     read -r check < <(vercmp "$vers" "$versN")
 
-    debug "checking $name ($vers => $versN)"
+    debug "checking $colorG$name$nocolor ($vers => $versN)"
 
     (( $check > 0 )) && warn "$name: local ($vers) is newer than aur ($versN)"
 
     if (( $check < 0 )); then
-      debug "upgrade available for $name (new version)"
+      debug "upgrade available for $colorG$name$nocolor (new version)"
       echo "$name"
     fi
 
@@ -326,7 +326,7 @@ set_targets() {
 
   info 'Searching AUR...'
 
-  debug "setting targets for $@ (dependency flag: $dep)"
+  debug "setting targets for $colorG$@$nocolor (dependency flag: $colorG$dep$nocolor)"
 
   while IFS='|' read -r name version _; do
     if is_ignored "$name"; then
@@ -373,14 +373,14 @@ process_target() {
   info 'Retrieving taurball from AUR...'
 
   if [[ "$sync_mode" == 'download' ]]; then
-    debug "downloading $name to filesystem"
+    debug "downloading $colorG$name$nocolor to filesystem"
 
     if ! taurball "$name" > "${name}.tar.gz"; then
       warn "$name: failed to retrieve aur sources"
       return 1
     fi
   else
-    debug "extracting $name directly"
+    debug "extracting $colorG$name$nocolor directly"
 
     if ! taurball "$name" | tar xfz -; then
       warn "$name: failed to retrieve aur sources"
@@ -398,7 +398,7 @@ build_target() {
 
   info 'Building package...'
 
-  debug "building $name..."
+  debug "building $colorG$name${nocolor}..."
 
   cd "$name" || die "$name: failed to change into source directory"
 
@@ -409,10 +409,10 @@ build_target() {
 
   if prompt_to_edit "$name" 'PKGBUILD' 'building'; then
     if (( ${deps[$name]} )); then
-      debug "executing $makepkg $makepkg_options --asdeps"
+      debug "executing $colorY$makepkg $makepkg_options --asdeps$nocolor"
       $makepkg $makepkg_options --asdeps || die "dependency package $name failed to build, aborting"
     else
-      debug "executing $makepkg $makepkg_options"
+      debug "executing $colorY$makepkg $makepkg_options$nocolor"
       $makepkg $makepkg_options || warn "package $name failed to build, skipping"
     fi
   fi
@@ -437,7 +437,7 @@ discard_sources() {
 
   info 'Discarding sources...'
 
-  debug "discarding ./${name}..."
+  debug "executing ${colorY}rm -rf ./$name$nocolor"
 
   rm -rf "./$name"
 }
