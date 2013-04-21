@@ -63,8 +63,8 @@ will be ignored. This may result in a "no targets" error or installation
 will proceed for other (available) targets.
 
 If a target found as a dependency is not available in the AUR, I assume 
-it's a repository package to be picked up makepkg. This may result in a 
-makepkg error if that's not the case.
+it's a repository package to be picked up by makepkg. This may result in 
+a makepkg error if that's not the case.
 
 There is no longer a global `aurgetrc`. Please copy 
 `/usr/share/aurget/config` to `$XDG_CONFIG_HOME/aurgetrc` and edit as 
