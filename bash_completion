@@ -20,7 +20,7 @@ _aurget() {
 
   # valid long options
   longopts='--devel --deps --nodeps --edit --noedit \
-            --discard --nodiscard --noconfirm'
+            --discard --nodiscard --nocolor --noconfirm'
 
   # all valid options
   allopts='-S -Sd -Sb -Sy -Su -Sdu -Sbu -Syu -Ss -Ssq -Sp -Si \
