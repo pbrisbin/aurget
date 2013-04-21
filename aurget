@@ -480,7 +480,7 @@ Usage: aurget [ -h | -S* [ --options ] [ -- ] <arguments> ]
 
         --nocolor       disable coloring
 
-        --noconfirm     auto-answer all prompts (passed to makepkg)
+        --noconfirm     auto-answer all prompts
 
         --ignore <package>
                         add additional packages to be ignored
