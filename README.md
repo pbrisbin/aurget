@@ -71,13 +71,13 @@ There is no longer a global `aurgetrc`. Please copy
 needed. This is the only location configuration will be loaded from.
 
 Some config values have changed names, please update any existing config 
-to match the example.
+based on the provided example.
 
 The default options for `makepkg` have been changed from `--noconfirm` 
 to `--syncdeps`. This can be adjusted in your config file.
 
-Temporary files are left in place after aurget quits. They are cleared 
-on startup only.
+Temporary files may be left in place after aurget quits. They are 
+actively cleared on startup only.
 
 Aurget no longer uses a lock file to prevent multiple instances from 
 being run at once. Don't hurt yourself.
@@ -86,9 +86,6 @@ Built packages are left wherever `makepkg` puts them. Feel free to tweak
 this behavior directly via `makepkg.conf`.
 
 PKGBUILD editing uses `$EDITOR` or `$VISUAL` with a fallback of "vi".
-
-Color is on by default and (at this time) cannot be turned off. I'll 
-eventually (re-)add a `--nocolor` flag.
 
 The `development_regex` is no longer configurable. If the one I'm using 
 is not correct for your needs, simply let me know and I'll update it.
