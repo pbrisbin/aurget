@@ -218,9 +218,9 @@ do_search() {
 }
 
 do_info() {
-  local name version description url outofdate url_path ood='No'
+  local name version description url outofdate ood='No'
 
-  while IFS='|' read -r name version description url outofdate url_path; do
+  while IFS='|' read -r name version description url outofdate _; do
     (( "$outofdate" )) && ood="${colorR}Yes${nocolor}"
 
     ( echo -e "${colorW}Repository  : ${colorM}aur${nocolor}"
