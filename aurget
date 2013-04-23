@@ -426,12 +426,12 @@ discard_sources() {
   local name="$1"
 
   if ! $discard_sources; then
-    debug 'keeping sources (discard false)'
+    debug "keeping sources for $colorG$name$nocolor (discard false)"
     return
   fi
 
-  if $keep_devels && is_devel "${name##*/}"; then
-    debug 'keeping sources (development package)'
+  if $keep_devels && is_devel "$name"; then
+    debug "keeping sources for $colorG$name$nocolor (development package)"
     return
   fi
 
