@@ -206,16 +206,16 @@ execute_search() {
   debug "executing search for $colorG$@$nocolor (mode: $colorG$mode$nocolor)"
 
   case "$mode" in
-    search) do_search  "$*" ;;
-    info)   do_info    "$@" ;;
-    quiet)  rpc_search "$*" | sort | cut -d '|' -f 1 ;;
+    search) rpc_search    "$*" | sort | print_search ;;
+    info)   rpc_multiinfo "$@" | sort | print_info   ;;
+    quiet)  rpc_search    "$*" | sort | cut -d '|' -f 1 ;;
     print)  for name; do pkgbuild "$name"; done ;;
   esac
 
   exit 0
 }
 
-do_search() {
+print_search() {
   local name version description outofdate ood
 
   while IFS='|' read -r name version description _ outofdate _; do
@@ -224,10 +224,10 @@ do_search() {
     ( echo -e "${colorM}aur/$colorW$name $colorG$version$nocolor $ood"
       echo -e "    ${description//\\\///}"
     ) 2>/dev/null
-  done < <(rpc_search "$*" | sort)
+  done
 }
 
-do_info() {
+print_info() {
   local name version description url outofdate ood='No'
 
   while IFS='|' read -r name version description url outofdate _; do
@@ -240,7 +240,7 @@ do_info() {
       echo -e "${colorW}Out of date : $nocolor$ood"
       echo -e "${colorW}Description : $nocolor${description//\\\///}\n"
     ) 2>/dev/null
-  done < <(rpc_multiinfo "$@" | sort)
+  done
 }
 # }}}
 
@@ -320,7 +320,6 @@ available_upgrades() {
       debug "upgrade available for $colorG$name$nocolor (new version)"
       echo "$name"
     fi
-
   done < <(rpc_multiinfo "${!versions[@]}")
 }
 # }}}
