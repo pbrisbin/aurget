@@ -261,7 +261,7 @@ resolve() {
         resolve "$dep"
       done
 
-      [[ ! " ${arguments[*]} " =~ " $name " ]] && dependencies+=( "$name" )
+      [[ " ${arguments[*]} " =~ " $name " ]] || dependencies+=( "$name" )
     fi
   done
 }
