@@ -128,9 +128,18 @@ prompt_to_edit() {
   prompt "Continue $reason"
 }
 
+set_early_options() {
+  local config_re=' --config +([^ ]+) '
+
+  [[ " $* " =~ " --debug " ]] && debug=true
+  [[ " $* " =~ $config_re  ]] && user_config="${BASH_REMATCH[1]}"
+}
+
 set_defaults() {
+  debug=${debug:-false}
+  user_config="${user_config:-${XDG_CONFIG_HOME:-$HOME/.config}/aurgetrc}"
+
   build_directory="$PWD"
-  debug=false
   devels=false
   discard_sources=true
   ignore_packages=''
@@ -171,8 +180,10 @@ set_no_color() {
 }
 
 source_config() {
-  local config="${XDG_CONFIG_HOME:-$HOME/.config}/aurgetrc"
-  [[ -r "$config" ]] && source "$config"
+  if [[ -r "$user_config" ]]; then
+    debug "sourcing user configuration from $colorM$user_config$nocolor"
+    source "$user_config"
+  fi
 }
 
 create_temp_directory() {
@@ -485,6 +496,8 @@ Usage: aurget [ -h | -S* [ --options ] [ -- ] <arguments> ]
         --ignore <package>
                         add additional packages to be ignored
 
+        --config <file> source <file> for user configuration
+
         -h, --help      display this
 
   Any unrecognized options will be passed directly to makepkg.
@@ -494,6 +507,8 @@ EOF
 # }}}
 
 # Main {{{
+set_early_options "$@"
+
 set_defaults
 
 source_config
