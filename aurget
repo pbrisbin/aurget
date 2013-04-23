@@ -251,8 +251,6 @@ resolve() {
   # global: dependencies[]
 
   for name; do
-    debug "resolving $colorG$name$nocolor (resolved so far: $colorG${#dependencies[@]}$nocolor)"
-
     if source_pkgbuild "$name"; then
       depends=($(pacman -T -- ${depends[@]} ${makedepends[@]}))
       depends=("${depends[@]%>*}")
@@ -272,16 +270,18 @@ source_pkgbuild() {
   local name="$1" pkgbuild="$temp_directory/${1}_PKGBUILD"
 
   if [[ ! -f "$pkgbuild" ]]; then
+    debug "resolving $colorG$name$nocolor (resolved so far: $colorG${#dependencies[@]}$nocolor)"
+
     if pkgbuild "$name" > "$pkgbuild"; then
       if prompt_to_edit "$name" "$pkgbuild"; then
         debug "sourcing PKGBUILD for $colorG$name$nocolor"
         source "$pkgbuild"
         return 0
       fi
+    else
+      debug "PKGBUILD ${colorR}not$nocolor available for $colorG$name$nocolor"
     fi
   fi
-
-  debug "no PKGBUILD available for $colorG$name$nocolor"
 
   touch "$pkgbuild"
   return 1
