@@ -399,19 +399,24 @@ set_targets() {
 }
 
 process_targets() {
-  local name version
+  local name version packages
 
   # global: versions[]
   # global: deps[]
 
-  echo -en "\n${colorY}Targets (${#versions[@]}):$nocolor "
-
   for name; do
-    version=${versions[$name]}
-    [[ -n "$version" ]] && echo -n "${name}-$version "
+    version="${versions[$name]}"
+
+    if [[ -n "$version" ]]; then
+      packages+="${name}-$version "
+    else
+      die "target not found: $name"
+    fi
   done
 
-  prompt "\n\nProceed with installation" || exit 0
+  echo -e "\n${colorY}Targets ($#):$nocolor $packages\n"
+
+  prompt "Proceed with installation" || exit 0
 
   enter_build_directory
 
