@@ -1,62 +1,53 @@
 #compdef aurget
 
-typeset -A opt_args
-
-_aurget_commands=(
-  '-S[Process target(s)]'
-  '-Sd[Download target(s)]'
-  '-Sb[Build target(s)]'
-  '-Sy[Install target(s)]'
-  '-Su[Process available upgrades]'
-  '-Sdu[Download available upgrades]'
-  '-Sbu[Build available upgrades]'
-  '-Syu[Install available upgrades]'
-  '-Ss[Search for AUR packages]'
-  '-Ssq[Search for AUR pacakges (print only names)]'
-  '-Si[Print info for AUR package]'
-  '-Sp[Print PKGBUILD for AUR package]'
-)
-
-_aurget_options=(
-  '--devel[Upgrade development packages]'
-  '--deps[Resolve dependencies]'
-  '--nodeps[Don'\''t resolve dependencies]'
-  '--edit[Present all PKGBUILDs for editing]'
-  '--noedit[Present no PKGBUILDs for editing]'
-  '--discard[Discard working files after building]'
-  '--nodiscard[Don'\''t discard working files after building]'
-  '--nocolor[Disable coloring]'
-  '--noconfirm[Auto-answer all prompts]'
-  '--debug[Include debug output]'
-  '--config[Use an alternate config file]:file:_files -/'
-  '--ignore[Ignore package]:package name'
-  '--help[Display help]'
-)
-
-_aurget_packages() {
+_aur_packages() {
   local -a aur_packages
   aur_packages=($(_call_program packages $service -Ssq $words[CURRENT] 2>/dev/null))
   compadd "$@" -a aur_packages
 }
 
 _aurget() {
-  case $words[2] in
-    -S|-S[dby])
-      _arguments -s -w : \
-        "$_aurget_options[@]" \
-        '*:package:_aurget_packages'
-      ;;
-    *)
-      if [[ "$words[*]" =~ -S ]]; then
+  if (( $#words[@] == 2 )); then
+    _arguments -s -w : \
+      '-S[Process target(s)]' \
+      '-Sd[Download target(s)]' \
+      '-Sb[Build target(s)]' \
+      '-Sy[Install target(s)]' \
+      '-Su[Process available upgrades]' \
+      '-Sdu[Download available upgrades]' \
+      '-Sbu[Build available upgrades]' \
+      '-Syu[Install available upgrades]' \
+      '-Ss[Search for AUR packages]' \
+      '-Ssq[Search for AUR pacakges (print only names)]' \
+      '-Si[Print info for AUR package]' \
+      '-Sp[Print PKGBUILD for AUR package]' \
+      '--help[Display help]'
+  else
+    case $words[2] in
+      -S|-S[dby])
         _arguments -s -w : \
-          "$_aurget_options[@]"
-      else
+          '--devel[Upgrade development packages]' \
+          '--deps[Resolve dependencies]' \
+          '--nodeps[Don'\''t resolve dependencies]' \
+          '--edit[Present all PKGBUILDs for editing]' \
+          '--noedit[Present no PKGBUILDs for editing]' \
+          '--discard[Discard working files after building]' \
+          '--nodiscard[Don'\''t discard working files after building]' \
+          '--nocolor[Disable coloring]' \
+          '--noconfirm[Auto-answer all prompts]' \
+          '--debug[Include debug output]' \
+          '--config[Use an alternate config file]:file:_files -/' \
+          '--ignore[Ignore package]:package name' \
+          '*:package:_aur_packages'
+        ;;
+      -S*)
         _arguments -s -w : \
-          "$_aurget_commands[@]" \
-          "$_aurget_options[@]"
-      fi
-      ;;
-  esac
+          '--debug[Include debug output]' \
+          '--config[Use an alternate config file]:file:_files -/'
+        ;;
+      *) return 1 ;;
+    esac
+  fi
 }
 
 _aurget "$@"
