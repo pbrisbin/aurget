@@ -5,9 +5,6 @@
 ###
 AUR='https://aur.archlinux.org'
 
-arguments=()
-dependencies=()
-
 # Support {{{
 die() { error $*; exit 1; }
 
@@ -19,15 +16,6 @@ error() { printf "${colorR}error:$nocolor $*\n" >&2; }
 
 debug() {
   $debug && printf "$colorW[${colorC}DEBUG$colorW]$nocolor $*\n" >&2
-}
-
-err_no_targets() {
-  if [[ "$opmode" == 'upgrade' ]]; then
-    printf "nothing to upgrade\n"
-    exit 0
-  fi
-
-  die 'no targets specified (use -h for help)'
 }
 
 # thanks Irm
@@ -120,19 +108,23 @@ prompt_to_edit() {
     prompt) prompt "Edit $name's PKGBUILD before $action" || return 0 ;;
   esac
 
+  debug "executing $colorY$EDITOR $pkgbuild$nocolor"
+
   $EDITOR "$pkgbuild" || die "editor returned non-zero ($?), aborting"
 
   prompt "Continue $action"
 }
+# }}}
 
+# Initialization {{{
 set_defaults() {
-  local config_re=' --config +([^ ]+) '
+  local config_regex=' --config +([^ ]+) '
 
   debug=false
   user_config="${XDG_CONFIG_HOME:-$HOME/.config}/aurgetrc"
 
-  [[ " $* " =~ " --debug " ]] && debug=true
-  [[ " $* " =~ $config_re  ]] && user_config="${BASH_REMATCH[1]}"
+  [[ " $* " =~ " --debug "    ]] && debug=true
+  [[ " $* " =~ $config_regex  ]] && user_config="${BASH_REMATCH[1]}"
 
   build_directory="$PWD"
   devels=false
@@ -238,7 +230,7 @@ enter_build_directory() {
 execute_search() {
   [[ "$opmode" == 'search' ]] || return 1
 
-  debug "executing search for $colorG$@$nocolor (mode: $colorG$search_mode$nocolor)"
+  debug "searching for $colorG$*$nocolor (mode: $colorG$search_mode$nocolor)"
 
   case "$search_mode" in
     search) rpc_search "$*" | sort | print_search ;;
@@ -372,6 +364,15 @@ available_upgrades() {
 # }}}
 
 # Target handling {{{
+err_no_targets() {
+  if [[ "$opmode" == 'upgrade' ]]; then
+    printf "nothing to upgrade\n"
+    exit 0
+  fi
+
+  die 'no targets specified (use -h for help)'
+}
+
 set_targets() {
   local dep="$1"; shift
   local name version
@@ -467,7 +468,7 @@ build_target() {
     customizepkg --modify || warn "customizepkg returned non-zero ($?)"
   fi
 
-  if prompt_to_edit "$name" 'PKGBUILD' 'building'; then
+  if prompt_to_edit "$name" './PKGBUILD' 'building'; then
     if (( ${deps[$name]} )); then
       debug "executing $colorY$makepkg $makepkg_options --asdeps$nocolor"
       $makepkg $makepkg_options --asdeps || die "dependency package $name failed to build, aborting"
@@ -555,6 +556,12 @@ EOF
 }
 # }}}
 
+arguments=()
+dependencies=()
+
+declare -A versions
+declare -A deps
+
 set_defaults "$@"
 
 source_config
@@ -570,9 +577,6 @@ add_available_upgrades
 (( "${#arguments[@]}" )) || err_no_targets
 
 set_dependencies
-
-declare -A versions
-declare -A deps
 
 info 'Searching AUR...'
 set_targets 1 "${dependencies[@]}"
