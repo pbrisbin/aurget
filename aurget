@@ -209,9 +209,10 @@ parse_options() {
       --noedit)      edit_pkgbuilds='never'                          ;;
       --discard)     discard_sources=true                            ;;
       --nodiscard)   discard_sources=false                           ;;
-      --debug)       debug=true                                      ;;
       -h|--help)     message; exit                                   ;;
       --)            shift; arguments+=( "$@" ); return              ;;
+      --debug)       :                                               ;;
+      --config)      : ; shift                                       ;;
       -*)            warn "unknown option $1, treating as makepkg argument..."
                      makepkg_options+=" $1"                          ;;
       *)             arguments+=( "$1" )                             ;;
