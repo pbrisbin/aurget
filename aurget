@@ -50,10 +50,6 @@ aur_search_url() {
 }
 
 aur_info_url() {
-  printf "$AUR/rpc.php?type=info&arg=$(url_encode "$1")\n"
-}
-
-aur_multiinfo_url() {
   local params='' arg
 
   for arg; do
@@ -71,9 +67,7 @@ taurball() { get "$(aur_packages_url $1)/${1}.tar.gz"; }
 
 rpc_search() { get "$(aur_search_url "$1")" | parse_rpc; }
 
-rpc_info() { get "$(aur_info_url "$1")" | parse_rpc; }
-
-rpc_multiinfo() { get "$(aur_multiinfo_url "$@")" | parse_rpc; }
+rpc_info() { get "$(aur_info_url "$@")" | parse_rpc; }
 
 parse_rpc() {
   awk -F '[^\\\\]"' -v RS='{"|,"|"}' '
@@ -245,9 +239,9 @@ execute_search() {
   debug "executing search for $colorG$@$nocolor (mode: $colorG$search_mode$nocolor)"
 
   case "$search_mode" in
-    search) rpc_search    "$*" | sort | print_search ;;
-    info)   rpc_multiinfo "$@" | sort | print_info   ;;
-    quiet)  rpc_search    "$*" | sort | cut -d '|' -f 1 ;;
+    search) rpc_search "$*" | sort | print_search ;;
+    info)   rpc_info   "$@" | sort | print_info   ;;
+    quiet)  rpc_search "$*" | sort | cut -d '|' -f 1 ;;
     print)  for name; do pkgbuild "$name"; done ;;
   esac
 }
@@ -371,7 +365,7 @@ available_upgrades() {
       debug "upgrade available for $colorG$name$nocolor (new version)"
       printf "$name\n"
     fi
-  done < <(rpc_multiinfo "${!versions[@]}")
+  done < <(rpc_info "${!versions[@]}")
 }
 # }}}
 
@@ -397,7 +391,7 @@ set_targets() {
 
     versions[$name]=$version
     deps[$name]=$dep
-  done < <(rpc_multiinfo "$@")
+  done < <(rpc_info "$@")
 }
 
 process_targets() {
