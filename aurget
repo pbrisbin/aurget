@@ -380,8 +380,8 @@ set_targets() {
   local name version
 
   # global: targets[]
-  # global: versions[]
-  # global: deps[]
+  # global: target_versions[]
+  # global: target_deps[]
 
   (( $# )) || return
 
@@ -399,18 +399,18 @@ set_targets() {
   done
 
   while IFS='|' read -r name version _; do
-    versions[$name]=$version
-    deps[$name]=$dep
+    target_versions[$name]=$version
+    target_deps[$name]=$dep
   done < <(rpc_info "$@")
 }
 
 process_targets() {
   local name version packages
 
-  # global: versions[]
+  # global: target_versions[]
 
   for name; do
-    version="${versions[$name]}"
+    version="${target_versions[$name]}"
 
     if [[ -n "$version" ]]; then
       packages+="${name}-$version "
@@ -428,7 +428,7 @@ process_targets() {
   [[ "$sync_mode" == 'install' ]] && makepkg_options+=' --install'
 
   for name; do
-    [[ -n "${versions[$name]}" ]] && process_target "$name"
+    [[ -n "${target_versions[$name]}" ]] && process_target "$name"
   done
 }
 
@@ -461,7 +461,7 @@ process_target() {
 build_target() {
   local name="$1" pkgbuild
 
-  # global: deps[]
+  # global: target_deps[]
 
   info 'Building package...'
 
@@ -475,7 +475,7 @@ build_target() {
   fi
 
   if prompt_to_edit "$name" './PKGBUILD' 'building'; then
-    if (( ${deps[$name]} )); then
+    if (( ${target_deps[$name]} )); then
       debug "executing $colorY$makepkg $makepkg_options --asdeps$nocolor"
       $makepkg $makepkg_options --asdeps || die "dependency package $name failed to build, aborting"
     else
@@ -565,8 +565,8 @@ EOF
 declare -a arguments
 declare -a dependencies
 declare -a targets
-declare -A versions # name->version
-declare -A deps     # name->is-dep?
+declare -A target_versions # name->version
+declare -A target_deps     # name->is-dep?
 
 set_defaults "$@"
 
