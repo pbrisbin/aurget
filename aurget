@@ -556,11 +556,10 @@ EOF
 }
 # }}}
 
-arguments=()
-dependencies=()
-
-declare -A versions
-declare -A deps
+declare -a arguments
+declare -a dependencies
+declare -A versions # name->version
+declare -A deps     # name->is-dep?
 
 set_defaults "$@"
 
