@@ -290,6 +290,7 @@ resolve() {
   local name dep
 
   # global: dependencies[]
+  # global: arguments[]
 
   for name; do
     if source_pkgbuild "$name"; then
@@ -320,7 +321,7 @@ source_pkgbuild() {
         return 0
       fi
     else
-      debug "PKGBUILD ${colorR}not$nocolor available for $colorG$name$nocolor"
+      debug "PKGBUILD ${colorR}not$nocolor available for $colorG$name$nocolor, assuming repository package"
     fi
   fi
 
