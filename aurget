@@ -11,19 +11,19 @@ dependencies=()
 # Support {{{
 die() { error $*; exit 1; }
 
-info() { echo -e "${colorB}:: $colorW$*$nocolor"; }
+info() { printf "${colorB}:: $colorW$*$nocolor\n"; }
 
-warn() { echo -e "${colorY}warning: $nocolor$*" >&2; }
+warn() { printf "${colorY}warning:$nocolor $*\n" >&2; }
 
-error() { echo -e "${colorR}error: $nocolor$*" >&2; }
+error() { printf "${colorR}error:$nocolor $*\n" >&2; }
 
 debug() {
-  $debug && echo -e "$colorW[${colorC}DEBUG$colorW]$nocolor $*" >&2
+  $debug && printf "$colorW[${colorC}DEBUG$colorW]$nocolor $*\n" >&2
 }
 
 err_no_targets() {
   if [[ "$opmode" == 'upgrade' ]]; then
-    echo 'nothing to upgrade'
+    printf "nothing to upgrade\n"
     exit 0
   fi
 
@@ -32,8 +32,7 @@ err_no_targets() {
 
 # thanks Irm
 url_encode() {
-  echo "$*" \
-    | hexdump -v -e '1/1 "%02x\t"' -e '1/1 "%_c\n"' \
+  hexdump -v -e '1/1 "%02x\t"' -e '1/1 "%_c\n"' <<< "$*" \
     | LANG=C awk '
       $1 == "20"                   { printf("%s", "+"); next }
       $1 ~  /0[adAD]/              {                    next }
@@ -43,15 +42,15 @@ url_encode() {
 }
 
 aur_packages_url() {
-  echo "$AUR/packages/$(url_encode "${1:0:2}")/$(url_encode "$1")"
+  printf "$AUR/packages/$(url_encode "${1:0:2}")/$(url_encode "$1")\n"
 }
 
 aur_search_url() {
-  echo "$AUR/rpc.php?type=search&arg=$(url_encode "$1")"
+  printf "$AUR/rpc.php?type=search&arg=$(url_encode "$1")\n"
 }
 
 aur_info_url() {
-  echo "$AUR/rpc.php?type=info&arg=$(url_encode "$1")"
+  printf "$AUR/rpc.php?type=info&arg=$(url_encode "$1")\n"
 }
 
 aur_multiinfo_url() {
@@ -61,7 +60,7 @@ aur_multiinfo_url() {
     params+="&arg\[\]=$(url_encode "$arg")"
   done
 
-  echo "$AUR/rpc.php?type=multiinfo$params"
+  printf "$AUR/rpc.php?type=multiinfo$params\n"
 }
 
 get() { debug "HTTP GET $colorM$1$nocolor"; curl --silent --fail "$1"; }
@@ -79,10 +78,14 @@ rpc_multiinfo() { get "$(aur_multiinfo_url "$@")" | parse_rpc; }
 parse_rpc() {
   awk -F '[^\\\\]"' -v RS='{"|,"|"}' '
     function unstring(str) {
-      sub(/[^:]+:/, "", str)
-      gsub(/\\\"/, "\"", str)
-      gsub(/"$/, "", str)
-      return substr(str, 2, length(str))
+      sub(/[^:]+:/, ""  , str) # remove prefix
+      gsub(/\\\"/ , "\"", str) # un-escape quotes
+      gsub(/\\\// , "/" , str) # un-escape urls
+      gsub(/%/    , "%%", str) # escape percents for printf
+      gsub(/\|/   , "/" , str) # replace pipe (our own field sep)
+      gsub(/"$/   , ""  , str) # remove extra trailing quote
+
+      return substr(str, 2, length(str)) # unquote value
     }
 
     /Name":/        { printf "%s",    unstring($0) }
@@ -101,9 +104,9 @@ is_ignored() { [[ " $ignore_packages " =~ " $1 " ]]; }
 prompt() {
   local a
 
-  echo -en "$*? [Y/n] "
+  printf "$*? [Y/n] "
 
-  $noconfirm && { echo 'Y'; return 0; }
+  $noconfirm && { printf "Y\n"; return 0; }
 
   read a
 
@@ -255,9 +258,8 @@ print_search() {
   while IFS='|' read -r name version description _ outofdate _; do
     (( "$outofdate" )) && ood="$colorR[out of date]$nocolor"
 
-    ( echo -e "${colorM}aur/$colorW$name $colorG$version$nocolor $ood"
-      echo -e "    ${description//\\\///}"
-    ) 2>/dev/null
+    printf "${colorM}aur/$colorW$name $colorG$version$nocolor $ood\n"
+    printf "    $description\n"
   done
 }
 
@@ -267,13 +269,12 @@ print_info() {
   while IFS='|' read -r name version description url outofdate _; do
     (( "$outofdate" )) && ood="${colorR}Yes$nocolor"
 
-    ( echo -e "${colorW}Repository  : ${colorM}aur$nocolor"
-      echo -e "${colorW}Name        : $name$nocolor"
-      echo -e "${colorW}Version     : $colorG$version$nocolor"
-      echo -e "${colorW}URL         : $colorC${url//\\\///}$nocolor"
-      echo -e "${colorW}Out of date : $nocolor$ood"
-      echo -e "${colorW}Description : $nocolor${description//\\\///}\n"
-    ) 2>/dev/null
+    printf "${colorW}Repository  : ${colorM}aur$nocolor\n"
+    printf "${colorW}Name        : $name$nocolor\n"
+    printf "${colorW}Version     : $colorG$version$nocolor\n"
+    printf "${colorW}URL         : $colorC$url$nocolor\n"
+    printf "${colorW}Out of date : $nocolor$ood\n"
+    printf "${colorW}Description : $nocolor$description\n\n"
   done
 }
 # }}}
@@ -348,7 +349,7 @@ available_upgrades() {
     if is_devel $name; then
       if $devels; then
         debug "upgrade available for $colorG$name$nocolor (development package)"
-        echo "$name"
+        printf "$name\n"
       fi
     else
       versions[$name]=$version
@@ -368,7 +369,7 @@ available_upgrades() {
 
     if (( $check < 0 )); then
       debug "upgrade available for $colorG$name$nocolor (new version)"
-      echo "$name"
+      printf "$name\n"
     fi
   done < <(rpc_multiinfo "${!versions[@]}")
 }
@@ -415,7 +416,7 @@ process_targets() {
     fi
   done
 
-  echo -e "\n${colorY}Targets ($#):$nocolor $packages\n"
+  printf "\n${colorY}Targets ($#):$nocolor $packages\n\n"
 
   prompt "Proceed with installation" || exit 0
 
