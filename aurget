@@ -334,19 +334,21 @@ available_upgrades() {
   declare -A versions
 
   while read -r name version; do
-    if is_devel $name; then
-      if $devels; then
-        debug "upgrade available for $colorG$name$nocolor (development package)"
-        printf "$name\n"
-      fi
-    else
-      versions[$name]=$version
-    fi
+    versions[$name]=$version
   done < <(pacman -Qm)
 
   debug "found $colorG${#versions[@]}$nocolor foreign packages to check"
 
   while IFS='|' read -r name versN _; do
+    if is_devel $name; then
+      if $devels; then
+        debug "upgrade available for $colorG$name$nocolor (development package)"
+        printf "$name\n"
+      fi
+
+      continue
+    fi
+
     vers="${versions[$name]}"
 
     read -r check < <(vercmp "$vers" "$versN")
@@ -377,6 +379,7 @@ set_targets() {
   local dep="$1"; shift
   local name version
 
+  # global: targets[]
   # global: versions[]
   # global: deps[]
 
@@ -384,7 +387,7 @@ set_targets() {
 
   debug "setting targets for $colorG$@$nocolor (dependency flag: $colorG$dep$nocolor)"
 
-  while IFS='|' read -r name version _; do
+  for name; do
     if is_ignored "$name"; then
       if ! prompt "$name is in ignore_packages. Install anyway"; then
         warn "skipping target: $name"
@@ -392,6 +395,10 @@ set_targets() {
       fi
     fi
 
+    targets+=( "$name" )
+  done
+
+  while IFS='|' read -r name version _; do
     versions[$name]=$version
     deps[$name]=$dep
   done < <(rpc_info "$@")
@@ -401,7 +408,6 @@ process_targets() {
   local name version packages
 
   # global: versions[]
-  # global: deps[]
 
   for name; do
     version="${versions[$name]}"
@@ -558,6 +564,7 @@ EOF
 
 declare -a arguments
 declare -a dependencies
+declare -a targets
 declare -A versions # name->version
 declare -A deps     # name->is-dep?
 
@@ -581,4 +588,4 @@ info 'Searching AUR...'
 set_targets 1 "${dependencies[@]}"
 set_targets 0 "${arguments[@]}"
 
-process_targets "${dependencies[@]}" "${arguments[@]}"
+process_targets "${targets[@]}"
