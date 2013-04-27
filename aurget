@@ -442,16 +442,12 @@ process_target() {
       return 1
     fi
 
-    build_target "$name"
-
-    discard_sources "$name"
+    build_target "$name" && discard_sources "$name"
   fi
 }
 
 build_target() {
-  local name="$1" pkgbuild
-
-  # global: target_deps[]
+  local name="$1" pkgbuild ret=0
 
   info 'Building package...'
 
@@ -470,13 +466,15 @@ build_target() {
       $makepkg $makepkg_options --asdeps || die "dependency package $name failed to build, aborting"
     else
       debug "executing $colorY$makepkg $makepkg_options$nocolor"
-      $makepkg $makepkg_options || warn "package $name failed to build, skipping"
+      $makepkg $makepkg_options || { ret=1; warn "package $name failed to build, skipping"; }
     fi
   fi
 
-  cd ..
+  cd .. || die 'unable to change out of source directory'
 
-  debug "build finished"
+  debug "build finished, returning $colorG$ret$nocolor"
+
+  return $ret
 }
 
 discard_sources() {
