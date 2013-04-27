@@ -137,7 +137,7 @@ set_defaults() {
   opmode='install'
   resolve_dependencies=false
   search_mode='search'
-  sync_mode='build'
+  sync_mode='install'
   temp_directory='/tmp/aurget'
 
   EDITOR="${EDITOR:-$VISUAL}"

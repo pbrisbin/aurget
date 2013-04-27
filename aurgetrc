@@ -39,7 +39,7 @@ resolve_dependencies=false
 
 # The default way to process packages for -S and -Su. Can be one of
 # download, build, or install.
-sync_mode='build'
+sync_mode='install'
 
 # Where aurget will place temporary working files as needed. This
 # directory is created and cleared when aurget starts.
