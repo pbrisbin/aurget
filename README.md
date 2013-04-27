@@ -18,7 +18,7 @@ Copy `aurget` from this repository into any directory on your `$PATH`.
 See `/usr/share/aurget/config`. The highlights:
 
 1. Where to build? (defaults to `.`)
-2. Download, build or install? (defaults to `build`)
+2. Download, build or install? (defaults to `install`)
 3. Edit PKGBUILDs? (defaults to `prompt`)
 4. Discard build files after? (defaults to `true`)
 
