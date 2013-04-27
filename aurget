@@ -230,6 +230,8 @@ enter_build_directory() {
 execute_search() {
   [[ "$opmode" == 'search' ]] || return 1
 
+  set -- "${arguments[@]}"
+
   debug "searching for $colorG$*$nocolor (mode: $colorG$search_mode$nocolor)"
 
   case "$search_mode" in
@@ -279,9 +281,6 @@ set_dependencies() {
 resolve() {
   local name dep
 
-  # global: dependencies[]
-  # global: arguments[]
-
   for name; do
     if source_pkgbuild "$name"; then
       depends=($(pacman -T -- ${depends[@]} ${makedepends[@]}))
@@ -326,6 +325,11 @@ add_available_upgrades() {
 
   info 'Starting AUR upgrade...'
   arguments=( $(available_upgrades) "${arguments[@]}" )
+
+  (( "${#arguments[@]}" )) || {
+    printf "nothing to upgrade\n"
+    exit 0
+  }
 }
 
 available_upgrades() {
@@ -366,26 +370,27 @@ available_upgrades() {
 # }}}
 
 # Target handling {{{
-err_no_targets() {
-  if [[ "$opmode" == 'upgrade' ]]; then
-    printf "nothing to upgrade\n"
-    exit 0
-  fi
-
-  die 'no targets specified (use -h for help)'
-}
-
 set_targets() {
-  local dep="$1"; shift
   local name version
 
-  # global: targets[]
-  # global: target_versions[]
-  # global: target_deps[]
+  set -- "${dependencies[@]}" "${arguments[@]}"
 
-  (( $# )) || return
+  (( "$#" )) || die 'no targets specified (use -h for help)'
 
-  debug "setting targets for $colorG$@$nocolor (dependency flag: $colorG$dep$nocolor)"
+  info 'Searching AUR...'
+
+  while IFS='|' read -r name version _; do
+    target_versions[$name]=$version
+  done < <(rpc_info "$@")
+
+  for name in "${dependencies[@]}"; do target_deps[$name]=1; done
+  for name in "${arguments[@]}";    do target_deps[$name]=0; done
+}
+
+process_targets() {
+  local name version packages
+
+  set -- "${dependencies[@]}" "${arguments[@]}"
 
   for name; do
     if is_ignored "$name"; then
@@ -395,21 +400,6 @@ set_targets() {
       fi
     fi
 
-    targets+=( "$name" )
-  done
-
-  while IFS='|' read -r name version _; do
-    target_versions[$name]=$version
-    target_deps[$name]=$dep
-  done < <(rpc_info "$@")
-}
-
-process_targets() {
-  local name version packages
-
-  # global: target_versions[]
-
-  for name; do
     version="${target_versions[$name]}"
 
     if [[ -n "$version" ]]; then
@@ -564,28 +554,17 @@ EOF
 
 declare -a arguments
 declare -a dependencies
-declare -a targets
 declare -A target_versions # name->version
 declare -A target_deps     # name->is-dep?
 
 set_defaults "$@"
-
 source_config
 
 [[ ! -t 1 ]] && set_no_color
 
 parse_options "$@"
-
-execute_search "${arguments[@]}" && exit
-
+execute_search && exit
 add_available_upgrades
-
-(( "${#arguments[@]}" )) || err_no_targets
-
 set_dependencies
-
-info 'Searching AUR...'
-set_targets 1 "${dependencies[@]}"
-set_targets 0 "${arguments[@]}"
-
-process_targets "${targets[@]}"
+set_targets
+process_targets
