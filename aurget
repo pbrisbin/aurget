@@ -151,6 +151,7 @@ buildpkg() {
   debug "executing $colorY$makepkg $makepkg_options $@$nocolor"
 
   if $silent; then
+    debug 'building silently...'
     $makepkg $makepkg_options "$@" --noconfirm &>/dev/null
   else
     $makepkg $makepkg_options "$@"
@@ -386,7 +387,7 @@ available_upgrades() {
 
   while IFS='|' read -r name versN _; do
     if is_devel "$name"; then
-      $devels && output_upgrade "$name" "development package"
+      $devels && output_upgrade "$name" 'development package'
       continue
     fi
 
