@@ -550,8 +550,12 @@ process_targets() {
       debug "extracting $colorG$name$nocolor directly"
 
       if ! taurball "$name" | tar xfz -; then
-        warn "$name: failed to retrieve aur sources"
-        continue
+        if (( ${target_deps[$name]} )); then
+          die "dependency package $name failed to download, aborting"
+        else
+          warn "package $name failed download, skipping"
+          continue
+        fi
       fi
 
       build_target "$name" && discard_sources "$name"
