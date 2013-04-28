@@ -570,6 +570,7 @@ build_target() {
 
   if [[ -f "/etc/customizepkg.d/$name" ]]; then
     info 'Calling customizepkg...'
+    debug "executing ${colorY}customizepkg --modify$nocolor"
     customizepkg --modify || warn "customizepkg returned non-zero ($?)"
   fi
 
