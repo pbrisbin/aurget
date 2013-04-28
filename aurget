@@ -5,7 +5,7 @@
 ###
 AUR='https://aur.archlinux.org'
 
-# Help message {{{
+# Message {{{
 message() {
   cat << EOF
 Usage: aurget [ -h | -S* [ --options ] [ -- ] <arguments> ]
@@ -134,6 +134,18 @@ parse_rpc() {
 is_devel() { [[ "$1" =~ -(git|hg|svn|darcs|csv|bzr)$ ]]; }
 
 is_ignored() { [[ " $ignore_packages " =~ " $1 " ]]; }
+
+create_temp_directory() {
+  debug "storing temporary files in $colorM$temp_directory$nocolor"
+  mkdir -p "$temp_directory" || die 'unable to create temp directory'
+  rm -rf "$temp_directory"/*
+}
+
+enter_build_directory() {
+  debug "building in $colorM$build_directory$nocolor"
+  mkdir -p "$build_directory" || die 'unable to make build directory'
+  cd "$build_directory"       || die 'unable to change to build directory'
+}
 
 buildpkg() {
   debug "executing $colorY$makepkg $makepkg_options $@$nocolor"
@@ -294,18 +306,6 @@ parse_options() {
 
     shift
   done
-}
-
-create_temp_directory() {
-  debug "storing temporary files in $colorM$temp_directory$nocolor"
-  mkdir -p "$temp_directory" || die 'unable to create temp directory'
-  rm -rf "$temp_directory"/*
-}
-
-enter_build_directory() {
-  debug "building in $colorM$build_directory$nocolor"
-  mkdir -p "$build_directory" || die 'unable to make build directory'
-  cd "$build_directory"       || die 'unable to change to build directory'
 }
 # }}}
 
