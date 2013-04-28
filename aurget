@@ -575,7 +575,6 @@ build_target() {
 
   if prompt_to_edit "$name" './PKGBUILD' 'building'; then
     if (( ${target_deps[$name]} )); then
-      debug "executing $colorY$makepkg $makepkg_options --asdeps$nocolor"
       buildpkg --asdeps || die "dependency package $name failed to build, aborting"
     else
       buildpkg || { ret=1; warn "package $name failed to build, skipping"; }
