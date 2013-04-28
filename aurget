@@ -526,7 +526,7 @@ setup_targets() {
 #
 ###
 process_targets() {
-  local name
+  local name ret=0
 
   set -- "${targets[@]}"
 
@@ -543,6 +543,7 @@ process_targets() {
       debug "downloading $colorG$name$nocolor to filesystem"
 
       if ! taurball "$name" > "${name}.tar.gz"; then
+        ret=1
         warn "$name: failed to retrieve aur sources"
         continue
       fi
@@ -553,6 +554,7 @@ process_targets() {
         if (( ${target_deps[$name]} )); then
           die "dependency package $name failed to download, aborting"
         else
+          ret=1
           warn "package $name failed download, skipping"
           continue
         fi
@@ -561,6 +563,10 @@ process_targets() {
       build_target "$name" && discard_sources "$name"
     fi
   done
+
+  debug "processing complete, returning $colorG$ret$nocolor"
+
+  return $ret
 }
 
 build_target() {
