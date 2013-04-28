@@ -221,6 +221,7 @@ set_defaults() {
 
   build_directory="$PWD"
   devels=false
+  disable_color=false
   discard_sources=true
   ignore_packages=''
   keep_devels=true
@@ -237,16 +238,14 @@ set_defaults() {
   EDITOR="${EDITOR:-$VISUAL}"
   EDITOR="${EDITOR:-vi}"
 
-  if [[ -t 1 ]]; then
-    colorR="\e[1;31m"
-    colorG="\e[1;32m"
-    colorY="\e[1;33m"
-    colorB="\e[1;34m"
-    colorM="\e[1;35m"
-    colorC="\e[1;36m"
-    colorW="\e[1;37m"
-    nocolor="\e[0m"
-  fi
+  colorR="\e[1;31m"
+  colorG="\e[1;32m"
+  colorY="\e[1;33m"
+  colorB="\e[1;34m"
+  colorM="\e[1;35m"
+  colorC="\e[1;36m"
+  colorW="\e[1;37m"
+  nocolor="\e[0m"
 }
 
 source_config() {
@@ -256,17 +255,19 @@ source_config() {
   fi
 }
 
-set_no_color() {
-  colorR=''
-  colorG=''
-  colorY=''
-  colorB=''
-  colorM=''
-  colorC=''
-  colorW=''
-  nocolor=''
+setup_colors() {
+  if $disable_color || [[ ! -t 1 ]]; then
+    colorR=''
+    colorG=''
+    colorY=''
+    colorB=''
+    colorM=''
+    colorC=''
+    colorW=''
+    nocolor=''
 
-  makepkg_options+=' --nocolor'
+    makepkg_options+=' --nocolor'
+  fi
 }
 
 parse_options() {
@@ -286,7 +287,7 @@ parse_options() {
       -Sp|-Ssp|-Sps) opmode='search' ; search_mode='print'           ;;
       --ignore)      shift; ignore_packages+=" $1"                   ;;
       --noconfirm)   noconfirm=true; makepkg_options+=" --noconfirm" ;;
-      --nocolor)     set_no_color                                    ;;
+      --nocolor)     disable_color=true                              ;;
       --devel)       devels=true                                     ;;
       --deps)        resolve_dependencies=true                       ;;
       --nodeps)      resolve_dependencies=false                      ;;
@@ -628,8 +629,7 @@ declare -A target_deps     # name->is-dep?
 
 set_defaults "$@"
 source_config
-
-[[ ! -t 1 ]] && set_no_color
+setup_colors
 
 parse_options "$@"
 
