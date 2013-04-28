@@ -135,6 +135,16 @@ is_devel() { [[ "$1" =~ -(git|hg|svn|darcs|csv|bzr)$ ]]; }
 
 is_ignored() { [[ " $ignore_packages " =~ " $1 " ]]; }
 
+buildpkg() {
+  debug "executing $colorY$makepkg $makepkg_options $@$nocolor"
+
+  if $silent; then
+    $makepkg $makepkg_options "$@" --noconfirm &>/dev/null
+  else
+    $makepkg $makepkg_options "$@"
+  fi
+}
+
 prompt() {
   local a
 
@@ -208,6 +218,7 @@ set_defaults() {
   opmode='install'
   resolve_dependencies=false
   search_mode='search'
+  silent=false
   sync_mode='install'
   temp_directory='/tmp/aurget'
 
@@ -271,6 +282,7 @@ parse_options() {
       --noedit)      edit_pkgbuilds='never'                          ;;
       --discard)     discard_sources=true                            ;;
       --nodiscard)   discard_sources=false                           ;;
+      --silent)      silent=true                                     ;;
       -h|--help)     message; exit                                   ;;
       --)            shift; arguments+=( "$@" ); return              ;;
       --debug)       :                                               ;;
@@ -564,10 +576,9 @@ build_target() {
   if prompt_to_edit "$name" './PKGBUILD' 'building'; then
     if (( ${target_deps[$name]} )); then
       debug "executing $colorY$makepkg $makepkg_options --asdeps$nocolor"
-      $makepkg $makepkg_options || die "dependency package $name failed to build, aborting"
+      buildpkg --asdeps || die "dependency package $name failed to build, aborting"
     else
-      debug "executing $colorY$makepkg $makepkg_options$nocolor"
-      $makepkg $makepkg_options || { ret=1; warn "package $name failed to build, skipping"; }
+      buildpkg || { ret=1; warn "package $name failed to build, skipping"; }
     fi
   fi
 
