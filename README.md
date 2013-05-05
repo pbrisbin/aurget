@@ -47,25 +47,6 @@ For detailed usage, see `aurget --help`.
 
 ## Gotchas
 
-*It doesn't do anything!*
-
-Default behavior is to build (not install). Default behavior is also to 
-discard the working folder afterwards. Makepkg's default behavior is to 
-place the built package in the working folder.
-
-If you've not purposely adjusted one of these three behaviors, the net 
-result is a built package which is immediately discarded... Oops.
-
-You should:
-
-1. Use `-Sy`
-2. Configure `sync_mode` or `discard_sources`
-3. Configure a `PKGDEST` for makepkg
-
-I'm open to adjusting aurget such that this is less surprising. There 
-are a few options I'm currently considering, feel free to cast your 
-vote.
-
 *I want to control where the built package goes.*
 
 Set `PKGDEST` either in `makepkg.conf` or as an environment variable. 
@@ -73,6 +54,16 @@ This is a makepkg feature, not aurget.
 
 While you're at it, the `PACMAN`, `SRCDEST`, and `BUILDDIR` settings may 
 or may not be useful to you as well.
+
+*It's erroring with package not found, but it's in the repos.*
+
+This can sometimes occur when a package was recently moved from the AUR 
+to [community]. The PKGBUILD still exists in the AUR and this tricks 
+aurget into adding it as a target during dependency resolution. When 
+installation proceeds, it validates the target and (correctly) errors.
+
+Simply install the repository package (using `--asdeps`) before retrying 
+your AUR installation.
 
 ## Bugs?
 
