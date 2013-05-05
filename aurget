@@ -135,6 +135,12 @@ is_devel() { [[ "$1" =~ -(git|hg|svn|darcs|csv|bzr)$ ]]; }
 
 is_ignored() { [[ " $ignore_packages " =~ " $1 " ]]; }
 
+searching() { [[ "$opmode" == 'search' ]]; }
+
+upgrading() { [[ "$opmode" == 'upgrade' ]]; }
+
+resolving() { $resolve_dependencies; }
+
 create_temp_directory() {
   debug "storing temporary files in $colorM$temp_directory$nocolor"
   mkdir -p "$temp_directory" || die 'unable to create temp directory'
@@ -210,8 +216,8 @@ nothing_to_do() {
 }
 # }}}
 
-# Initialization {{{
-set_defaults() {
+# Initialize {{{
+initialize() {
   local config_regex=' --config +([^ ]+) '
 
   debug=false
@@ -220,6 +226,49 @@ set_defaults() {
   [[ " $* " =~ " --debug "    ]] && debug=true
   [[ " $* " =~ $config_regex  ]] && user_config="${BASH_REMATCH[1]}"
 
+  set_defaults
+  source_config
+  setup_colors
+
+  while [[ -n "$1" ]]; do
+    case "$1" in
+      -S)            opmode='install'                                ;;
+      -Sy)           opmode='install'; sync_mode='install'           ;;
+      -Sb)           opmode='install'; sync_mode='build'             ;;
+      -Sd)           opmode='install'; sync_mode='download'          ;;
+      -Su)           opmode='upgrade'                                ;;
+      -Syu|-Suy)     opmode='upgrade'; sync_mode='install'           ;;
+      -Sbu|-Sub)     opmode='upgrade'; sync_mode='build'             ;;
+      -Sdu|-Sud)     opmode='upgrade'; sync_mode='download'          ;;
+      -Ss)           opmode='search' ; search_mode='search'          ;;
+      -Ssq|-Sqs)     opmode='search' ; search_mode='quiet'           ;;
+      -Si|-Ssi|-Sis) opmode='search' ; search_mode='info'            ;;
+      -Sp|-Ssp|-Sps) opmode='search' ; search_mode='print'           ;;
+      --ignore)      shift; ignore_packages+=" $1"                   ;;
+      --noconfirm)   noconfirm=true; makepkg_options+=" --noconfirm" ;;
+      --nocolor)     disable_color=true                              ;;
+      --devel)       devels=true                                     ;;
+      --deps)        resolve_dependencies=true                       ;;
+      --nodeps)      resolve_dependencies=false                      ;;
+      --edit)        edit_pkgbuilds='always'                         ;;
+      --noedit)      edit_pkgbuilds='never'                          ;;
+      --discard)     discard_sources=true                            ;;
+      --nodiscard)   discard_sources=false                           ;;
+      --silent)      silent=true                                     ;;
+      -h|--help)     message; exit                                   ;;
+      --)            shift; arguments+=( "$@" ); return              ;;
+      --debug)       :                                               ;;
+      --config)      : ; shift                                       ;;
+      -*)            warn "unknown option $1, treating as makepkg argument..."
+                     makepkg_options+=" $1"                          ;;
+      *)             arguments+=( "$1" )                             ;;
+    esac
+
+    shift
+  done
+}
+
+set_defaults() {
   build_directory="$PWD"
   devels=false
   disable_color=false
@@ -270,56 +319,10 @@ setup_colors() {
     makepkg_options+=' --nocolor'
   fi
 }
-
-parse_options() {
-  while [[ -n "$1" ]]; do
-    case "$1" in
-      -S)            opmode='install'                                ;;
-      -Sy)           opmode='install'; sync_mode='install'           ;;
-      -Sb)           opmode='install'; sync_mode='build'             ;;
-      -Sd)           opmode='install'; sync_mode='download'          ;;
-      -Su)           opmode='upgrade'                                ;;
-      -Syu|-Suy)     opmode='upgrade'; sync_mode='install'           ;;
-      -Sbu|-Sub)     opmode='upgrade'; sync_mode='build'             ;;
-      -Sdu|-Sud)     opmode='upgrade'; sync_mode='download'          ;;
-      -Ss)           opmode='search' ; search_mode='search'          ;;
-      -Ssq|-Sqs)     opmode='search' ; search_mode='quiet'           ;;
-      -Si|-Ssi|-Sis) opmode='search' ; search_mode='info'            ;;
-      -Sp|-Ssp|-Sps) opmode='search' ; search_mode='print'           ;;
-      --ignore)      shift; ignore_packages+=" $1"                   ;;
-      --noconfirm)   noconfirm=true; makepkg_options+=" --noconfirm" ;;
-      --nocolor)     disable_color=true                              ;;
-      --devel)       devels=true                                     ;;
-      --deps)        resolve_dependencies=true                       ;;
-      --nodeps)      resolve_dependencies=false                      ;;
-      --edit)        edit_pkgbuilds='always'                         ;;
-      --noedit)      edit_pkgbuilds='never'                          ;;
-      --discard)     discard_sources=true                            ;;
-      --nodiscard)   discard_sources=false                           ;;
-      --silent)      silent=true                                     ;;
-      -h|--help)     message; exit                                   ;;
-      --)            shift; arguments+=( "$@" ); return              ;;
-      --debug)       :                                               ;;
-      --config)      : ; shift                                       ;;
-      -*)            warn "unknown option $1, treating as makepkg argument..."
-                     makepkg_options+=" $1"                          ;;
-      *)             arguments+=( "$1" )                             ;;
-    esac
-
-    shift
-  done
-}
 # }}}
 
 # Search {{{
-#
-# Perform an AUR search based on $arguments[]. Returns 1 if we're not
-# searching.
-#
-##
 perform_search() {
-  [[ "$opmode" == 'search' ]] || return 1
-
   set -- "${arguments[@]}"
 
   debug "searching for $colorG$*$nocolor (mode: $colorG$search_mode$nocolor)"
@@ -360,14 +363,7 @@ print_info() {
 # }}}
 
 # Add available upgrades {{{
-#
-# Adds any available upgrades to the front of the $arguments[] array.
-# Returns 1 if we're not processing upgrades.
-#
-##
 add_available_upgrades() {
-  [[ "$opmode" == 'upgrade' ]] || return 1
-
   info 'Starting AUR upgrade...'
   arguments=( $(available_upgrades) "${arguments[@]}" )
 
@@ -415,14 +411,7 @@ output_upgrade() {
 # }}}
 
 # Resolve dependencies {{{
-#
-# Resolves dependencies for $arguments[] and places them in the
-# $dependencies[] array. Returns 1 if we're not resolving dependencies.
-#
-##
 resolve_dependencies() {
-  $resolve_dependencies || return 1
-
   info 'Resolving dependencies...'
   create_temp_directory
   resolve "${arguments[@]}"
@@ -470,13 +459,6 @@ source_pkgbuild() {
 # }}}
 
 # Setup targets {{{
-#
-# For each package in the $dependencies[] and $arguments[] arrays,
-# ensure they are available in the AUR, handle ignored packages, and
-# populate the $targets[], $target_versions[], and $target_deps[] arrays
-# for later processing.
-#
-###
 setup_targets() {
   local name version versions
 
@@ -521,12 +503,6 @@ setup_targets() {
 # }}}
 
 # Process targets {{{
-#
-# For each entry in the $targets[] array, download, build, or install it
-# based on the current sync_mode. Uses $target_deps[] to know if the
-# package is a dependency or not.
-#
-###
 process_targets() {
   local name ret=0
 
@@ -628,15 +604,14 @@ declare -a targets
 declare -A target_versions # name->version
 declare -A target_deps     # name->is-dep?
 
-set_defaults "$@"
-source_config
-setup_colors
+initialize "$@"
 
-parse_options "$@"
+if searching; then
+  perform_search
+else
+  upgrading && add_available_upgrades
+  resolving && resolve_dependencies
 
-perform_search || {
-  add_available_upgrades
-  resolve_dependencies
   setup_targets
   process_targets
-}
+fi
