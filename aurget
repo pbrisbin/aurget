@@ -126,8 +126,7 @@ parse_rpc() {
     /Version":/     { printf "|%s",   unstring($0) }
     /Description":/ { printf "|%s",   unstring($0) }
     /URL":/         { printf "|%s",   unstring($0) }
-    /OutOfDate":/   { printf "|%s",   unstring($0) }
-    /URLPath":/     { printf "|%s\n", unstring($0) }
+    /OutOfDate":/   { printf "|%s\n", unstring($0) }
   '
 }
 
@@ -338,7 +337,7 @@ perform_search() {
 print_search() {
   local name version description outofdate ood
 
-  while IFS='|' read -r name version description _ outofdate _; do
+  while IFS='|' read -r name version description _ outofdate; do
     (( "$outofdate" )) && ood="$colorR[out of date]$nocolor"
 
     printf "${colorM}aur/$colorW$name $colorG$version$nocolor $ood\n"
@@ -349,7 +348,7 @@ print_search() {
 print_info() {
   local name version description url outofdate ood='No'
 
-  while IFS='|' read -r name version description url outofdate _; do
+  while IFS='|' read -r name version description url outofdate; do
     (( "$outofdate" )) && ood="${colorR}Yes$nocolor"
 
     printf "${colorW}Repository  : ${colorM}aur$nocolor\n"
