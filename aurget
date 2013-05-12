@@ -119,7 +119,10 @@ parse_rpc() {
       gsub(/\|/   , "/" , str) # replace pipe (our own field sep)
       gsub(/"$/   , ""  , str) # remove extra trailing quote
 
-      return substr(str, 2, length(str)) # unquote value
+      if(substr(str, 1, 1) == "\"")
+        return substr(str, 2, length(str)) # unquote value
+      else
+        return str
     }
 
     /Name":/        { printf "%s",    unstring($0) }
