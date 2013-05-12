@@ -74,10 +74,10 @@ debug() {
 url_encode() {
   hexdump -v -e '1/1 "%02x\t"' -e '1/1 "%_c\n"' <<< "$*" \
     | LANG=C awk '
-      $1 == "20"                   { printf("%s", "+"); next }
-      $1 ~  /0[adAD]/              {                    next }
-      $2 ~  /^[a-zA-Z0-9.*()\/-]$/ { printf("%s", $2);  next }
-                                   { printf("%%%s", $1)      }
+      $1 == "20"                    { printf("%s", "+"); next }
+      $1 ~  /0[adAD]/               {                    next }
+      $2 ~  /^[a-zA-Z0-9.*()\/_-]$/ { printf("%s", $2);  next }
+                                    { printf("%%%s", $1)      }
     '
 }
 
