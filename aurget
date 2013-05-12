@@ -341,7 +341,7 @@ print_search() {
   local name version description outofdate ood
 
   while IFS='|' read -r name version description _ outofdate; do
-    (( "$outofdate" )) && ood="$colorR[out of date]$nocolor"
+    (( $outofdate )) && ood="$colorR[out of date]$nocolor" || ood=''
 
     printf "${colorM}aur/$colorW$name $colorG$version$nocolor $ood\n"
     printf "    $description\n"
@@ -349,10 +349,10 @@ print_search() {
 }
 
 print_info() {
-  local name version description url outofdate ood='No'
+  local name version description url outofdate ood
 
   while IFS='|' read -r name version description url outofdate; do
-    (( "$outofdate" )) && ood="${colorR}Yes$nocolor"
+    (( $outofdate )) && ood="${colorR}Yes$nocolor" || ood='No'
 
     printf "${colorW}Repository  : ${colorM}aur$nocolor\n"
     printf "${colorW}Name        : $name$nocolor\n"
