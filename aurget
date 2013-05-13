@@ -133,6 +133,8 @@ parse_rpc() {
   '
 }
 
+keep_sources() { [[ "$1" =~ "$keep_source_packages" ]]; }
+
 is_devel() { [[ "$1" =~ -(git|hg|svn|darcs|csv|bzr)$ ]]; }
 
 is_ignored() { [[ " $ignore_packages " =~ " $1 " ]]; }
@@ -277,6 +279,7 @@ set_defaults() {
   discard_sources=true
   ignore_packages=''
   keep_devels=true
+  keep_source_packages=''
   makepkg='makepkg'
   makepkg_options='--syncdeps'
   noconfirm=false
@@ -584,6 +587,11 @@ discard_sources() {
 
   if ! $discard_sources; then
     debug "keeping sources for $colorG$name$nocolor (discard false)"
+    return
+  fi
+
+  if keep_sources "$name"; then
+    debug "keeping sources for $colorG$name$nocolor (keep sources)"
     return
   fi
 
