@@ -133,7 +133,7 @@ parse_rpc() {
   '
 }
 
-keep_sources() { [[ "$1" =~ "$keep_source_packages" ]]; }
+keep_sources() { [[ " $keep_source_packages " =~ " $1 " ]]; }
 
 is_devel() { [[ "$1" =~ -(git|hg|svn|darcs|csv|bzr)$ ]]; }
 
