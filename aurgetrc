@@ -26,6 +26,10 @@ ignore_packages=''
 # discard sources for development packages.
 keep_devels=true
 
+# A regex for packages to keep the sources for,
+# regardless of discard_sources.
+keep_source_packages=''
+
 # The makepkg executable
 makepkg='makepkg'
 
