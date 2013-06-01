@@ -211,7 +211,7 @@ prompt_to_install() {
 
   printf "\n\n"
 
-  prompt "Proceed with installation" || exit 0
+  prompt 'Proceed with installation' || exit 0
 }
 
 nothing_to_do() {
@@ -227,7 +227,7 @@ initialize() {
   debug=false
   user_config="${XDG_CONFIG_HOME:-$HOME/.config}/aurgetrc"
 
-  [[ " $* " =~ " --debug "    ]] && debug=true
+  [[ " $* " =~ ' --debug '    ]] && debug=true
   [[ " $* " =~ $config_regex  ]] && user_config="${BASH_REMATCH[1]}"
 
   set_defaults
@@ -249,7 +249,7 @@ initialize() {
       -Si|-Ssi|-Sis) opmode='search' ; search_mode='info'            ;;
       -Sp|-Ssp|-Sps) opmode='search' ; search_mode='print'           ;;
       --ignore)      shift; ignore_packages+=" $1"                   ;;
-      --noconfirm)   noconfirm=true; makepkg_options+=" --noconfirm" ;;
+      --noconfirm)   noconfirm=true; makepkg_options+=' --noconfirm' ;;
       --nocolor)     disable_color=true                              ;;
       --devel)       devels=true                                     ;;
       --deps)        resolve_dependencies=true                       ;;
