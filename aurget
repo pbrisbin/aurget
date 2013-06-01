@@ -139,6 +139,10 @@ is_devel() { [[ "$1" =~ -(git|hg|svn|darcs|csv|bzr)$ ]]; }
 
 is_ignored() { [[ " $ignore_packages " =~ " $1 " ]]; }
 
+downloading() { [[ "$sync_mode" == 'download' ]]; }
+
+installing() { [[ "$sync_mode" == 'install' ]]; }
+
 searching() { [[ "$opmode" == 'search' ]]; }
 
 upgrading() { [[ "$opmode" == 'upgrade' ]]; }
@@ -513,7 +517,7 @@ process_targets() {
 
   set -- "${targets[@]}"
 
-  [[ "$sync_mode" == 'install' ]] && makepkg_options+=' --install'
+  installing && makepkg_options+=' --install'
 
   debug "processing $colorG$#$nocolor targets"
 
@@ -522,7 +526,7 @@ process_targets() {
   for name; do
     info 'Retrieving taurball from AUR...'
 
-    if [[ "$sync_mode" == 'download' ]]; then
+    if downloading; then
       debug "downloading $colorG$name$nocolor to filesystem"
 
       if ! taurball "$name" > "${name}.tar.gz"; then
