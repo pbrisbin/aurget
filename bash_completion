@@ -19,7 +19,7 @@ _aurget() {
   aurget=$(basename "$aurget_exec")
 
   # valid long options
-  longopts='--devel --deps --nodeps --edit --noedit \
+  longopts='--builddir --devel --deps --nodeps --edit --noedit \
             --discard --nodiscard --nocolor --noconfirm'
 
   # all valid options

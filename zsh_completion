@@ -26,6 +26,7 @@ _aurget() {
     case $words[2] in
       -S|-S[dby])
         _arguments -s -w : \
+          '--builddir[Build in an alternate directory]:directory:_files -/' \
           '--devel[Upgrade development packages]' \
           '--deps[Resolve dependencies]' \
           '--nodeps[Don'\''t resolve dependencies]' \

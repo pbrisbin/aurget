@@ -29,6 +29,9 @@ Usage: aurget [ -h | -S* [ --options ] [ -- ] <arguments> ]
         -Sp  <package>  print the PKGBUILD for <package>
         -Si  <package>  print extended info for <package>
 
+        --builddir <directory>
+                        build in <directory>
+
         --devel         only affects -Su, add all development packages
 
         --deps          resolve dependencies
@@ -252,6 +255,7 @@ initialize() {
       -Ssq|-Sqs)     opmode='search' ; search_mode='quiet'           ;;
       -Si|-Ssi|-Sis) opmode='search' ; search_mode='info'            ;;
       -Sp|-Ssp|-Sps) opmode='search' ; search_mode='print'           ;;
+      --builddir)    shift; build_directory="$1"                     ;;
       --ignore)      shift; ignore_packages+=" $1"                   ;;
       --noconfirm)   noconfirm=true; makepkg_options+=' --noconfirm' ;;
       --nocolor)     disable_color=true                              ;;
