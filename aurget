@@ -278,6 +278,8 @@ initialize() {
 
     shift
   done
+
+  [[ -z "$opmode" ]] && { message; exit 1; }
 }
 
 set_defaults() {
@@ -291,7 +293,7 @@ set_defaults() {
   makepkg='makepkg'
   makepkg_options='--syncdeps'
   noconfirm=false
-  opmode='install'
+  opmode=''
   resolve_dependencies=false
   search_mode='search'
   silent=false
