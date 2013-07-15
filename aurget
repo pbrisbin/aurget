@@ -548,7 +548,7 @@ process_targets() {
           die "dependency package $name failed to download, aborting"
         else
           ret=1
-          warn "package $name failed download, skipping"
+          warn "package $name failed to download, skipping"
           continue
         fi
       fi
