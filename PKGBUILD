@@ -28,6 +28,6 @@ package() {
 md5sums=('b5136ba2f3f2d2d6034576aa2a73c4ac'
          '8630f2ca36bc0f4603c58f1f49bd9338'
          'aaaeaeb7169e14b807fbb29b346263d9'
-         '1970f7841118c33a10aabe87eaf38f65'
+         '976b2de0e15fd87316d16543be53b208'
          '2d33fc9c6d8b8c9219c7a91c90f328bc'
          'e8df58f145a7d487cccb0e7f6b1ec8aa')
