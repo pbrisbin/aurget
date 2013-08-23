@@ -8,6 +8,8 @@
 #
 #  ~/.config/aurgetrc
 #
+# See aurgetrc(5) for details on this file.
+#
 ###
 
 # The directory within which to build.

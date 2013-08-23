@@ -7,13 +7,21 @@ arch=('any')
 url="https://github.com/pbrisbin/$pkgname"
 license=('GPL')
 install=$pkgname.install
-source=($pkgname aurgetrc bash_completion zsh_completion)
+source=(
+  $pkgname
+  ${pkgname}.1
+  ${pkgname}rc.5
+  ${pkgname}rc
+  bash_completion
+  zsh_completion
+)
 optdepends=('customizepkg: for auto-customizing packages')
 
 package() {
-  install -Dm755 $pkgname "$pkgdir/usr/bin/$pkgname"
-
-  install -Dm644 aurgetrc "$pkgdir/usr/share/aurget/config"
+  install -Dm755 $pkgname        "$pkgdir/usr/bin/$pkgname"
+  install -Dm644 ${pkgname}.1    "$pkgdir/usr/share/man/man1/${pkgname}.1"
+  install -Dm644 ${pkgname}rc.5  "$pkgdir/usr/share/man/man5/${pkgname}rc.5"
+  install -Dm644 ${pkgname}rc    "$pkgdir/usr/share/aurget/config"
   install -Dm644 bash_completion "$pkgdir/etc/bash_completion.d/aurget"
   install -Dm644 zsh_completion  "$pkgdir/usr/share/zsh/site-functions/_aurget"
 }
