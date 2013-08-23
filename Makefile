@@ -1,5 +1,5 @@
 NAME    = aurget
-VERSION = 4.0.11
+VERSION = 4.0.12
 RELEASE = 1
 AUTHOR  = pbrisbin
 URL     = https://github.com/$(AUTHOR)/$(NAME)
