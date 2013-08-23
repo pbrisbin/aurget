@@ -1,34 +1,29 @@
-NAME=aurget
-VERSION=4.0.9
-AUTHOR=pbrisbin
-URL=https://github.com/$(AUTHOR)/$(NAME)
+NAME    = aurget
+VERSION = 4.0.11
+AUTHOR  = pbrisbin
+URL     = https://github.com/$(AUTHOR)/$(NAME)
 
-DIRS=bin share
-INSTALL_DIRS=`find $(DIRS) -type d 2>/dev/null`
-INSTALL_FILES=`find $(DIRS) -type f 2>/dev/null`
+PREFIX ?= /usr/local
 
-PREFIX?=/usr/local
+pkgver:
+	sed -i "s/^pkgver=.*/pkgver=$(VERSION)/" PKGBUILD
 
-tag:
-	echo "update pkgver in PKGBUILD"
-	echo "git tag -a v$(VERSION)"
+md5sums:
+	sed -i '/^md5sums=.*/,$$d' PKGBUILD
+	makepkg --geninteg --clean >> PKGBUILD
 
-md5:
-	echo "update md5 in PKGBUILD"
+man: aurget.1 aurget.5
 
-release:
-	echo "tag, md5, makepkg in pkg"
+aurget.1: doc/aurget.1.md
+	kramdown-man doc/aurget.1.md > aurget.1
 
-man:
-	kramdown-man doc/man/aurget.1.md > share/man/man1/aurget.1
-	kramdown-man doc/man/aurgetrc.5.md > share/man/man5/aurgetrc.5
+aurget.5: doc/aurgetrc.5.md
+	kramdown-man doc/aurgetrc.5.md > aurgetrc.5
 
-install:
-	for dir in $(INSTALL_DIRS); do mkdir -p $(PREFIX)/$$dir; done
-	for file in $(INSTALL_FILES); do cp $$file $(PREFIX)/$$file; done
+distcheck: man pkgver md5sums
+	makepkg --install --clean
 
-uninstall:
-	for file in $(INSTALL_FILES); do rm -f $(PREFIX)/$$file; done
-	rm -rf $(DOC_DIR)
+dist: man pkgver md5sums
+	makepkg --source --clean
 
-.PHONY: man install uninstall
+.PHONY: dist distcheck man md5sums pkgver
