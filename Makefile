@@ -14,12 +14,12 @@ md5sums:
 	sed -i '/^md5sums=.*/,$$d' PKGBUILD
 	makepkg --geninteg --clean >> PKGBUILD
 
-man: aurget.1 aurget.5
+man: aurget.1 aurgetrc.5
 
 aurget.1: doc/aurget.1.md
 	kramdown-man doc/aurget.1.md > aurget.1
 
-aurget.5: doc/aurgetrc.5.md
+aurgetrc.5: doc/aurgetrc.5.md
 	kramdown-man doc/aurgetrc.5.md > aurgetrc.5
 
 distcheck: man pkgver md5sums
@@ -28,7 +28,7 @@ distcheck: man pkgver md5sums
 
 dist: man pkgver md5sums
 	makepkg --source --clean
-	git commit -am "Releasing new version"
+	git commit -am "Releasing $(VERSION)-$(RELEASE)"
 	git tag -a -m v$(VERSION) v$(VERSION)
 
 clean:
