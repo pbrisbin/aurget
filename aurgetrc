@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Aurget v4 config file. Place this file at:
+# Place this file at:
 #
 #  $XDG_CONFIG_HOME/aurgetrc
 #
