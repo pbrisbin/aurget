@@ -6,7 +6,7 @@ aurgetrc - aurget configuration file
 
 ## SYNOPSIS
 
-$XDG_CONFIG_HOME/aurgetrc
+${XDG_CONFIG_HOME:-~/.config}/aurgetrc
 
 ## DESCRIPTION
 
@@ -16,7 +16,7 @@ ability to persistently set variables used by `aurget`.
 It is read from `$XDG_CONFIG_HOME/aurgetrc`. The `--config` flag can be 
 used to override this default. See `aurget(1)`.
 
-An example can be found at `$PREFIX/share/aurget/samples/aurgetrc`.
+An example can be found at `/usr/share/aurget/samples/aurgetrc`.
 
 ## VARIABLES
 

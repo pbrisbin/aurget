@@ -146,10 +146,10 @@ Find some of `aurget`'s competitors:
 
 ## FILES
 
-*/usr/share/aurget/samples/aurgetrc*
+*/usr/share/doc/aurget/samples/aurgetrc*
   Sample configuration file.
 
-*$XDG_CONFIG_HOME/aurgetrc*
+*${XDG_CONFIG_HOME:-~/.config}/aurgetrc*
   Default location of user configuration file.
 
 ## KNOWN BUGS
