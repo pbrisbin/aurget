@@ -31,3 +31,39 @@ Searching for "aur helper"
       The Ultimate Super Duper Aur Helper
   aur/yaah 0.5.1-1 
       Yet another AUR helper
+
+Searching quietly for "aur helper"
+
+  $ aurget -Ssq --nocolor aur helper
+  aur77i-git
+  aurinstaller-git
+  mate-file-manager-makepkg
+  meat-git
+  pacaur-git
+  pacaur
+  pkgbuilder-git
+  pkgbuilder
+  powaur
+  raur-git
+  raury-git
+  spinach
+  tusdah
+  yaah
+
+Searching for info on chruby and aurget
+
+  $ aurget -Ssi --nocolor chruby aurget
+  Repository  : aur
+  Name        : aurget
+  Version     : 4.0.12-1
+  URL         : https://github.com/pbrisbin/aurget
+  Out of date : No
+  Description : A simple Pacman-like interface to the AUR
+  
+  Repository  : aur
+  Name        : chruby
+  Version     : 0.3.6-1
+  URL         : https://github.com/postmodern/chruby
+  Out of date : No
+  Description : changes the current ruby. Supports both zsh and bash.
+  
