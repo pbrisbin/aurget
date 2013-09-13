@@ -14,13 +14,13 @@ md5sums:
 	sed -i '/^md5sums=.*/,$$d' PKGBUILD
 	makepkg --geninteg --clean >> PKGBUILD
 
-man: aurget.1 aurgetrc.5
+man: $(NAME).1 $(NAME)rc.5
 
-aurget.1: doc/aurget.1.md
-	kramdown-man doc/aurget.1.md > aurget.1
+$(NAME).1: doc/$(NAME).1.md
+	kramdown-man doc/$(NAME).1.md > $(NAME).1
 
-aurgetrc.5: doc/aurgetrc.5.md
-	kramdown-man doc/aurgetrc.5.md > aurgetrc.5
+$(NAME)rc.5: doc/$(NAME)rc.5.md
+	kramdown-man doc/$(NAME)rc.5.md > $(NAME)rc.5
 
 distcheck: man pkgver md5sums
 	makepkg --install --clean
