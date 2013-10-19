@@ -475,13 +475,16 @@ source_pkgbuild() {
 
 # Setup targets {{{
 setup_targets() {
-  local name version versions
+  local name version versions pkgbuild
 
   declare -A versions
 
   set -- "${dependencies[@]}" "${arguments[@]}"
 
   (( "$#" )) || die 'no targets specified (use -h for help)'
+
+  for name in "${dependencies[@]}"; do target_deps[$name]=1; done
+  for name in "${arguments[@]}";    do target_deps[$name]=0; done
 
   debug "setting up $colorG$#$nocolor targets for processing"
 
@@ -495,7 +498,19 @@ setup_targets() {
   for name; do
     version="${versions[$name]}"
 
-    [[ -z "$version" ]] && die "target not found: $name"
+    if [[ -z "$version" ]]; then
+      pkgbuild="$temp_directory/${name}_PKGBUILD"
+
+      if [[ -f "$pkgbuild" ]]; then
+        debug "target $colorG$name$nocolor may have moved to repos"
+        debug "legacy PKGBUILD: $colorG$pkgbuild$nocolor"
+
+        # let makepkg deal with it
+        (( ${target_deps[$name]} )) && continue
+      fi
+
+      die "target not found: $name"
+    fi
 
     if is_ignored "$name"; then
       if ! prompt "$name is in ignore_packages. Install anyway"; then
@@ -511,9 +526,6 @@ setup_targets() {
   (( "${#targets[@]}" )) || nothing_to_do
 
   prompt_to_install "${targets[@]}"
-
-  for name in "${dependencies[@]}"; do target_deps[$name]=1; done
-  for name in "${arguments[@]}";    do target_deps[$name]=0; done
 }
 # }}}
 
