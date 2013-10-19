@@ -141,7 +141,7 @@ resolution and indirectly sourced by \fBmakepkg\fR when building\.
 .LP
 .PP
 By default, you are prompted to edit PKGBUILDs before they are sourced 
-or built\. This behavior can be changed in your \fBaurgetrc\fR or the 
+or built\. This behavior can be changed in your \fBaurgetrc\fR or via the 
 \fB--[no]edit\fR flag\. See \fBaurgetrc(5)\fR\.
 .LP
 .SH MAKEPKG
@@ -197,17 +197,6 @@ Sample configuration file\.
 .TP
 \fI\[Do]\[lC]XDG\[ru]CONFIG\[ru]HOME:\-\[ti]\[sl]\.config\[rC]\[sl]aurgetrc\fP
 Default location of user configuration file\.
-.LP
-.SH KNOWN BUGS
-.LP
-.PP
-If called with \fB--debug\fR, some early debug messages will be colored even 
-when using \fB--nocolor\fR or not connected to a terminal\.
-.LP
-.PP
-If a package has been recently moved out of the AUR, but its PKGBUILD is 
-still present there, its presence will confuse \fBaurget\fR during 
-dependency resolution\.
 .LP
 .SH AUTHOR
 .LP

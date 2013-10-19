@@ -15,10 +15,10 @@ md5sums:
 man: $(NAME).1 $(NAME)rc.5
 
 $(NAME).1: doc/$(NAME).1.md
-	kramdown-man doc/$(NAME).1.md > $(NAME).1
+	kramdown-man < doc/$(NAME).1.md > $(NAME).1
 
 $(NAME)rc.5: doc/$(NAME)rc.5.md
-	kramdown-man doc/$(NAME)rc.5.md > $(NAME)rc.5
+	kramdown-man < doc/$(NAME)rc.5.md > $(NAME)rc.5
 
 distcheck: man pkgver md5sums
 	makepkg --install --clean
