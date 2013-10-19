@@ -108,7 +108,7 @@ PKGBUILDs will be directly sourced by `aurget` as part of dependency
 resolution and indirectly sourced by `makepkg` when building.
 
 By default, you are prompted to edit PKGBUILDs before they are sourced 
-or built. This behavior can be changed in your `aurgetrc` or the 
+or built. This behavior can be changed in your `aurgetrc` or via the 
 `--[no]edit` flag. See `aurgetrc(5)`.
 
 ## MAKEPKG
@@ -151,11 +151,6 @@ Find some of `aurget`'s competitors:
 
 *${XDG_CONFIG_HOME:-~/.config}/aurgetrc*
   Default location of user configuration file.
-
-## KNOWN BUGS
-
-If called with `--debug`, some early debug messages will be colored even 
-when using `--nocolor` or not connected to a terminal.
 
 ## AUTHOR
 
