@@ -232,12 +232,16 @@ initialize() {
   local config_regex=' --config +([^ ]+) '
 
   debug=false
+  disable_color=false
   user_config="${XDG_CONFIG_HOME:-$HOME/.config}/aurgetrc"
 
   [[ " $* " =~ ' --debug '    ]] && debug=true
+  [[ " $* " =~ ' --nocolor '  ]] && disable_color=true
   [[ " $* " =~ $config_regex  ]] && user_config="${BASH_REMATCH[1]}"
 
   set_defaults
+  setup_colors
+
   source_config
   setup_colors
 
@@ -258,7 +262,6 @@ initialize() {
       --builddir)    shift; build_directory="$1"                     ;;
       --ignore)      shift; ignore_packages+=" $1"                   ;;
       --noconfirm)   noconfirm=true; makepkg_options+=' --noconfirm' ;;
-      --nocolor)     disable_color=true                              ;;
       --devel)       devels=true                                     ;;
       --deps)        resolve_dependencies=true                       ;;
       --nodeps)      resolve_dependencies=false                      ;;
@@ -270,6 +273,7 @@ initialize() {
       -h|--help)     message; exit                                   ;;
       --)            shift; arguments+=( "$@" ); return              ;;
       --debug)       :                                               ;;
+      --nocolor)     :                                               ;;
       --config)      : ; shift                                       ;;
       -*)            warn "unknown option $1, treating as makepkg argument..."
                      makepkg_options+=" $1"                          ;;
@@ -285,7 +289,6 @@ initialize() {
 set_defaults() {
   build_directory="$PWD"
   devels=false
-  disable_color=false
   discard_sources=true
   ignore_packages=''
   keep_devels=true
