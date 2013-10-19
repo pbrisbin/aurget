@@ -1,10 +1,8 @@
 NAME    = aurget
-VERSION = 4.0.12
+VERSION = 4.0.13
 RELEASE = 1
 AUTHOR  = pbrisbin
 URL     = https://github.com/$(AUTHOR)/$(NAME)
-
-PREFIX ?= /usr/local
 
 pkgver:
 	sed -i "s/^pkgver=.*/pkgver=$(VERSION)/" PKGBUILD
