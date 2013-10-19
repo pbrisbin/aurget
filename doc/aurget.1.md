@@ -157,10 +157,6 @@ Find some of `aurget`'s competitors:
 If called with `--debug`, some early debug messages will be colored even 
 when using `--nocolor` or not connected to a terminal.
 
-If a package has been recently moved out of the AUR, but its PKGBUILD is 
-still present there, its presence will confuse `aurget` during 
-dependency resolution.
-
 ## AUTHOR
 
 Patrick Brisbin <pbrisbin@gmail.com>
