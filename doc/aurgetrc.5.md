@@ -24,11 +24,11 @@ An example can be found at `/usr/share/aurget/samples/aurgetrc`.
   The directory within which to build. Default is current directory.
 
 `discard_sources` *true*|*false*
-  Remove the extracted source directory after processing. Default is 
-  `true`.
+  Remove the extracted source directory after successful processing. 
+  Default is `true`.
 
 `edit_pkgbuilds` *prompt*|*always*|*never*
-  When to edit PKGBUILDs. Default is `prompt`.
+  When to present PKGBUILDs for editing. Default is `prompt`.
 
 `ignore_packages` *PACKAGE PACKAGE ...*
   Packages to ignore. Default is unset
