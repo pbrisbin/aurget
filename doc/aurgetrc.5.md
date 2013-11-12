@@ -1,4 +1,4 @@
-# aurgetrc 5 "August 2013" aurgetrc "User Manuals"
+# aurgetrc 5 "November 2013" aurgetrc "User Manuals"
 
 ## NAME
 
