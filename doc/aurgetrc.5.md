@@ -92,6 +92,21 @@ An example can be found at `/usr/share/aurget/samples/aurgetrc`.
   Reset color. Don't change this unless you know what you're doing. 
   Default is `\\e[0m`.
 
+## SPECIAL VARIABLES
+
+The following variables are not officially supported, but can still be 
+useful in certain scenarios.
+
+`debug` *true*|*false*
+  When *true*, acts as if `--debug` had been passed except that messages 
+  printed before configuration is sourced are not seen. When *false*, 
+  prevents `--debug` from having any effect.
+
+`disable_color` *true*|*false*
+  When *true*, acts as if `--no-color` had been passed except that 
+  messages printed before configuration is sourced are still colorized. 
+  When *false*, prevents `--no-color` from having any effect.
+
 ## AUTHOR
 
 Patrick Brisbin <pbrisbin@gmail.com>
