@@ -61,35 +61,36 @@ An example can be found at `/usr/share/aurget/samples/aurgetrc`.
 ## COLORS
 
 `colorR` *ANSI ESCAPE*
-  The color for elements which are usually `red`. Default is `\e[1;31m`.
+  The color for elements which are usually `red`. Default is 
+  `\\e[1;31m`.
 
 `colorG` *ANSI ESCAPE*
   The color for elements which are usually `green`. Default is 
-  `\e[1;32m`.
+  `\\e[1;32m`.
 
 `colorY` *ANSI ESCAPE*
   The color for elements which are usually `yellow`. Default is 
-  `\e[1;33m`.
+  `\\e[1;33m`.
 
 `colorB` *ANSI ESCAPE*
   The color for elements which are usually `blue`. Default is 
-  `\e[1;34m`.
+  `\\e[1;34m`.
 
 `colorM` *ANSI ESCAPE*
   The color for elements which are usually `magenta`. Default is 
-  `\e[1;35m`.
+  `\\e[1;35m`.
 
 `colorC` *ANSI ESCAPE*
   The color for elements which are usually `cyan`. Default is 
-  `\e[1;36m`.
+  `\\e[1;36m`.
 
 `colorW` *ANSI ESCAPE*
   The color for elements which are usually `white`. Default is 
-  `\e[1;37m`.
+  `\\e[1;37m`.
 
 `nocolor` *ANSI ESCAPE*
   Reset color. Don't change this unless you know what you're doing. 
-  Default is `\e[0m`.
+  Default is `\\e[0m`.
 
 ## AUTHOR
 
