@@ -1,6 +1,6 @@
 # Author: Patrick Brisbin <pbrisbin@gmail.com>
 pkgname=aurget
-pkgver=4.0.13
+pkgver=4.0.14
 pkgrel=1
 pkgdesc="A simple Pacman-like interface to the AUR"
 arch=('any')
@@ -27,7 +27,7 @@ package() {
 }
 md5sums=('6618f3ea3afaadb635ef8f6bb2b1b23d'
          '4092cb54276821c107d36f12ea50c44d'
-         '55f6849430f3080089ad141b262bb9f6'
+         'd07275a96a0e6a48f00267bfcf81e29b'
          '976b2de0e15fd87316d16543be53b208'
          '2d33fc9c6d8b8c9219c7a91c90f328bc'
          'e8df58f145a7d487cccb0e7f6b1ec8aa')
