@@ -103,9 +103,9 @@ useful in certain scenarios.
   prevents `--debug` from having any effect.
 
 `disable_color` *true*|*false*
-  When *true*, acts as if `--no-color` had been passed except that 
+  When *true*, acts as if `--nocolor` had been passed except that 
   messages printed before configuration is sourced are still colorized. 
-  When *false*, prevents `--no-color` from having any effect.
+  When *false*, prevents `--nocolor` from having any effect.
 
 ## AUTHOR
 
