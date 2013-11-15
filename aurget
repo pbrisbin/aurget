@@ -61,7 +61,7 @@ EOF
 # }}}
 
 # Support {{{
-die() { error $*; exit 1; }
+die() { error "$*"; exit 1; }
 
 info() { printf "${colorB}:: $colorW$*$nocolor\n"; }
 
@@ -104,9 +104,9 @@ aur_info_url() {
 
 get() { debug "HTTP GET $colorM$1$nocolor"; curl --silent --fail "$1"; }
 
-pkgbuild() { get "$(aur_packages_url $1)/PKGBUILD"; }
+pkgbuild() { get "$(aur_packages_url "$1")/PKGBUILD"; }
 
-taurball() { get "$(aur_packages_url $1)/${1}.tar.gz"; }
+taurball() { get "$(aur_packages_url "$1")/${1}.tar.gz"; }
 
 rpc_search() { get "$(aur_search_url "$1")" | parse_rpc; }
 
@@ -357,7 +357,9 @@ print_search() {
   local name version description outofdate ood
 
   while IFS='|' read -r name version description _ outofdate; do
-    (( $outofdate )) && ood="$colorR[out of date]$nocolor" || ood=''
+    ood=''
+
+    (( outofdate )) && ood="$colorR[out of date]$nocolor"
 
     printf "${colorM}aur/$colorW$name $colorG$version$nocolor $ood\n"
     printf "    $description\n"
@@ -368,7 +370,9 @@ print_info() {
   local name version description url outofdate ood
 
   while IFS='|' read -r name version description url outofdate; do
-    (( $outofdate )) && ood="${colorR}Yes$nocolor" || ood='No'
+    ood='No'
+
+    (( outofdate )) && ood="${colorR}Yes$nocolor"
 
     printf "${colorW}Repository  : ${colorM}aur$nocolor\n"
     printf "${colorW}Name        : $name$nocolor\n"
@@ -411,8 +415,8 @@ available_upgrades() {
 
     debug "checking $colorG$name$nocolor ($vers => $versN)"
 
-    (( $check > 0 )) && warn "$name: local ($vers) is newer than aur ($versN)"
-    (( $check < 0 )) && output_upgrade "$name" "$vers => $versN"
+    (( check > 0 )) && warn "$name: local ($vers) is newer than aur ($versN)"
+    (( check < 0 )) && output_upgrade "$name" "$vers => $versN"
   done < <(rpc_info "${!versions[@]}")
 }
 
@@ -440,7 +444,7 @@ resolve() {
 
   for name; do
     if source_pkgbuild "$name"; then
-      depends=($(pacman -T -- ${depends[@]} ${makedepends[@]}))
+      depends=($(pacman -T -- "${depends[@]}" "${makedepends[@]}"))
       depends=("${depends[@]%>*}")
       depends=("${depends[@]%=*}")
       depends=("${depends[@]%<*}")
