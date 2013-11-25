@@ -231,17 +231,13 @@ nothing_to_do() {
 initialize() {
   local config_regex=' --config +([^ ]+) '
 
-  debug=false
-  disable_color=false
-  user_config="${XDG_CONFIG_HOME:-$HOME/.config}/aurgetrc"
+  set_defaults
 
   [[ " $* " =~ ' --debug '    ]] && debug=true
   [[ " $* " =~ ' --nocolor '  ]] && disable_color=true
   [[ " $* " =~ $config_regex  ]] && user_config="${BASH_REMATCH[1]}"
 
-  set_defaults
   setup_colors
-
   source_config
   setup_colors
 
@@ -288,7 +284,9 @@ initialize() {
 
 set_defaults() {
   build_directory="$PWD"
+  debug=false
   devels=false
+  disable_color=false
   discard_sources=true
   ignore_packages=''
   keep_devels=true
@@ -302,6 +300,7 @@ set_defaults() {
   silent=false
   sync_mode='install'
   temp_directory='/tmp/aurget'
+  user_config="${XDG_CONFIG_HOME:-$HOME/.config}/aurgetrc"
 
   EDITOR="${EDITOR:-$VISUAL}"
   EDITOR="${EDITOR:-vi}"
