@@ -80,7 +80,7 @@ url_encode() {
       $1 == "20"                    { printf("%s", "+"); next }
       $1 ~  /0[adAD]/               {                    next }
       $2 ~  /^[a-zA-Z0-9.*()\/_-]$/ { printf("%s", $2);  next }
-                                    { printf("%%%s", $1)      }
+                                    { printf("%%%%%s", $1)    }
     '
 }
 
