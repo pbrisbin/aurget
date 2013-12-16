@@ -1,6 +1,6 @@
 # Author: Patrick Brisbin <pbrisbin@gmail.com>
 pkgname=aurget
-pkgver=4.0.15
+pkgver=4.0.16
 pkgrel=1
 pkgdesc="A simple Pacman-like interface to the AUR"
 arch=('any')
@@ -25,7 +25,7 @@ package() {
   install -Dm644 bash_completion "$pkgdir/etc/bash_completion.d/aurget"
   install -Dm644 zsh_completion  "$pkgdir/usr/share/zsh/site-functions/_aurget"
 }
-md5sums=('6618f3ea3afaadb635ef8f6bb2b1b23d'
+md5sums=('00f7b48bfe94f099b8f657bdbe704297'
          '4092cb54276821c107d36f12ea50c44d'
          '3726da3816919d2c309668246e9d9c02'
          '976b2de0e15fd87316d16543be53b208'
