@@ -1,7 +1,7 @@
 # Author: Patrick Brisbin <pbrisbin@gmail.com>
 pkgname=aurget
 pkgver=4.2.1
-pkgrel=1
+pkgrel=2
 pkgdesc="A simple, Pacman-like AUR helper"
 arch=('any')
 url="https://github.com/pbrisbin/$pkgname"
