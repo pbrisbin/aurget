@@ -52,6 +52,9 @@ An example can be found at `/usr/share/aurget/samples/aurgetrc`.
   Source PKGBUILDs and attempt to resolve dependencies. Default is 
   `false`.
 
+`sort_mode` *name*|*votes*
+  How to sort search results. Default is `name`.
+
 `sync_mode` *download*|*build*|*install*
   How to process packages. Default is `install`.
 
