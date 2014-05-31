@@ -2,7 +2,7 @@
 pkgname=aurget
 pkgver=4.2.1
 pkgrel=1
-pkgdesc="A simple Pacman-like interface to the AUR"
+pkgdesc="A simple, Pacman-like AUR helper"
 arch=('any')
 url="https://github.com/pbrisbin/$pkgname"
 license=('GPL')
