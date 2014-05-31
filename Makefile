@@ -24,7 +24,7 @@ test:
 	cram test
 
 release_aur:
-	makepkg --source --clean
+	mkaurball
 	aur-submit $(NAME)-$(VERSION)-$(RELEASE).src.tar.gz
 
 release_git:
