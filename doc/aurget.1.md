@@ -59,6 +59,11 @@ multiple actions are passed, the last specified is used.
 
 ## OPTIONS
 
+`--sort` *MODE*
+  Set the mode for sorting of search results. When *name*, sort the 
+  results by Name ascending. When *votes*, sort the results by Number of 
+  Votes descending. Defaults to *name*.
+
 `--builddir` *DIRECTORY*
   Set the build directory, default is current directory.
 
