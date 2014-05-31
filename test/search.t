@@ -58,6 +58,7 @@ Searching for info on chruby and aurget
   Version     : 4.0.12-1
   URL         : https://github.com/pbrisbin/aurget
   Out of date : No
+  Votes       : 194
   Description : A simple Pacman-like interface to the AUR
   
   Repository  : aur
@@ -65,5 +66,6 @@ Searching for info on chruby and aurget
   Version     : 0.3.6-1
   URL         : https://github.com/postmodern/chruby
   Out of date : No
+  Votes       : 7
   Description : changes the current ruby. Supports both zsh and bash.
   
