@@ -20,16 +20,30 @@ $(NAME).1: doc/$(NAME).1.md
 $(NAME)rc.5: doc/$(NAME)rc.5.md
 	kramdown-man < doc/$(NAME)rc.5.md > $(NAME)rc.5
 
-distcheck: man pkgver md5sums
-	makepkg --install --clean
-	rm $(NAME)-$(VERSION)-$(RELEASE)-any.pkg.tar.xz
+test:
+	cram test
 
-dist: man pkgver md5sums
+release_aur:
 	makepkg --source --clean
-	git commit -am "Releasing $(VERSION)-$(RELEASE)"
+	aur-submit $(NAME)-$(VERSION)-$(RELEASE).src.tar.gz
+
+release_git:
+	git add PKGBUILD \
+		aurget \
+		aurget.1 \
+		aurgetrc.5 \
+		aurgetrc \
+		bash_completion \
+		zsh_completion
+	git commit -m "Releasing $(VERSION)-$(RELEASE)"
 	git tag -a -m v$(VERSION) v$(VERSION)
+	git push
+	git push --tags
+
+release: test man pkgver md5sums release_aur release_git clean
 
 clean:
 	rm -f $(NAME)-$(VERSION)-$(RELEASE).src.tar.gz
+	rm -f $(NAME)-$(VERSION)-$(RELEASE)-any.pkg.tar.xz
 
-.PHONY: dist distcheck man md5sums pkgver clean
+.PHONY: release release_aur release_git test man clean
