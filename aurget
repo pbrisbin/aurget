@@ -108,9 +108,9 @@ pkgbuild() { get "$(aur_packages_url "$1")/PKGBUILD"; }
 
 taurball() { get "$(aur_packages_url "$1")/${1}.tar.gz"; }
 
-rpc_search() { get "$(aur_search_url "$1")" | parse_rpc; }
+rpc_search() { get "$(aur_search_url "$1")" | parse_rpc | sort_rpc; }
 
-rpc_info() { get "$(aur_info_url "$@")" | parse_rpc; }
+rpc_info() { get "$(aur_info_url "$@")" | parse_rpc | sort_rpc; }
 
 parse_rpc() {
   awk -F '[^\\\\]"' -v RS='{"|,"|"}' '
@@ -135,6 +135,14 @@ parse_rpc() {
     /NumVotes":/    { printf "|%s",   unstring($0) }
     /OutOfDate":/   { printf "|%s\n", unstring($0) }
   '
+}
+
+sort_rpc() {
+  case "$sort_mode" in
+    name)  sort ;;
+    votes) sort -t '|' -k 5,5nr -k 1,1 ;;
+    *) die 'invalid argument to --sort. must be name or votes' ;;
+  esac
 }
 
 keep_sources() { [[ " $keep_source_packages " =~ " $1 " ]]; }
@@ -267,6 +275,7 @@ initialize() {
       --discard)     discard_sources=true                            ;;
       --nodiscard)   discard_sources=false                           ;;
       --silent)      silent=true                                     ;;
+      --sort)        shift; sort_mode="$1"                           ;;
       -h|--help)     message; exit                                   ;;
       --)            shift; arguments+=( "$@" ); return              ;;
       --debug)       :                                               ;;
@@ -299,6 +308,7 @@ set_defaults() {
   resolve_dependencies=false
   search_mode='search'
   silent=false
+  sort_mode='name'
   sync_mode='install'
   temp_directory='/tmp/aurget'
   user_config="${XDG_CONFIG_HOME:-$HOME/.config}/aurgetrc"
@@ -346,9 +356,9 @@ perform_search() {
   debug "searching for $colorG$*$nocolor (mode: $colorG$search_mode$nocolor)"
 
   case "$search_mode" in
-    search) rpc_search "$*" | sort | print_search ;;
-    info)   rpc_info   "$@" | sort | print_info   ;;
-    quiet)  rpc_search "$*" | sort | cut -d '|' -f 1 ;;
+    search) rpc_search "$*" | print_search ;;
+    info)   rpc_info   "$@" | print_info   ;;
+    quiet)  rpc_search "$*" | cut -d '|' -f 1 ;;
     print)  for name; do pkgbuild "$name"; done ;;
   esac
 }

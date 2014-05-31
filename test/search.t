@@ -50,6 +50,24 @@ Searching quietly for "aur helper"
   tusdah
   yaah
 
+Sorting by votes
+
+  $ aurget -Ssq --nocolor --sort votes aur helper
+  pacaur
+  meat-git
+  pkgbuilder
+  spinach
+  pacaur-git
+  powaur
+  aurinstaller-git
+  tusdah
+  mate-file-manager-makepkg
+  pkgbuilder-git
+  raury-git
+  raur-git
+  aur77i-git
+  yaah
+
 Searching for info on chruby and aurget
 
   $ aurget -Ssi --nocolor chruby aurget
