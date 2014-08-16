@@ -133,6 +133,7 @@ parse_rpc() {
     }
 
     /Name":/        { printf "%s",    unstring($0) }
+    /PackageBase":/ { printf "|%s",   unstring($0) }
     /Version":/     { printf "|%s",   unstring($0) }
     /Description":/ { printf "|%s",   unstring($0) }
     /URL":/         { printf "|%s",   unstring($0) }
@@ -383,13 +384,15 @@ print_search() {
 print_info() {
   local name version description url votes outofdate ood
 
-  while IFS='|' read -r name version description url votes outofdate; do
+  while IFS='|' read -r name pkgbase version description url votes outofdate; do
     ood='No'
 
     (( outofdate )) && ood="${colorR}Yes$nocolor"
 
     printf "${colorW}Repository  : ${colorM}aur$nocolor\n"
     printf "${colorW}Name        : $name$nocolor\n"
+    [[ "$name" != "$pkgbase" ]] && \
+    printf "${colorW}Base        : $colorB$pkgbase$nocolor\n"
     printf "${colorW}Version     : $colorG$version$nocolor\n"
     printf "${colorW}URL         : $colorC$url$nocolor\n"
     printf "${colorW}Out of date : $nocolor$ood\n"
@@ -408,7 +411,7 @@ add_available_upgrades() {
 }
 
 available_upgrades() {
-  local versions name version vers versN check
+  local versions name pkgbase version vers versN check
 
   declare -A versions
 
@@ -418,7 +421,7 @@ available_upgrades() {
 
   debug "found $colorG${#versions[@]}$nocolor foreign packages to check"
 
-  while IFS='|' read -r name versN _; do
+  while IFS='|' read -r name pkgbase versN _; do
     if is_devel "$name"; then
       $devels && output_upgrade "$name" 'development package'
       continue
@@ -497,27 +500,31 @@ source_pkgbuild() {
 
 # Setup targets {{{
 setup_targets() {
-  local name version versions pkgbuild
+  local name pkgbase version deps pkgbases versions pkgbuild
 
+  declare -A deps
+  declare -A pkgbases
   declare -A versions
 
   set -- "${dependencies[@]}" "${arguments[@]}"
 
   (( "$#" )) || die 'no targets specified (use -h for help)'
 
-  for name in "${dependencies[@]}"; do target_deps[$name]=1; done
-  for name in "${arguments[@]}";    do target_deps[$name]=0; done
+  for name in "${dependencies[@]}"; do deps[$name]=1; done
+  for name in "${arguments[@]}";    do deps[$name]=0; done
 
   debug "setting up $colorG$#$nocolor targets for processing"
 
   info 'Searching AUR...'
 
-  while IFS='|' read -r name version _; do
+  while IFS='|' read -r name pkgbase version _; do
     debug "found $colorG$name$nocolor in the AUR at version $colorG$version$nocolor"
+    pkgbases[$name]=$pkgbase
     versions[$name]=$version
   done < <(rpc_info "$@")
 
   for name; do
+    pkgbase="${pkgbases[$name]}"
     version="${versions[$name]}"
 
     if [[ -z "$version" ]]; then
@@ -528,7 +535,7 @@ setup_targets() {
         debug "legacy PKGBUILD: $colorG$pkgbuild$nocolor"
 
         # let makepkg deal with it
-        (( ${target_deps[$name]} )) && continue
+        (( ${deps[$name]} )) && continue
       fi
 
       die "target not found: $name"
@@ -541,21 +548,26 @@ setup_targets() {
       fi
     fi
 
-    targets+=( "$name" )
-    target_versions[$name]=$version
+    if [[ -z "${target_versions[$name]}" ]]; then
+      [[ -n "${targets[$pkgbase]}" ]] && \
+      targets[$pkgbase]+=","
+      targets[$pkgbase]+="$name"
+      target_versions[$name]=$version
+    fi
+    target_deps[$pkgbase]=${deps[$name]}
   done
 
   (( "${#targets[@]}" )) || nothing_to_do
 
-  prompt_to_install "${targets[@]}"
+  prompt_to_install "${!target_versions[@]}"
 }
 # }}}
 
 # Process targets {{{
 process_targets() {
-  local name ret=0
+  local pkgbase ret=0
 
-  set -- "${targets[@]}"
+  set -- "${!targets[@]}"
 
   installing && makepkg_options+=' --install'
 
@@ -563,31 +575,31 @@ process_targets() {
 
   enter_build_directory
 
-  for name; do
+  for pkgbase; do
     info 'Retrieving taurball from AUR...'
 
     if downloading; then
-      debug "downloading $colorG$name$nocolor to filesystem"
+      debug "downloading $colorG$pkgbase$nocolor to filesystem"
 
-      if ! taurball "$name" > "${name}.tar.gz"; then
+      if ! taurball "$pkgbase" > "${pkgbase}.tar.gz"; then
         ret=1
-        warn "$name: failed to retrieve aur sources"
+        warn "$pkgbase: failed to retrieve aur sources"
         continue
       fi
     else
-      debug "extracting $colorG$name$nocolor directly"
+      debug "extracting $colorG$pkgbase$nocolor directly"
 
-      if ! taurball "$name" | tar xfz -; then
-        if (( ${target_deps[$name]} )); then
-          die "dependency package $name failed to download, aborting"
+      if ! taurball "$pkgbase" | tar xfz -; then
+        if (( ${target_deps[$pkgbase]} )); then
+          die "dependency package $pkgbase failed to download, aborting"
         else
           ret=1
-          warn "package $name failed to download, skipping"
+          warn "package $pkgbase failed to download, skipping"
           continue
         fi
       fi
 
-      build_target "$name" && discard_sources "$name"
+      build_target "$pkgbase" && discard_sources "$pkgbase"
     fi
   done
 
@@ -597,25 +609,25 @@ process_targets() {
 }
 
 build_target() {
-  local name="$1" pkgbuild ret=0
+  local pkgbase="$1" pkgbuild ret=0
 
   info 'Building package...'
 
-  debug "building $colorG$name${nocolor}..."
+  debug "building $colorG$pkgbase${nocolor}..."
 
-  cd "$name" || die 'unable to change to source directory'
+  cd "$pkgbase" || die 'unable to change to source directory'
 
-  if [[ -f "/etc/customizepkg.d/$name" ]]; then
+  if [[ -f "/etc/customizepkg.d/$pkgbase" ]]; then
     info 'Calling customizepkg...'
     debug "executing ${colorY}customizepkg --modify$nocolor"
     customizepkg --modify || warn "customizepkg returned non-zero ($?)"
   fi
 
-  if prompt_to_edit "$name" './PKGBUILD' 'building'; then
-    if (( ${target_deps[$name]} )); then
-      buildpkg --asdeps || die "dependency package $name failed to build, aborting"
+  if prompt_to_edit "$pkgbase" './PKGBUILD' 'building'; then
+    if (( ${target_deps[$pkgbase]} )); then
+      buildpkg --pkg "${targets[$pkgbase]}" --asdeps || die "dependency package $pkgbase failed to build, aborting"
     else
-      buildpkg || { ret=1; warn "package $name failed to build, skipping"; }
+      buildpkg --pkg "${targets[$pkgbase]}" || { ret=1; warn "package $pkgbase failed to build, skipping"; }
     fi
   fi
 
@@ -627,36 +639,36 @@ build_target() {
 }
 
 discard_sources() {
-  local name="$1"
+  local pkgbase="$1"
 
   if ! $discard_sources; then
-    debug "keeping sources for $colorG$name$nocolor (discard false)"
+    debug "keeping sources for $colorG$pkgbase$nocolor (discard false)"
     return
   fi
 
-  if keep_sources "$name"; then
-    debug "keeping sources for $colorG$name$nocolor (keep sources)"
+  if keep_sources "$pkgbase"; then
+    debug "keeping sources for $colorG$pkgbase$nocolor (keep sources)"
     return
   fi
 
-  if $keep_devels && is_devel "$name"; then
-    debug "keeping sources for $colorG$name$nocolor (development package)"
+  if $keep_devels && is_devel "$pkgbase"; then
+    debug "keeping sources for $colorG$pkgbase$nocolor (development package)"
     return
   fi
 
   info 'Discarding sources...'
 
-  debug "executing ${colorY}rm -rf ./$name$nocolor"
+  debug "executing ${colorY}rm -rf ./$pkgbase$nocolor"
 
-  rm -rf "./$name"
+  rm -rf "./$pkgbase"
 }
 # }}}
 
 declare -a arguments
 declare -a dependencies
-declare -a targets
+declare -A targets         # pkgbase->name(s)
 declare -A target_versions # name->version
-declare -A target_deps     # name->is-dep?
+declare -A target_deps     # pkgbase->is-dep?
 
 initialize "$@"
 
