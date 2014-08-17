@@ -145,7 +145,7 @@ parse_rpc() {
 sort_rpc() {
   case "$sort_mode" in
     name)  sort ;;
-    votes) sort -t '|' -k 5,5nr -k 1,1 ;;
+    votes) sort -t '|' -k 6,6nr -k 1,1 ;;
     *) die 'invalid argument to --sort. must be name or votes' ;;
   esac
 }
@@ -371,7 +371,7 @@ perform_search() {
 print_search() {
   local name version description outofdate ood
 
-  while IFS='|' read -r name version description _ _ outofdate; do
+  while IFS='|' read -r name _ version description _ _ outofdate; do
     ood=''
 
     (( outofdate )) && ood="$colorR[out of date]$nocolor"
