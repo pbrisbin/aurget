@@ -1,0 +1,30 @@
+# Maintainer:  Bartłomiej Piotrowski <bpiotrowski@archlinux.org>
+# Contributor: intelfx <intelfx100 [at] gmail [dot] com>
+# Contributor: Behem0th <grantipak@gmail.com>
+
+pkgname=freshplayerplugin
+pkgver=0.1.0
+pkgrel=2
+pkgdesc='PPAPI-host NPAPI-plugin adapter.'
+arch=('i686' 'x86_64')
+url='https://github.com/i-rinat/freshplayerplugin'
+license=('MIT')
+depends=('chromium-pepper-flash' 'pango' 'alsa-lib' 'freetype2' 'uriparser')
+makedepends=('git' 'cmake')
+provides=('freshplayerplugin-git')
+conflicts=('freshplayerplugin-git')
+source=($url/archive/v$pkgver.tar.gz)
+md5sums=('b2ab5e356bcb1dd2f6a50a0e8f6dfad9')
+
+build() {
+  cd $pkgname-$pkgver
+  cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr
+  make
+}
+
+package() {
+  cd $pkgname-$pkgver
+  install -Dm644 libfreshwrapper.so \
+    "$pkgdir"/usr/lib/mozilla/plugins/libfreshwrapper.so
+  install -Dm644 LICENSE.MIT "$pkgdir"/usr/share/licenses/$pkgname/LICENSE
+}
