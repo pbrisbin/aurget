@@ -16,9 +16,11 @@ man: $(NAME).1 $(NAME)rc.5
 
 $(NAME).1: doc/$(NAME).1.md
 	kramdown-man < doc/$(NAME).1.md > $(NAME).1
+	[ -s $(NAME).1 ]
 
 $(NAME)rc.5: doc/$(NAME)rc.5.md
 	kramdown-man < doc/$(NAME)rc.5.md > $(NAME)rc.5
+	[ -s $(NAME)rc.5 ]
 
 test:
 	cram test
