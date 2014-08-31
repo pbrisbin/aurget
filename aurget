@@ -327,7 +327,7 @@ set_defaults() {
   colorB="\e[1;34m"
   colorM="\e[1;35m"
   colorC="\e[1;36m"
-  colorW="\e[1;37m"
+  colorW="\e[1m"
   nocolor="\e[0m"
 }
 
