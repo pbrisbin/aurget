@@ -1,51 +1,33 @@
-NAME    = aurget
-VERSION = 4.3.2
-RELEASE = 1
-AUTHOR  = pbrisbin
-URL     = https://github.com/$(AUTHOR)/$(NAME)
+PREFIX    ?= /usr/local
+MANPREFIX ?= $(PREFIX)/share/man
 
-pkgver:
-	sed -i "s/^pkgver=.*/pkgver=$(VERSION)/" PKGBUILD
-	sed -i "s/^pkgrel=.*/pkgrel=$(RELEASE)/" PKGBUILD
+aurget.1: doc/aurget.1.md
+	kramdown-man < doc/aurget.1.md > doc/aurget.1
+	[ -s doc/aurget.1 ]
 
-md5sums:
-	sed -i '/^md5sums=.*/,$$d' PKGBUILD
-	makepkg --geninteg --clean >> PKGBUILD
+aurgetrc.5: doc/aurgetrc.5.md
+	kramdown-man < doc/aurgetrc.5.md > doc/aurgetrc.5
+	[ -s doc/aurgetrc.5 ]
 
-man: $(NAME).1 $(NAME)rc.5
-
-$(NAME).1: doc/$(NAME).1.md
-	kramdown-man < doc/$(NAME).1.md > $(NAME).1
-	[ -s $(NAME).1 ]
-
-$(NAME)rc.5: doc/$(NAME)rc.5.md
-	kramdown-man < doc/$(NAME)rc.5.md > $(NAME)rc.5
-	[ -s $(NAME)rc.5 ]
+man: aurget.1 aurgetrc.5
 
 test:
 	cram test
 
-release_aur:
-	mkaurball
-	aur-submit $(NAME)-$(VERSION)-$(RELEASE).src.tar.gz
+install:
+	install -Dm755 aurget $(DESTDIR)/$(PREFIX)/bin/aurget
+	install -Dm644 aurgetrc $(DESTDIR)/$(PREFIX)/share/doc/aurget/samples/aurgetrc
+	install -Dm644 doc/aurget.1 $(DESTDIR)/$(MANPREFIX)/man1/aurget.1
+	install -Dm644 doc/aurgetrc.5 $(DESTDIR)/$(MANPREFIX)/man5/aurgetrc.5
+	install -Dm644 completion/bash $(DESTDIR)/$(PREFIX)/bash_completion.d/aurget
+	install -Dm644 completion/zsh $(DESTDIR)/$(PREFIX)/share/zsh/site-functions/_aurget
 
-release_git:
-	git add PKGBUILD \
-		aurget \
-		aurget.1 \
-		aurgetrc.5 \
-		aurgetrc \
-		bash_completion \
-		zsh_completion
-	git commit -m "Releasing $(VERSION)-$(RELEASE)"
-	git tag -a -m v$(VERSION) v$(VERSION)
-	git push
-	git push --tags
+uninstall:
+	$(RM) $(DESTDIR)/$(PREFIX)/bin/aurget \
+	  $(DESTDIR)/$(MANPREFIX)/man1/aurget.1 \
+	  $(DESTDIR)/$(MANPREFIX)/man5/aurgetrc.5 \
+	  $(DESTDIR)/$(PREFIX)/share/doc/aurget/samples/aurgetrc \
+	  $(DESTDIR)/$(PREFIX)/bash_completion.d/aurget \
+	  $(DESTDIR)/$(PREFIX)/share/zsh/site-functions/_aurget
 
-release: test man pkgver md5sums release_aur release_git clean
-
-clean:
-	rm -f $(NAME)-$(VERSION)-$(RELEASE).src.tar.gz
-	rm -f $(NAME)-$(VERSION)-$(RELEASE)-any.pkg.tar.xz
-
-.PHONY: release release_aur release_git test man clean
+.PHONY: test install uninstall
