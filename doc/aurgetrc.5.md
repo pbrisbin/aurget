@@ -89,7 +89,7 @@ An example can be found at `/usr/share/aurget/samples/aurgetrc`.
 
 `colorW` *ANSI ESCAPE*
   The color for elements which are usually `white`. Default is 
-  `\\e[1;37m`.
+  `\\e[1;m`.
 
 `nocolor` *ANSI ESCAPE*
   Reset color. Don't change this unless you know what you're doing. 
