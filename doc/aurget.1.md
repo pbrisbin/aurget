@@ -82,11 +82,17 @@ multiple actions are passed, the last specified is used.
 `--[no]edit`
   Always present PKGBUILDs for editing before sourcing. See `EDITING PKGBUILDS`.
 
+`--[no]discard`
+  Discard sources after a successful build.
+
 `--ignore` *PACKAGE*
   Ignore the given package.
 
 `--nocolor`
   Disable color. See `COLOR`.
+
+`--noconfirm`
+  Auto answer all prompts with their default choice.
 
 `-h`, `--help`
   Print brief usage instructions.
