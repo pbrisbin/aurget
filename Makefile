@@ -1,15 +1,15 @@
 PREFIX    ?= /usr/local
 MANPREFIX ?= $(PREFIX)/share/man
 
-aurget.1: doc/aurget.1.md
+doc/aurget.1: doc/aurget.1.md
 	kramdown-man < doc/aurget.1.md > doc/aurget.1
 	[ -s doc/aurget.1 ]
 
-aurgetrc.5: doc/aurgetrc.5.md
+doc/aurgetrc.5: doc/aurgetrc.5.md
 	kramdown-man < doc/aurgetrc.5.md > doc/aurgetrc.5
 	[ -s doc/aurgetrc.5 ]
 
-man: aurget.1 aurgetrc.5
+man: doc/aurget.1 doc/aurgetrc.5
 
 test:
 	cram test
