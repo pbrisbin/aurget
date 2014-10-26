@@ -18,6 +18,10 @@ build_directory="$PWD"
 # Should aurget remove the extracted source directory after processing?
 discard_sources=true
 
+# Ask for sudo password once upfront and maintain the cached credentials while
+# we're running. See aurget(5) for details.
+eager_sudo=false
+
 # When to edit PKGBUILDs. One of prompt, always, or never.
 edit_pkgbuilds='prompt'
 

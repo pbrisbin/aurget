@@ -27,6 +27,15 @@ An example can be found at `/usr/share/aurget/samples/aurgetrc`.
   Remove the extracted source directory after successful processing. 
   Default is `true`.
 
+`eager_sudo` *true*|*false*
+  Prompt for your `sudo` password immediately and maintain the cached
+  credentials during operation. This prevents `aurget` from erroring later if a
+  package takes a long time to build and you're not around to enter your
+  password when `pacman` is eventually invoked. Note: if set to `true`, this
+  mechanism will be invoked on any non-search commands. This means it may prompt
+  you even when `sudo` would not actually be needed (i.e. with `-Sd` or `-Sb`).
+  Default is `false`.
+
 `edit_pkgbuilds` *prompt*|*always*|*never*
   When to present PKGBUILDs for editing. Default is `prompt`.
 
