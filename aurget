@@ -166,6 +166,8 @@ upgrading() { [[ "$opmode" == 'upgrade' ]]; }
 
 resolving() { $resolve_dependencies; }
 
+eager_sudo() { $eager_sudo; }
+
 create_temp_directory() {
   debug "storing temporary files in $colorM$temp_directory$nocolor"
   mkdir -p "$temp_directory" || die 'unable to create temp directory'
@@ -239,6 +241,16 @@ nothing_to_do() {
   printf " there is nothing to do\n"
   exit 0
 }
+
+sudo_upfront() {
+  sudo -v
+
+  while true; do
+    sudo -n true
+    sleep 60
+    kill -0 "$$" || exit
+  done 2>/dev/null &
+}
 # }}}
 
 # Initialize {{{
@@ -303,6 +315,7 @@ set_defaults() {
   devels=false
   disable_color=false
   discard_sources=true
+  eager_sudo=false
   ignore_packages=''
   keep_devels=true
   keep_source_packages=''
@@ -675,6 +688,8 @@ initialize "$@"
 if searching; then
   perform_search
 else
+  eager_sudo && sudo_upfront
+
   upgrading && add_available_upgrades
   resolving && resolve_dependencies
 
