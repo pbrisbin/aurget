@@ -565,14 +565,15 @@ setup_targets() {
       [[ -n "${targets[$pkgbase]}" ]] && \
       targets[$pkgbase]+=","
       targets[$pkgbase]+="$name"
+      target_names+=( "$name" )
       target_versions[$name]=$version
     fi
     target_deps[$pkgbase]=${deps[$name]}
   done
 
-  (( "${#targets[@]}" )) || nothing_to_do
+  (( "${#target_names[@]}" )) || nothing_to_do
 
-  prompt_to_install "${!target_versions[@]}"
+  prompt_to_install "${target_names[@]}"
 }
 # }}}
 
@@ -580,7 +581,7 @@ setup_targets() {
 process_targets() {
   local pkgbase ret=0
 
-  set -- "${!targets[@]}"
+  set -- "${target_names[@]}"
 
   installing && makepkg_options+=' --install'
 
@@ -679,6 +680,7 @@ discard_sources() {
 
 declare -a arguments
 declare -a dependencies
+declare -a target_names
 declare -A targets         # pkgbase->name(s)
 declare -A target_versions # name->version
 declare -A target_deps     # pkgbase->is-dep?
