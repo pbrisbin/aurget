@@ -3,7 +3,6 @@
 Installing a single split package
 
   $ aurget -Sb --builddir "$PWD" --noedit --nodeps --noconfirm chromium-pepper-flash
-  :: Resolving dependencies...
   :: Searching AUR...
   
   Targets (1): chromium-pepper-flash-1:14.0.0.177-1 
