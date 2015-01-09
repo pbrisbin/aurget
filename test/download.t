@@ -2,7 +2,7 @@
 
 Downloading the taurball for aurget
 
-  $ aurget -Sd --builddir "$PWD" --nodeps --noconfirm aurget
+  $ aurget -Sd --builddir "$PWD" --noedit --nodeps --noconfirm aurget
   :: Searching AUR...
   
   Targets (1): aurget-4.0.12-1 

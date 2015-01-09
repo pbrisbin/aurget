@@ -2,7 +2,7 @@
 
 Installing a single split package
 
-  $ aurget -Sb --builddir "$PWD" --noconfirm chromium-pepper-flash
+  $ aurget -Sb --builddir "$PWD" --noedit --nodeps --noconfirm chromium-pepper-flash
   :: Resolving dependencies...
   :: Searching AUR...
   

@@ -2,7 +2,7 @@
 
 Building the package for aurget
 
-  $ aurget -Sb --builddir "$PWD" --nodeps --noconfirm --nodiscard aurget
+  $ aurget -Sb --builddir "$PWD" --noedit --nodeps --noconfirm --nodiscard aurget
   :: Searching AUR...
   
   Targets (1): aurget-4.0.12-1 
