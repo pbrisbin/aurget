@@ -1,0 +1,42 @@
+# $Id$
+# Maintainer: Chris Fordham <chris [at] fordham-nagy [dot] id [dot] au> aka flaccid
+# Package Source: https://github.com/flaccid/archlinux-packages/blob/master/python-botocore/PKGBUILD
+
+pkgname=python-botocore
+_pkgname=botocore
+pkgver=0.76.0
+pkgrel=1
+pkgdesc="The low-level, core functionality of boto 3."
+url="https://github.com/boto/botocore"
+arch=('any')
+license=('custom:botocore')
+depends=(
+  'python'
+  'python-jmespath=0.5.0'
+  'python-dateutil>=2.1'
+  'python-six>=1.1.0'
+)
+makedepends=('python-setuptools')
+conflicts=('python-botocore-git python2-botocore-git')
+source=("https://github.com/boto/botocore/archive/$pkgver.tar.gz")
+sha256sums=('6b74b904c95d5b84bd50d8e9e0369d8b6c6d351cab5543dcf341ad4b697c6343')
+
+package() {
+  cd "$srcdir/$_pkgname-$pkgver"
+  python setup.py install --root="$pkgdir/" --optimize=1
+
+  msg 'Install docs, requirements.txt.'
+	install -D -m644 "$srcdir/$_pkgname-$pkgver/requirements.txt" "$pkgdir/usr/share/doc/$pkgname/requirements.txt"
+	install -D -m644 "$srcdir/$_pkgname-$pkgver/README.rst" ${pkgdir}/usr/share/doc/${pkgname}/README.rst
+	install -D -m644 requirements.txt ${pkgdir}/usr/share/doc/${pkgname}/requirements.txt
+
+  msg 'Install LICENSE.'
+	install -D -m644 LICENSE.txt "$pkgdir/usr/share/licenses/$_pkgname/LICENSE"
+
+  # do not include the tests/ generated from the install
+  msg 'Removing tests.'
+  rm -Rfv "$pkgdir"/usr/lib/python*/site-packages/tests
+}
+
+# vim:set ts=2 sw=2 et:
+
