@@ -473,8 +473,18 @@ resolve_dependencies() {
 resolve() {
   local name dep
 
+  debug "resolving dependencies for $colorG$*$nocolor..."
+
   for name; do
     if source_pkgbuild "$name"; then
+      if [[ " ${arguments[*]} " =~ " $name " ]]; then
+        debug "skipping (already in argument list)"
+      else
+        dependencies=( "$name" "${dependencies[@]}" )
+        debug "added dependency $colorG$name$nocolor"
+        debug "current set: $colorG${dependencies[*]}$nocolor"
+      fi
+
       depends=($(pacman -T -- "${depends[@]}" "${makedepends[@]}"))
       depends=("${depends[@]%>*}")
       depends=("${depends[@]%=*}")
@@ -483,8 +493,6 @@ resolve() {
       for dep in "${depends[@]}"; do
         resolve "$dep"
       done
-
-      [[ " ${arguments[*]} " =~ " $name " ]] || dependencies=( "$name" "${dependencies[@]}" )
     fi
   done
 }
