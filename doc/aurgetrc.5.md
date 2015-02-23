@@ -16,7 +16,7 @@ ability to persistently set variables used by `aurget`.
 It is read from `$XDG_CONFIG_HOME/aurgetrc`. The `--config` flag can be 
 used to override this default. See `aurget(1)`.
 
-An example can be found at `/usr/share/aurget/samples/aurgetrc`.
+An example can be found at `/usr/share/doc/aurget/samples/aurgetrc`.
 
 ## VARIABLES
 
