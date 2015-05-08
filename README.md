@@ -1,5 +1,7 @@
 # Aurget
 
+[![Build Status](https://travis-ci.org/pbrisbin/aurget.svg?branch=master)](https://travis-ci.org/pbrisbin/aurget)
+
 A safe and simple, pacman-like interface to the AUR.
 
 ## Installation
