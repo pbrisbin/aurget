@@ -12,7 +12,8 @@ doc/aurgetrc.5: doc/aurgetrc.5.md
 man: doc/aurget.1 doc/aurgetrc.5
 
 test:
-	cram test
+	cram --shell=bash test
+	cram --shell=zsh test
 
 install:
 	install -Dm755 aurget $(DESTDIR)/$(PREFIX)/bin/aurget
