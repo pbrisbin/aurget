@@ -107,7 +107,7 @@ aur_info_url() {
 
 get() { debug "HTTP GET $colorM$1$nocolor"; curl --silent --fail "$1"; }
 
-pkgbuild() { get "$(aur_packages_url)/plain/PKGBUILD?h=$1"; }
+pkgbuild() { get "$(aur_packages_url)/plain/PKGBUILD?h=$(url_encode "$1")"; }
 
 taurball() { get "$(aur_packages_url)/snapshot/$(url_encode "$1").tar.gz"; }
 
@@ -614,6 +614,7 @@ process_targets() {
       fi
     else
       debug "extracting $colorG$pkgbase$nocolor directly"
+
       if ! taurball "$pkgbase" | tar xfz -; then
         if (( ${target_deps[$pkgbase]} )); then
           die "dependency package $pkgbase failed to download, aborting"
