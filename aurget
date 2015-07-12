@@ -3,7 +3,7 @@
 # pbrisbin 2013
 #
 ###
-AUR='https://aur.archlinux.org'
+AUR='https://aur4.archlinux.org' # to be changed back to the aur-subdomain on 2015-08-08
 
 # Message {{{
 message() {
@@ -81,7 +81,6 @@ debug() {
 url_encode() {
   hexdump -v -e '1/1 "%02x\t"' -e '1/1 "%_c\n"' <<< "$*" \
     | LANG=C awk '
-      $1 == "20"                    { printf("%s", "+"); next }
       $1 ~  /0[adAD]/               {                    next }
       $2 ~  /^[a-zA-Z0-9.*()\/_-]$/ { printf("%s", $2);  next }
                                     { printf("%%%%%s", $1)    }
@@ -89,7 +88,7 @@ url_encode() {
 }
 
 aur_packages_url() {
-  printf "$AUR/packages/$(url_encode "${1:0:2}")/$(url_encode "$1")\n"
+  printf "$AUR/cgit/aur.git\n"
 }
 
 aur_search_url() {
@@ -108,9 +107,9 @@ aur_info_url() {
 
 get() { debug "HTTP GET $colorM$1$nocolor"; curl --silent --fail "$1"; }
 
-pkgbuild() { get "$(aur_packages_url "$1")/PKGBUILD"; }
+pkgbuild() { get "$(aur_packages_url)/plain/PKGBUILD?h=$1"; }
 
-taurball() { get "$(aur_packages_url "$1")/${1}.tar.gz"; }
+taurball() { get "$(aur_packages_url)/snapshot/$(url_encode "$1").tar.gz"; }
 
 rpc_search() { get "$(aur_search_url "$1")" | parse_rpc | sort_rpc; }
 
@@ -615,7 +614,6 @@ process_targets() {
       fi
     else
       debug "extracting $colorG$pkgbase$nocolor directly"
-
       if ! taurball "$pkgbase" | tar xfz -; then
         if (( ${target_deps[$pkgbase]} )); then
           die "dependency package $pkgbase failed to download, aborting"
