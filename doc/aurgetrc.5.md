@@ -20,6 +20,12 @@ An example can be found at `/usr/share/doc/aurget/samples/aurgetrc`.
 
 ## VARIABLES
 
+`use_aur4` *true*|*false*
+  Use the AUR4 (https://aur4.archlinux.org) instead of the old AUR3
+  (https://aur.archlinux.org). Default is `false`. Note that this
+  will become obsolete on 2015-08-08 when the AUR4 will move to the
+  aur-sobdomain.
+
 `build_directory` *DIRECTORY*
   The directory within which to build. Default is current directory.
 
@@ -40,7 +46,7 @@ An example can be found at `/usr/share/doc/aurget/samples/aurgetrc`.
   When to present PKGBUILDs for editing. Default is `prompt`.
 
 `ignore_packages` *PACKAGE PACKAGE ...*
-  Packages to ignore. Default is unset
+  Packages to ignore. Default is unset.
 
 `keep_devels` *true*|*false*
   If you choose to discard sources, you can separately choose to NOT 
