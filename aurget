@@ -3,7 +3,8 @@
 # pbrisbin 2013
 #
 ###
-AUR='https://aur4.archlinux.org' # to be changed back to the aur-subdomain on 2015-08-08
+AUR3='https://aur.archlinux.org'
+AUR4='https://aur4.archlinux.org'
 
 # Message {{{
 message() {
@@ -28,6 +29,9 @@ Usage: aurget [ -h | -S* [ --options ] [ -- ] <arguments> ]
         -Ssq <term>     search aur for <term>, print only package names
         -Sp  <package>  print the PKGBUILD for <package>
         -Si  <package>  print extended info for <package>
+
+        --aur3          use the AUR3 ($AUR3)
+        --aur4          use the AUR4 ($AUR4)
 
         --sort <name|votes>
                         sort search output by name (ascending) or votes
@@ -87,12 +91,18 @@ url_encode() {
     '
 }
 
-aur_packages_url() {
-  printf "$AUR/cgit/aur.git\n"
+aur_url() { $use_aur4 && printf "$AUR4\n" || printf "$AUR3\n"; }
+
+aur3_packages_url() {
+  printf "$AUR3/packages/$(url_encode "${1:0:2}")/$(url_encode "$1")\n"
+}
+
+aur4_packages_url() {
+  printf "$AUR4/cgit/aur.git\n"
 }
 
 aur_search_url() {
-  printf "$AUR/rpc.php?type=search&arg=$(url_encode "$1")\n"
+  printf "$(aur_url)/rpc.php?type=search&arg=$(url_encode "$1")\n"
 }
 
 aur_info_url() {
@@ -102,14 +112,26 @@ aur_info_url() {
     params+="&arg\[\]=$(url_encode "$arg")"
   done
 
-  printf "$AUR/rpc.php?type=multiinfo$params\n"
+  printf "$(aur_url)/rpc.php?type=multiinfo$params\n"
 }
 
 get() { debug "HTTP GET $colorM$1$nocolor"; curl --silent --fail "$1"; }
 
-pkgbuild() { get "$(aur_packages_url)/plain/PKGBUILD?h=$(url_encode "$1")"; }
+pkgbuild() {
+if $use_aur4; then
+  get "$(aur4_packages_url)/plain/PKGBUILD?h=$(url_encode "$1")"
+else
+  get "$(aur3_packages_url "$1")/PKGBUILD"
+fi
+}
 
-taurball() { get "$(aur_packages_url)/snapshot/$(url_encode "$1").tar.gz"; }
+taurball() {
+if $use_aur4; then
+  get "$(aur4_packages_url)/snapshot/$(url_encode "$1").tar.gz";
+else
+  get "$(aur3_packages_url "$1")/$(url_encode "$1").tar.gz";
+fi
+}
 
 rpc_search() { get "$(aur_search_url "$1")" | parse_rpc | sort_rpc; }
 
@@ -280,6 +302,8 @@ initialize() {
       -Ssq|-Sqs)     opmode='search' ; search_mode='quiet'           ;;
       -Si|-Ssi|-Sis) opmode='search' ; search_mode='info'            ;;
       -Sp|-Ssp|-Sps) opmode='search' ; search_mode='print'           ;;
+      --aur3)        use_aur4=false                                  ;;
+      --aur4)        use_aur4=true                                   ;;
       --builddir)    shift; build_directory="$1"                     ;;
       --ignore)      shift; ignore_packages+=" $1"                   ;;
       --noconfirm)   noconfirm=true; makepkg_options+=' --noconfirm' ;;
@@ -310,6 +334,7 @@ initialize() {
 
 set_defaults() {
   build_directory="$PWD"
+  use_aur4=false
   debug=false
   devels=false
   disable_color=false
