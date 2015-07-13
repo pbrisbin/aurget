@@ -59,14 +59,10 @@ multiple actions are passed, the last specified is used.
 
 ## OPTIONS
 
-`--aur3`
-  Use the AUR3 (https://aur.archlinux.org), which is the default.
-
 `--aur4`
-  Use the AUR4 (https://aur4.archlinux.org) instead of AUR3. This will 
-  become the default on 2015-08-08, when the AUR4 will move to the 
-  aur-subdomain.
-
+  Use the new AUR v4 (https://aur4.archlinux.org). This will become the default
+  AUR version on *2015-08-08*, at which point this flag will be deprecated and
+  its behavior will become `aurget`'s default.
 
 `--sort` *MODE*
   Set the mode for sorting of search results. When *name*, sort the 

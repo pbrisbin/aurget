@@ -12,9 +12,6 @@
 #
 ###
 
-# Whether to use AUR4 instead of AUR3.
-use_aur4=false
-
 # The directory within which to build.
 build_directory="$PWD"
 

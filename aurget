@@ -3,7 +3,7 @@
 # pbrisbin 2013
 #
 ###
-AUR3='https://aur.archlinux.org'
+AUR='https://aur.archlinux.org'
 AUR4='https://aur4.archlinux.org'
 
 # Message {{{
@@ -30,8 +30,7 @@ Usage: aurget [ -h | -S* [ --options ] [ -- ] <arguments> ]
         -Sp  <package>  print the PKGBUILD for <package>
         -Si  <package>  print extended info for <package>
 
-        --aur3          use the AUR3 ($AUR3)
-        --aur4          use the AUR4 ($AUR4)
+        --aur4          use new AUR v4 ($AUR4)
 
         --sort <name|votes>
                         sort search output by name (ascending) or votes
@@ -85,24 +84,19 @@ debug() {
 url_encode() {
   hexdump -v -e '1/1 "%02x\t"' -e '1/1 "%_c\n"' <<< "$*" \
     | LANG=C awk '
+      $1 == "20"                    { printf("%s", "+"); next }
       $1 ~  /0[adAD]/               {                    next }
       $2 ~  /^[a-zA-Z0-9.*()\/_-]$/ { printf("%s", $2);  next }
                                     { printf("%%%%%s", $1)    }
     '
 }
 
-aur_url() { $use_aur4 && printf "$AUR4\n" || printf "$AUR3\n"; }
-
-aur3_packages_url() {
-  printf "$AUR3/packages/$(url_encode "${1:0:2}")/$(url_encode "$1")\n"
-}
-
-aur4_packages_url() {
-  printf "$AUR4/cgit/aur.git\n"
+aur_packages_url() {
+  printf "$AUR/packages/$(url_encode "${1:0:2}")/$(url_encode "$1")\n"
 }
 
 aur_search_url() {
-  printf "$(aur_url)/rpc.php?type=search&arg=$(url_encode "$1")\n"
+  printf "$AUR/rpc.php?type=search&arg=$(url_encode "$1")\n"
 }
 
 aur_info_url() {
@@ -112,25 +106,25 @@ aur_info_url() {
     params+="&arg\[\]=$(url_encode "$arg")"
   done
 
-  printf "$(aur_url)/rpc.php?type=multiinfo$params\n"
+  printf "$AUR/rpc.php?type=multiinfo$params\n"
 }
 
 get() { debug "HTTP GET $colorM$1$nocolor"; curl --silent --fail "$1"; }
 
 pkgbuild() {
-if $use_aur4; then
-  get "$(aur4_packages_url)/plain/PKGBUILD?h=$(url_encode "$1")"
-else
-  get "$(aur3_packages_url "$1")/PKGBUILD"
-fi
+  if aur4; then
+    get "$AUR4/plain/PKGBUILD?h=$(url_encode "$1")"
+  else
+    get "$(aur_packages_url "$1")/PKGBUILD"
+  fi
 }
 
 taurball() {
-if $use_aur4; then
-  get "$(aur4_packages_url)/snapshot/$(url_encode "$1").tar.gz";
-else
-  get "$(aur3_packages_url "$1")/$(url_encode "$1").tar.gz";
-fi
+  if aur4; then
+    get "$AUR4/snapshot/$(url_encode "$1").tar.gz";
+  else
+    get "$(aur_packages_url "$1")/$(url_encode "$1").tar.gz";
+  fi
 }
 
 rpc_search() { get "$(aur_search_url "$1")" | parse_rpc | sort_rpc; }
@@ -188,6 +182,8 @@ upgrading() { [[ "$opmode" == 'upgrade' ]]; }
 resolving() { $resolve_dependencies; }
 
 eager_sudo() { $eager_sudo; }
+
+aur4() { $aur4; }
 
 create_temp_directory() {
   debug "storing temporary files in $colorM$temp_directory$nocolor"
@@ -302,8 +298,7 @@ initialize() {
       -Ssq|-Sqs)     opmode='search' ; search_mode='quiet'           ;;
       -Si|-Ssi|-Sis) opmode='search' ; search_mode='info'            ;;
       -Sp|-Ssp|-Sps) opmode='search' ; search_mode='print'           ;;
-      --aur3)        use_aur4=false                                  ;;
-      --aur4)        use_aur4=true                                   ;;
+      --aur4)        aur4=true                                       ;;
       --builddir)    shift; build_directory="$1"                     ;;
       --ignore)      shift; ignore_packages+=" $1"                   ;;
       --noconfirm)   noconfirm=true; makepkg_options+=' --noconfirm' ;;
@@ -334,7 +329,7 @@ initialize() {
 
 set_defaults() {
   build_directory="$PWD"
-  use_aur4=false
+  aur4=false
   debug=false
   devels=false
   disable_color=false
