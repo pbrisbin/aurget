@@ -121,7 +121,7 @@ get() { debug "HTTP GET $colorM$1$nocolor"; curl --silent --fail "$1"; }
 
 pkgbuild() {
   if aur4; then
-    get "$AUR4/plain/PKGBUILD?h=$(url_encode "$1")"
+    get "$AUR4/cgit/aur.git/plain/PKGBUILD?h=$(url_encode "$1")"
   else
     get "$(aur_packages_url "$1")/PKGBUILD"
   fi
@@ -129,7 +129,7 @@ pkgbuild() {
 
 taurball() {
   if aur4; then
-    get "$AUR4/snapshot/$(url_encode "$1").tar.gz";
+    get "$AUR4/cgit/aur.git/snapshot/$(url_encode "$1").tar.gz"
   else
     get "$(aur_packages_url "$1")/$(url_encode "$1").tar.gz";
   fi
