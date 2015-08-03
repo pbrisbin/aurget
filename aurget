@@ -96,7 +96,11 @@ aur_packages_url() {
 }
 
 aur_search_url() {
-  printf "$AUR/rpc.php?type=search&arg=$(url_encode "$1")\n"
+  if aur4; then
+    printf "$AUR4/rpc.php?type=search&arg=$(url_encode "$1")\n"
+  else
+    printf "$AUR/rpc.php?type=search&arg=$(url_encode "$1")\n"
+  fi
 }
 
 aur_info_url() {
@@ -106,7 +110,11 @@ aur_info_url() {
     params+="&arg\[\]=$(url_encode "$arg")"
   done
 
-  printf "$AUR/rpc.php?type=multiinfo$params\n"
+  if aur4; then
+    printf "$AUR4/rpc.php?type=multiinfo$params\n"
+  else
+    printf "$AUR/rpc.php?type=multiinfo$params\n"
+  fi
 }
 
 get() { debug "HTTP GET $colorM$1$nocolor"; curl --silent --fail "$1"; }
