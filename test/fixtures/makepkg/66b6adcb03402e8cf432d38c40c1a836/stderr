@@ -1,23 +1,24 @@
-==> Making package: chromium-plugins 1:36.0.1985.143-1 (Sun Aug 17 15:14:46 GMT 2014)
+==> Making package: chromium-pepper-flash 1:18.0.0.209-1 (Mon Aug 10 12:09:58 GMT 2015)
 ==> Checking runtime dependencies...
 ==> Checking buildtime dependencies...
 ==> Retrieving sources...
-  -> Downloading license.html...
+  -> Downloading chromium-pepper-flash-license.html...
   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
                                  Dload  Upload   Total   Spent    Left  Speed
-  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100   265  100   265    0     0   2034      0 --:--:-- --:--:-- --:--:--  2038
-  0     0    0 52500    0     0   117k      0 --:--:-- --:--:-- --:--:--  117k
-  -> Downloading google-chrome-stable-36.0.1985.143-1.x86_64.rpm...
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100   265  100   265    0     0   1852      0 --:--:-- --:--:-- --:--:--  1853
+100 52777    0 52777    0     0   230k      0 --:--:-- --:--:-- --:--:--  230k
+  -> Downloading google-chrome-stable-44.0.2403.130-1.x86_64.rpm...
   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
                                  Dload  Upload   Total   Spent    Left  Speed
-  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0  1 58.2M    1  750k    0     0  1946k      0  0:00:30 --:--:--  0:00:30 1945k 11 58.2M   11 6892k    0     0  4969k      0  0:00:12  0:00:01  0:00:11 4968k 24 58.2M   24 14.3M    0     0  6159k      0  0:00:09  0:00:02  0:00:07 6158k 35 58.2M   35 20.7M    0     0  6266k      0  0:00:09  0:00:03  0:00:06 6266k 46 58.2M   46 27.0M    0     0  6320k      0  0:00:09  0:00:04  0:00:05 6321k 57 58.2M   57 33.3M    0     0  6344k      0  0:00:09  0:00:05  0:00:04 6684k 67 58.2M   67 39.3M    0     0  6306k      0  0:00:09  0:00:06  0:00:03 6678k 72 58.2M   72 42.0M    0     0  5381k      0  0:00:11  0:00:08  0:00:03 5051k 73 58.2M   73 42.9M    0     0  5244k      0  0:00:11  0:00:08  0:00:03 4549k 82 58.2M   82 47.9M    0     0  5227k      0  0:00:11  0:00:09  0:00:02 4269k 91 58.2M   91 53.0M    0     0  5231k      0  0:00:11  0:00:10  0:00:01 4033k100 58.2M  100 58.2M    0     0  5289k      0  0:00:11  0:00:11 --:--:-- 3961k
-==> Validating source files with sha1sums...
-    license.html ... Skipped
-    google-chrome-stable-36.0.1985.143-1.x86_64.rpm ... Passed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:01 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:02 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:03 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:04 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:05 --:--:--     0 17 45.6M   17 8198k    0     0  1279k      0  0:00:36  0:00:06  0:00:30 1673k 43 45.6M   43 19.7M    0     0  2729k      0  0:00:17  0:00:07  0:00:10 4129k 69 45.6M   69 31.8M    0     0  3884k      0  0:00:12  0:00:08  0:00:04 6671k 94 45.6M   94 43.2M    0     0  4712k      0  0:00:09  0:00:09 --:--:-- 9059k100 45.6M  100 45.6M    0     0  4884k      0  0:00:09  0:00:09 --:--:-- 11.2M
+==> Validating source files with sha256sums...
+    chromium-pepper-flash-license.html ... Passed
+==> Validating source files with sha256sums...
+    google-chrome-stable-44.0.2403.130-1.x86_64.rpm ... Passed
 ==> Extracting sources...
-  -> Extracting google-chrome-stable-36.0.1985.143-1.x86_64.rpm with bsdtar
+  -> Extracting google-chrome-stable-44.0.2403.130-1.x86_64.rpm with bsdtar
 ==> Entering fakeroot environment...
-==> Starting package_chromium-pepper-flash()...
+==> Starting package()...
 ==> Tidying install...
   -> Purging unwanted files...
   -> Removing libtool files...
@@ -26,8 +27,7 @@
   -> Stripping unneeded symbols from binaries and libraries...
 ==> Creating package "chromium-pepper-flash"...
   -> Generating .PKGINFO file...
-  -> Adding install file...
   -> Generating .MTREE file...
   -> Compressing package...
 ==> Leaving fakeroot environment.
-==> Finished making: chromium-plugins 1:36.0.1985.143-1 (Sun Aug 17 15:15:30 GMT 2014)
+==> Finished making: chromium-pepper-flash 1:18.0.0.209-1 (Mon Aug 10 12:10:19 GMT 2015)

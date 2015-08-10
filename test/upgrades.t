@@ -4,9 +4,9 @@ Available upgrades are found
 
   $ echo 'no' | aurget '-Syu' --nodeps
   :: Starting AUR upgrade...
-  warning: cram: local (0.6-1) is newer than aur (0.5-2)
+  warning: underscorejs: local (1.8.2-1) is newer than aur (1.8.1-1)
   :: Searching AUR...
   
-  Targets (1): heroku-toolbelt-2.40.0-1 
+  Targets (1): docker-compose-1.3.3-1 
   
   Proceed with installation? [Y/n]  (no-eol)

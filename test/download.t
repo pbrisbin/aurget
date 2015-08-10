@@ -5,18 +5,12 @@ Downloading the taurball for aurget
   $ aurget -Sd --builddir "$PWD" --noedit --nodeps --noconfirm aurget
   :: Searching AUR...
   
-  Targets (1): aurget-4.0.12-1 
+  Targets (1): aurget-4.5.0-1 
   
   Proceed with installation? [Y/n] Y
   :: Retrieving taurball from AUR...
 
   $ tar xf aurget.tar.gz
   > ls aurget
+  Makefile
   PKGBUILD
-  aurget
-  aurget.1
-  aurget.install
-  aurgetrc
-  aurgetrc.5
-  bash_completion
-  zsh_completion

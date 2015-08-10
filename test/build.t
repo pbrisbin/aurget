@@ -5,29 +5,44 @@ Building the package for aurget
   $ aurget -Sb --builddir "$PWD" --noedit --nodeps --noconfirm --nodiscard aurget
   :: Searching AUR...
   
-  Targets (1): aurget-4.0.12-1 
+  Targets (1): aurget-4.5.0-1 
   
   Proceed with installation? [Y/n] Y
   :: Retrieving taurball from AUR...
   :: Building package...
-  ==> Making package: aurget 4.0.12-1 (Sun Aug 17 15:08:35 GMT 2014)
+  install -Dm755 aurget /tmp/cramtests-axD11F/build.t/aurget/pkg/aurget//usr/bin/aurget
+  install -Dm644 aurgetrc /tmp/cramtests-axD11F/build.t/aurget/pkg/aurget//usr/share/doc/aurget/samples/aurgetrc
+  install -Dm644 doc/aurget.1 /tmp/cramtests-axD11F/build.t/aurget/pkg/aurget//usr/share/man/man1/aurget.1
+  install -Dm644 doc/aurgetrc.5 /tmp/cramtests-axD11F/build.t/aurget/pkg/aurget//usr/share/man/man5/aurgetrc.5
+  install -Dm644 completion/bash /tmp/cramtests-axD11F/build.t/aurget/pkg/aurget//usr/share/bash-completion/completions/aurget
+  install -Dm644 completion/zsh /tmp/cramtests-axD11F/build.t/aurget/pkg/aurget//usr/share/zsh/site-functions/_aurget
+  ==> Making package: aurget 4.5.0-1 (Mon Aug 10 12:08:19 GMT 2015)
   ==> Checking runtime dependencies...
   ==> Checking buildtime dependencies...
   ==> Retrieving sources...
-    -> Found aurget
-    -> Found aurget.1
-    -> Found aurgetrc.5
-    -> Found aurgetrc
-    -> Found bash_completion
-    -> Found zsh_completion
+    -> Downloading v4.5.0.tar.gz...
+    % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                   Dload  Upload   Total   Spent    Left  Speed
+  
+    0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+    0     0    0     0    0     0      0      0 --:--:--  0:00:01 --:--:--     0
+    0     0    0     0    0     0      0      0 --:--:--  0:00:02 --:--:--     0
+    0     0    0     0    0     0      0      0 --:--:--  0:00:03 --:--:--     0
+    0     0    0     0    0     0      0      0 --:--:--  0:00:04 --:--:--     0
+    0     0    0     0    0     0      0      0 --:--:--  0:00:05 --:--:--     0
+  100   123    0   123    0     0     21      0 --:--:--  0:00:05 --:--:--    29
+  
+    0     0    0     0    0     0      0      0 --:--:--  0:00:05 --:--:--     0
+    0     0    0     0    0     0      0      0 --:--:--  0:00:07 --:--:--     0
+    0     0    0     0    0     0      0      0 --:--:--  0:00:08 --:--:--     0
+    0     0    0     0    0     0      0      0 --:--:--  0:00:09 --:--:--     0
+    0     0    0     0    0     0      0      0 --:--:--  0:00:10 --:--:--     0
+    0     0    0     0    0     0      0      0 --:--:--  0:00:11 --:--:--     0
+  100 52764  100 52764    0     0   4657      0  0:00:11  0:00:11 --:--:-- 12629
   ==> Validating source files with md5sums...
-      aurget ... Passed
-      aurget.1 ... Passed
-      aurgetrc.5 ... Passed
-      aurgetrc ... Passed
-      bash_completion ... Passed
-      zsh_completion ... Passed
+      v4.5.0.tar.gz ... Passed
   ==> Extracting sources...
+    -> Extracting v4.5.0.tar.gz with bsdtar
   ==> Entering fakeroot environment...
   ==> Starting package()...
   ==> Tidying install...
@@ -38,8 +53,7 @@ Building the package for aurget
     -> Stripping unneeded symbols from binaries and libraries...
   ==> Creating package "aurget"...
     -> Generating .PKGINFO file...
-    -> Adding install file...
     -> Generating .MTREE file...
     -> Compressing package...
   ==> Leaving fakeroot environment.
-  ==> Finished making: aurget 4.0.12-1 (Sun Aug 17 15:08:36 GMT 2014)
+  ==> Finished making: aurget 4.5.0-1 (Mon Aug 10 12:08:31 GMT 2015)
