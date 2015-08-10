@@ -4,7 +4,6 @@
 #
 ###
 AUR='https://aur.archlinux.org'
-AUR4='https://aur4.archlinux.org'
 
 # Message {{{
 message() {
@@ -29,8 +28,6 @@ Usage: aurget [ -h | -S* [ --options ] [ -- ] <arguments> ]
         -Ssq <term>     search aur for <term>, print only package names
         -Sp  <package>  print the PKGBUILD for <package>
         -Si  <package>  print extended info for <package>
-
-        --aur4          use new AUR v4 ($AUR4)
 
         --sort <name|votes>
                         sort search output by name (ascending) or votes
@@ -96,11 +93,7 @@ aur_packages_url() {
 }
 
 aur_search_url() {
-  if aur4; then
-    printf "$AUR4/rpc.php?type=search&arg=$(url_encode "$1")\n"
-  else
-    printf "$AUR/rpc.php?type=search&arg=$(url_encode "$1")\n"
-  fi
+  printf "$AUR/rpc.php?type=search&arg=$(url_encode "$1")\n"
 }
 
 aur_info_url() {
@@ -110,29 +103,17 @@ aur_info_url() {
     params+="&arg\[\]=$(url_encode "$arg")"
   done
 
-  if aur4; then
-    printf "$AUR4/rpc.php?type=multiinfo$params\n"
-  else
-    printf "$AUR/rpc.php?type=multiinfo$params\n"
-  fi
+  printf "$AUR/rpc.php?type=multiinfo$params\n"
 }
 
 get() { debug "HTTP GET $colorM$1$nocolor"; curl --silent --fail "$1"; }
 
 pkgbuild() {
-  if aur4; then
-    get "$AUR4/cgit/aur.git/plain/PKGBUILD?h=$(url_encode "$1")"
-  else
-    get "$(aur_packages_url "$1")/PKGBUILD"
-  fi
+  get "$AUR/cgit/aur.git/plain/PKGBUILD?h=$(url_encode "$1")"
 }
 
 taurball() {
-  if aur4; then
-    get "$AUR4/cgit/aur.git/snapshot/$(url_encode "$1").tar.gz"
-  else
-    get "$(aur_packages_url "$1")/$(url_encode "$1").tar.gz";
-  fi
+  get "$AUR/cgit/aur.git/snapshot/$(url_encode "$1").tar.gz"
 }
 
 rpc_search() { get "$(aur_search_url "$1")" | parse_rpc | sort_rpc; }
@@ -190,8 +171,6 @@ upgrading() { [[ "$opmode" == 'upgrade' ]]; }
 resolving() { $resolve_dependencies; }
 
 eager_sudo() { $eager_sudo; }
-
-aur4() { $aur4; }
 
 create_temp_directory() {
   debug "storing temporary files in $colorM$temp_directory$nocolor"
@@ -306,7 +285,7 @@ initialize() {
       -Ssq|-Sqs)     opmode='search' ; search_mode='quiet'           ;;
       -Si|-Ssi|-Sis) opmode='search' ; search_mode='info'            ;;
       -Sp|-Ssp|-Sps) opmode='search' ; search_mode='print'           ;;
-      --aur4)        aur4=true                                       ;;
+      --aur4)        warn "deprecated --aur4 option, ignoring..."    ;;
       --builddir)    shift; build_directory="$1"                     ;;
       --ignore)      shift; ignore_packages+=" $1"                   ;;
       --noconfirm)   noconfirm=true; makepkg_options+=' --noconfirm' ;;
@@ -337,7 +316,6 @@ initialize() {
 
 set_defaults() {
   build_directory="$PWD"
-  aur4=false
   debug=false
   devels=false
   disable_color=false
