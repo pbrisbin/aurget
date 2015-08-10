@@ -59,11 +59,6 @@ multiple actions are passed, the last specified is used.
 
 ## OPTIONS
 
-`--aur4`
-  Use the new AUR v4 (https://aur4.archlinux.org). This will become the default
-  AUR version on *2015-08-08*, at which point this flag will be deprecated and
-  its behavior will become `aurget`'s default.
-
 `--sort` *MODE*
   Set the mode for sorting of search results. When *name*, sort the 
   results by Name ascending. When *votes*, sort the results by Number of 
