@@ -10,20 +10,21 @@ Building the package for aurget
   Proceed with installation? [Y/n] Y
   :: Retrieving taurball from AUR...
   :: Building package...
-  install -Dm755 aurget /tmp/cramtests-BIZOuT/build.t/aurget/pkg/aurget//usr/bin/aurget
-  install -Dm644 aurgetrc /tmp/cramtests-BIZOuT/build.t/aurget/pkg/aurget//usr/share/doc/aurget/samples/aurgetrc
-  install -Dm644 doc/aurget.1 /tmp/cramtests-BIZOuT/build.t/aurget/pkg/aurget//usr/share/man/man1/aurget.1
-  install -Dm644 doc/aurgetrc.5 /tmp/cramtests-BIZOuT/build.t/aurget/pkg/aurget//usr/share/man/man5/aurgetrc.5
-  install -Dm644 completion/bash /tmp/cramtests-BIZOuT/build.t/aurget/pkg/aurget//usr/share/bash-completion/completions/aurget
-  install -Dm644 completion/zsh /tmp/cramtests-BIZOuT/build.t/aurget/pkg/aurget//usr/share/zsh/site-functions/_aurget
-  ==> Making package: aurget 4.6.0-1 (Mon Feb 29 22:16:01 GMT 2016)
+  make[1]: Entering directory '/tmp/cramtests-q1oEQU/build.t/aurget/src/aurget-4.6.0'
+  install -Dm755 aurget /tmp/cramtests-q1oEQU/build.t/aurget/pkg/aurget//usr/bin/aurget
+  install -Dm644 aurgetrc /tmp/cramtests-q1oEQU/build.t/aurget/pkg/aurget//usr/share/doc/aurget/samples/aurgetrc
+  install -Dm644 doc/aurget.1 /tmp/cramtests-q1oEQU/build.t/aurget/pkg/aurget//usr/share/man/man1/aurget.1
+  install -Dm644 doc/aurgetrc.5 /tmp/cramtests-q1oEQU/build.t/aurget/pkg/aurget//usr/share/man/man5/aurgetrc.5
+  install -Dm644 completion/bash /tmp/cramtests-q1oEQU/build.t/aurget/pkg/aurget//usr/share/bash-completion/completions/aurget
+  install -Dm644 completion/zsh /tmp/cramtests-q1oEQU/build.t/aurget/pkg/aurget//usr/share/zsh/site-functions/_aurget
+  make[1]: Leaving directory '/tmp/cramtests-q1oEQU/build.t/aurget/src/aurget-4.6.0'
+  ==> Making package: aurget 4.6.0-1 (Tue Mar  1 16:48:32 GMT 2016)
   ==> Checking runtime dependencies...
   ==> Checking buildtime dependencies...
   ==> Retrieving sources...
     -> Downloading v4.6.0.tar.gz...
     % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
                                    Dload  Upload   Total   Spent    Left  Speed
-  * (glob)
   * (glob)
   * (glob)
   * (glob)
@@ -48,4 +49,4 @@ Building the package for aurget
     -> Generating .MTREE file...
     -> Compressing package...
   ==> Leaving fakeroot environment.
-  ==> Finished making: aurget 4.6.0-1 (Mon Feb 29 22:16:03 GMT 2016)
+  ==> Finished making: aurget 4.6.0-1 (Tue Mar  1 16:48:33 GMT 2016)

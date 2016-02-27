@@ -657,9 +657,9 @@ build_target() {
 
   if prompt_to_edit "$pkgbase" './PKGBUILD' 'building'; then
     if (( ${target_deps[$pkgbase]} )); then
-      buildpkg --pkg "${targets[$pkgbase]}" --asdeps || die "dependency package $pkgbase failed to build, aborting"
+      buildpkg --asdeps || die "dependency package $pkgbase failed to build, aborting"
     else
-      buildpkg --pkg "${targets[$pkgbase]}" || { ret=1; warn "package $pkgbase failed to build, skipping"; }
+      buildpkg || { ret=1; warn "package $pkgbase failed to build, skipping"; }
     fi
   fi
 
