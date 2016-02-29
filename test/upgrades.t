@@ -2,11 +2,13 @@
 
 Available upgrades are found
 
+(Note: this just happens to be the updates required at the time I last ran the
+specs with real network.)
+
   $ echo 'no' | aurget '-Syu' --nodeps
   :: Starting AUR upgrade...
-  warning: underscorejs: local (1.8.2-1) is newer than aur (1.8.1-1)
   :: Searching AUR...
   
-  Targets (1): docker-compose-1.3.3-1 
+  Targets (4): aws-cli-1.10.8-1 codeclimate-0.21.0-1 google-cloud-sdk-98.0.0-1 python-botocore-1.3.30-1 
   
   Proceed with installation? [Y/n]  (no-eol)
