@@ -93,7 +93,7 @@ aur_packages_url() {
 }
 
 aur_search_url() {
-  printf "$AUR/rpc.php?type=search&arg=$(url_encode "$1")\n"
+  printf "$AUR/rpc/?v=5&type=search&arg=$(url_encode "$1")\n"
 }
 
 aur_info_url() {
@@ -103,7 +103,7 @@ aur_info_url() {
     params+="&arg\[\]=$(url_encode "$arg")"
   done
 
-  printf "$AUR/rpc.php?type=multiinfo$params\n"
+  printf "$AUR/rpc/?v=5&type=info$params\n"
 }
 
 get() { debug "HTTP GET $colorM$1$nocolor"; curl --silent --fail "$1"; }
