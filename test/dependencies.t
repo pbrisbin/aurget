@@ -6,6 +6,6 @@ Resolving dependencies for aws-cli
   :: Resolving dependencies...
   :: Searching AUR...
   
-  Targets (2): python-bcdoc-0.12.2-1 aws-cli-1.7.44-1 
+  Targets (2): python-botocore-1.3.30-1 aws-cli-1.10.8-1 
   
   Proceed with installation? [Y/n]  (no-eol)
