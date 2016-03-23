@@ -89,11 +89,13 @@ url_encode() {
 }
 
 aur_packages_url() {
-  printf "$AUR/packages/$(url_encode "${1:0:2}")/$(url_encode "$1")\n"
+  printf "%s/packages/%s/%s\n" "$AUR" \
+    "$(url_encode "${1:0:2}")" \
+    "$(url_encode "$1")"
 }
 
 aur_search_url() {
-  printf "$AUR/rpc/?v=5&type=search&arg=$(url_encode "$1")\n"
+  printf "%s/rpc/?v=5&type=search&arg=%s\n" "$AUR" "$(url_encode "$1")"
 }
 
 aur_info_url() {
