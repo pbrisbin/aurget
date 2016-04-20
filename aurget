@@ -177,7 +177,7 @@ eager_sudo() { $eager_sudo; }
 create_temp_directory() {
   debug "storing temporary files in $colorM$temp_directory$nocolor"
   mkdir -p "$temp_directory" || die 'unable to create temp directory'
-  rm -rf "$temp_directory"/*
+  rm -rf "${temp_directory:?}"/*
 }
 
 enter_build_directory() {
@@ -187,7 +187,7 @@ enter_build_directory() {
 }
 
 buildpkg() {
-  debug "executing $colorY$makepkg $makepkg_options $@$nocolor"
+  debug "executing $colorY$makepkg $makepkg_options $*$nocolor"
 
   if $silent; then
     debug 'building silently...'
@@ -204,7 +204,7 @@ prompt() {
 
   $noconfirm && { printf "Y\n"; return 0; }
 
-  read a
+  read -r a
 
   case "${a:-y}" in
     y|Y) return 0      ;;
@@ -354,6 +354,7 @@ set_defaults() {
 source_config() {
   if [[ -r "$user_config" ]]; then
     debug "sourcing user configuration from $colorM$user_config$nocolor"
+    # shellcheck source=/dev/null
     source "$user_config"
   fi
 }
@@ -513,6 +514,7 @@ source_pkgbuild() {
 
       if prompt_to_edit "$name" "$pkgbuild"; then
         debug "executing ${colorY}source $pkgbuild$nocolor"
+        # shellcheck source=/dev/null
         source "$pkgbuild"
         return 0
       fi

@@ -4,3 +4,7 @@ engines:
 ratings:
   paths:
   - "aurget"
+exclude_paths:
+  - "aurgetrc"
+  - "completion/*"
+  - "test/*"
