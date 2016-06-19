@@ -84,12 +84,13 @@ url_encode() {
       $1 == "20"                    { printf("%s", "+"); next }
       $1 ~  /0[adAD]/               {                    next }
       $2 ~  /^[a-zA-Z0-9.*()\/_-]$/ { printf("%s", $2);  next }
-                                    { printf("%%%%%s", $1)    }
+                                    { printf("%%%s", $1)      }
     '
 }
 
 aur_search_url() {
-  printf "%s/rpc/?v=5&type=search&arg=%s\n" "$AUR" "$(url_encode "$1")"
+  # avoid printf because url_encode outputs "%"
+  echo "$AUR/rpc/?v=5&type=search&arg=$(url_encode "$1")"
 }
 
 aur_info_url() {
@@ -99,7 +100,8 @@ aur_info_url() {
     params+="&arg\[\]=$(url_encode "$arg")"
   done
 
-  printf "$AUR/rpc/?v=5&type=info$params\n"
+  # avoid printf because url_encode outputs "%"
+  echo "$AUR/rpc/?v=5&type=info$params"
 }
 
 get() { debug "HTTP GET $colorM$1$nocolor"; curl --silent --fail "$1"; }
