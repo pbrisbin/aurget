@@ -74,7 +74,7 @@ warn() { printf "${colorY}warning:$nocolor $*\n" >&2; }
 error() { printf "${colorR}error:$nocolor $*\n" >&2; }
 
 debug() {
-  $debug && printf "$colorW[${colorC}DEBUG$colorW]$nocolor $*\n" >&2
+  $debug && printf "$colorW[${colorC}DEBUG$colorW]$nocolor ${*//%/%%}\n" >&2
 }
 
 # thanks Irm
