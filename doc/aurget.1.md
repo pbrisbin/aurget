@@ -163,6 +163,15 @@ Find some of `aurget`'s competitors:
 *${XDG_CONFIG_HOME:-~/.config}/aurgetrc*
   Default location of user configuration file.
 
+## ENVIRONMENT VARIABLES
+
+*EDITOR*
+  The program used for editing `PKGBUILD` files.
+
+*VISUAL*
+  An alternative to `EDITOR`; used if `EDITOR` is not set. If neither are set,
+  `vi` is used.
+
 ## AUTHOR
 
 Patrick Brisbin <pbrisbin@gmail.com>
