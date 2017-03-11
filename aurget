@@ -649,11 +649,7 @@ build_target() {
 
   cd "$pkgbase" || die 'unable to change to source directory'
 
-  if [[ -f "/etc/customizepkg.d/$pkgbase" ]]; then
-    info 'Calling customizepkg...'
-    debug "executing ${colorY}customizepkg --modify$nocolor"
-    customizepkg --modify || warn "customizepkg returned non-zero ($?)"
-  fi
+  invoke_customizepkg "$pkgbase"
 
   if prompt_to_edit "$pkgbase" './PKGBUILD' 'building'; then
     if (( ${target_deps[$pkgbase]} )); then
@@ -693,6 +689,22 @@ discard_sources() {
   debug "executing ${colorY}rm -rf ./$pkgbase$nocolor"
 
   rm -rf "./$pkgbase"
+}
+
+invoke_customizepkg() {
+  local pkgbase=$1 dir
+
+  type -p customizepkg &>/dev/null || return
+
+  : "${CUSTOMIZEPKG_CONFIG:=/etc/customizepkg.d}"
+
+  for dir in "$CUSTOMIZEPKG_CONFIG" "$HOME/.customizepkg"; do
+    if [[ -f "$dir/$pkgbase" ]]; then
+      info 'Calling customizepkg...'
+      debug "executing ${colorY}customizepkg --modify$nocolor"
+      customizepkg --modify || warn "customizepkg returned non-zero ($?)"
+    fi
+  done
 }
 # }}}
 
