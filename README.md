@@ -13,8 +13,20 @@ Study the Arch [wiki][], then manually build and install [aurget][].
 
 ## Usage
 
-~~~
-$ aurget --help
-$ man 1 aurget
-$ man 5 aurgetrc
-~~~
+```console
+aurget --help
+man 1 aurget
+man 5 aurgetrc
+```
+
+### Development & Testing
+
+Install cram: https://aur.archlinux.org/packages/cram/
+
+```
+make test
+```
+
+---
+
+[CHANGELOG](./CHANGELOG.md) | [LICENSE](./LICENSE)
