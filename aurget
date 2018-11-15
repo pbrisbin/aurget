@@ -170,10 +170,16 @@ resolving() { $resolve_dependencies; }
 
 eager_sudo() { $eager_sudo; }
 
-create_temp_directory() {
-  debug "storing temporary files in $colorM$temp_directory$nocolor"
-  mkdir -p "$temp_directory" || die 'unable to create temp directory'
-  rm -rf "${temp_directory:?}"/*
+create_package_directory() {
+  if [ -d "$pkgbuild_directory" ]
+  then
+  else
+  mkdir "$pkgbuild_directory" || die 'unable to create package directory' 
+  fi
+}
+
+clean_package_directory() {
+  rm -rf "${pkgbuild_directory:?}"/*
 }
 
 enter_build_directory() {
@@ -331,7 +337,7 @@ set_defaults() {
   silent=false
   sort_mode='name'
   sync_mode='install'
-  temp_directory='/tmp/aurget'
+  pkgbuild_directory='~/.cache/aurget'
   user_config="${XDG_CONFIG_HOME:-$HOME/.config}/aurgetrc"
 
   EDITOR="${EDITOR:-$VISUAL}"
@@ -470,7 +476,7 @@ output_upgrade() {
 # Resolve dependencies {{{
 resolve_dependencies() {
   info 'Resolving dependencies...'
-  create_temp_directory
+  create_package_directory
   resolve "${arguments[@]}"
 }
 
@@ -502,7 +508,7 @@ resolve() {
 }
 
 source_pkgbuild() {
-  local name="$1" pkgbuild="$temp_directory/${1}_PKGBUILD"
+  local name="$1" pkgbuild="$pkgbuild_directory/${1}_PKGBUILD"
 
   if [[ ! -f "$pkgbuild" ]]; then
     if pkgbuild "$name" > "$pkgbuild"; then
@@ -554,7 +560,7 @@ setup_targets() {
     version="${versions[$name]}"
 
     if [[ -z "$version" ]]; then
-      pkgbuild="$temp_directory/${name}_PKGBUILD"
+      pkgbuild="$pkgbuild_directory/${name}_PKGBUILD"
 
       if [[ -f "$pkgbuild" ]]; then
         debug "target $colorG$name$nocolor may have moved to repos"
