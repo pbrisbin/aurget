@@ -37,6 +37,8 @@ Usage: aurget [ -h | -S* [ --options ] [ -- ] <arguments> ]
                         build in <directory>
 
         --devel         only affects -Su, add all development packages
+        
+        --clean         Removes pkgbuild files
 
         --deps          resolve dependencies
         --nodeps        don't resolve dependencies
@@ -166,6 +168,8 @@ searching() { [[ "$opmode" == 'search' ]]; }
 
 upgrading() { [[ "$opmode" == 'upgrade' ]]; }
 
+clean() { [[ "$opmode" == 'clean' ]]; }
+
 resolving() { $resolve_dependencies; }
 
 eager_sudo() { $eager_sudo; }
@@ -294,6 +298,7 @@ initialize() {
       --ignore)      shift; ignore_packages+=" $1"                   ;;
       --noconfirm)   noconfirm=true; makepkg_options+=' --noconfirm' ;;
       --devel)       devels=true                                     ;;
+      --clean)       opmode='clean'                                  ;;
       --deps)        resolve_dependencies=true                       ;;
       --nodeps)      resolve_dependencies=false                      ;;
       --edit)        edit_pkgbuilds='always'                         ;;
@@ -723,7 +728,9 @@ declare -A target_versions # name->version
 declare -A target_deps     # pkgbase->is-dep?
 
 initialize "$@"
-
+if clean; then
+clean_package_directory
+fi
 if searching; then
   perform_search
 else
