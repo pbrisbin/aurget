@@ -5,13 +5,15 @@ jobs:
   build:
     docker:
       - image: python:2.7
+    environment:
+      DEBIAN_FRONTEND: noninteractive
+      FIXTURES_NO_RECORD: 1
     steps:
       - checkout
       - run:
           name: Setup
           command: |
             # Install hexdump
-            export DEBIAN_FRONTEND=noninteractive
             apt-get update -q -y
             apt-get install -q -y bsdmainutils
 
