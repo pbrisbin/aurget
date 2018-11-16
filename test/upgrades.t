@@ -9,6 +9,6 @@ specs with real network.)
   :: Starting AUR upgrade...
   :: Searching AUR...
   
-  Targets (4): aws-cli-1.10.8-1 codeclimate-0.21.0-1 google-cloud-sdk-98.0.0-1 python-botocore-1.3.30-1 
+  Targets (18): aurget-4.7.2-1 chruby-0.3.9-3 codeclimate-0.34.1-1 csslint-1.0.5-1 downgrade-6.0.0-2 google-cloud-sdk-222.0.0-1 google-talkplugin-5.41.3.0-1 laptop-mode-tools-1.72.2-3 lnav-0.8.4-1 neovim-symlinks-3-1 python-behave-1.2.6-1 python-parse_type-0.4.2-1 python2-notify2-0.3.1-2 rcm-1.3.3-1 ruby-install-0.7.0-1 rxvt-unicode-patched-9.22-10 tmate-2.2.1-2 xrectsel-0.3.2-1 
   
   Proceed with installation? [Y/n]  (no-eol)
