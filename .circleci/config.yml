@@ -9,7 +9,13 @@ jobs:
       - checkout
       - run:
           name: Setup
-          command: pip install cram
+          command: |
+            # Install hexdump
+            export DEBIAN_FRONTEND=noninteractive
+            apt-get update -q -y
+            apt-get install -q -y bsdmainutils
+
+            pip install cram
       - run:
           name: Test
           command: make test
