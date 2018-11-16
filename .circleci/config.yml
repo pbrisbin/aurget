@@ -1,0 +1,15 @@
+---
+version: 2.0
+
+jobs:
+  build:
+    docker:
+      - image: python:2.7
+    steps:
+      - checkout
+      - run:
+          name: Setup
+          command: pip install cram
+      - run:
+          name: Test
+          command: make test
