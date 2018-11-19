@@ -1,7 +1,5 @@
 # Aurget
 
-[![CircleCI-Badge](https://circleci.com/gh/pbrisbin/aurget.svg?style=svg)](https://circleci.com/gh/pbrisbin/aurget)
-
 A safe and simple, pacman-like interface to the AUR.
 
 ## Installation
