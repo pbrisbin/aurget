@@ -193,6 +193,22 @@ buildpkg() {
   fi
 }
 
+cache_pkgs() {
+  local pkg
+
+  (
+    cd "$1" || return 1
+
+    makepkg --packagelist | while read -r pkg; do
+      debug "caching package \"$pkg\" in \"$pkg_cache_dir\""
+      if ! sudo mv "$pkg" "$pkg_cache_dir"; then
+        error "could not cache package \"$pkg\" in \"$pkg_cache_dir\""
+        return 1
+      fi
+    done
+  )
+}
+
 prompt() {
   local a
 
@@ -333,6 +349,8 @@ set_defaults() {
   sync_mode='install'
   temp_directory='/tmp/aurget'
   user_config="${XDG_CONFIG_HOME:-$HOME/.config}/aurgetrc"
+  pkg_cache_dir=$(sed -n 's/^CacheDir[ \t]*\=[ \t]*//p' /etc/pacman.conf)
+  pkg_cache_dir=${pkg_cache_dir:-/var/cache/pacman/pkg}
 
   EDITOR="${EDITOR:-$VISUAL}"
   EDITOR="${EDITOR:-vi}"
@@ -631,7 +649,7 @@ process_targets() {
         fi
       fi
 
-      build_target "$pkgbase" && discard_sources "$pkgbase"
+      build_target "$pkgbase" && cache_pkgs "$pkgbase" && discard_sources "$pkgbase"
     fi
   done
 
