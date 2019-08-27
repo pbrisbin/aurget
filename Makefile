@@ -12,7 +12,7 @@ doc/aurgetrc.5: doc/aurgetrc.5.md
 man: doc/aurget.1 doc/aurgetrc.5
 
 test:
-	cram test
+	FIXTURES_NO_RECORD=1 cram test
 
 install:
 	install -Dm755 aurget $(DESTDIR)/$(PREFIX)/bin/aurget
