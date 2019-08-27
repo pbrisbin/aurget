@@ -12,6 +12,7 @@ if [[ ! -d "$fixtures" ]]; then
   fi
 
   mkdir -p "$fixtures"
+  echo $* >"$fixtures"/arguments
   $program "$@" >"$fixtures/stdout" 2>"$fixtures/stderr"
   echo $? >"$fixtures/exit_code"
 fi
