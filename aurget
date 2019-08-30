@@ -7,7 +7,7 @@ AUR='https://aur.archlinux.org'
 
 # Message {{{
 message() {
-  cat << EOF
+  cat <<EOF
 Usage: aurget [ -h | -S* [ --options ] [ -- ] <arguments> ]
 
   Options:
@@ -65,7 +65,10 @@ EOF
 # }}}
 
 # Support {{{
-die() { error "$*"; exit 1; }
+die() {
+  error "$*"
+  exit 1
+}
 
 info() { printf "${colorB}:: $colorW$*$nocolor\n"; }
 
@@ -79,8 +82,8 @@ debug() {
 
 # thanks Irm
 url_encode() {
-  hexdump -v -e '1/1 "%02x\t"' -e '1/1 "%_c\n"' <<< "$*" \
-    | LANG=C awk '
+  hexdump -v -e '1/1 "%02x\t"' -e '1/1 "%_c\n"' <<<"$*" |
+    LANG=C awk '
       $1 == "20"                    { printf("%s", "+"); next }
       $1 ~  /0[adAD]/               {                    next }
       $2 ~  /^[a-zA-Z0-9.*()\/_-]$/ { printf("%s", $2);  next }
@@ -104,7 +107,10 @@ aur_info_url() {
   echo "$AUR/rpc/?v=5&type=info$params"
 }
 
-get() { debug "HTTP GET $colorM$1$nocolor"; curl --silent --fail "$1"; }
+get() {
+  debug "HTTP GET $colorM$1$nocolor"
+  curl --silent --fail "$1"
+}
 
 pkgbuild() {
   get "$AUR/cgit/aur.git/plain/PKGBUILD?h=$(url_encode "$1")"
@@ -146,7 +152,7 @@ parse_rpc() {
 
 sort_rpc() {
   case "$sort_mode" in
-    name)  sort ;;
+    name) sort ;;
     votes) sort -t '|' -k 6,6nr -k 1,1 ;;
     *) die 'invalid argument to --sort. must be name or votes' ;;
   esac
@@ -179,7 +185,7 @@ create_temp_directory() {
 enter_build_directory() {
   debug "building in $colorM$build_directory$nocolor"
   mkdir -p "$build_directory" || die 'unable to make build directory'
-  cd "$build_directory"       || die 'unable to change to build directory'
+  cd "$build_directory" || die 'unable to change to build directory'
 }
 
 buildpkg() {
@@ -214,23 +220,27 @@ prompt() {
 
   printf "$*? [Y/n] "
 
-  $noconfirm && { printf "Y\n"; return 0; }
+  $noconfirm && {
+    printf "Y\n"
+    return 0
+  }
 
   read -r a
 
   case "${a:-y}" in
-    y|Y) return 0      ;;
-    q|Q) die 'aborted' ;;
-    *)   return 1      ;;
+    y | Y) return 0 ;;
+    q | Q) die 'aborted' ;;
+    *) return 1 ;;
   esac
 }
 
 prompt_to_edit() {
-  local name="$1" pkgbuild="$2"; shift 2
+  local name="$1" pkgbuild="$2"
+  shift 2
   local action="${*:-sourcing for dependencies}"
 
   case "${edit_pkgbuilds:-prompt}" in
-    never)  return 0 ;;
+    never) return 0 ;;
     prompt) prompt "Edit $name's PKGBUILD before $action" || return 0 ;;
   esac
 
@@ -277,9 +287,9 @@ initialize() {
 
   set_defaults
 
-  [[ " $* " =~ ' --debug '    ]] && debug=true
-  [[ " $* " =~ ' --nocolor '  ]] && disable_color=true
-  [[ " $* " =~ $config_regex  ]] && user_config="${BASH_REMATCH[1]}"
+  [[ " $* " =~ ' --debug ' ]] && debug=true
+  [[ " $* " =~ ' --nocolor ' ]] && disable_color=true
+  [[ " $* " =~ $config_regex ]] && user_config="${BASH_REMATCH[1]}"
 
   setup_colors
   source_config
@@ -287,45 +297,102 @@ initialize() {
 
   while [[ -n "$1" ]]; do
     case "$1" in
-      -S)            opmode='install'                                ;;
-      -Sy)           opmode='install'; sync_mode='install'           ;;
-      -Sb)           opmode='install'; sync_mode='build'             ;;
-      -Sd)           opmode='install'; sync_mode='download'          ;;
-      -Su)           opmode='upgrade'                                ;;
-      -Syu|-Suy)     opmode='upgrade'; sync_mode='install'           ;;
-      -Sbu|-Sub)     opmode='upgrade'; sync_mode='build'             ;;
-      -Sdu|-Sud)     opmode='upgrade'; sync_mode='download'          ;;
-      -Ss)           opmode='search' ; search_mode='search'          ;;
-      -Ssq|-Sqs)     opmode='search' ; search_mode='quiet'           ;;
-      -Si|-Ssi|-Sis) opmode='search' ; search_mode='info'            ;;
-      -Sp|-Ssp|-Sps) opmode='search' ; search_mode='print'           ;;
-      --aur4)        warn "deprecated --aur4 option, ignoring..."    ;;
-      --builddir)    shift; build_directory="$1"                     ;;
-      --ignore)      shift; ignore_packages+=" $1"                   ;;
-      --noconfirm)   noconfirm=true; makepkg_options+=' --noconfirm' ;;
-      --devel)       devels=true                                     ;;
-      --deps)        resolve_dependencies=true                       ;;
-      --nodeps)      resolve_dependencies=false                      ;;
-      --edit)        edit_pkgbuilds='always'                         ;;
-      --noedit)      edit_pkgbuilds='never'                          ;;
-      --discard)     discard_sources=true                            ;;
-      --nodiscard)   discard_sources=false                           ;;
-      --silent)      silent=true                                     ;;
-      --sort)        shift; sort_mode="$1"                           ;;
-      -h|--help)     message; exit                                   ;;
-      --)            shift; arguments+=( "$@" ); return              ;;
-      --debug)       :                                               ;;
-      --nocolor)     :                                               ;;
-      --config)      : ; shift                                       ;;
-      -*)            warn "unknown option $1, treating as makepkg argument..."
-                     makepkg_options+=" $1"                          ;;
-      *)             arguments+=( "$1" )                             ;;
+      -S) opmode='install' ;;
+      -Sy)
+        opmode='install'
+        sync_mode='install'
+        ;;
+      -Sb)
+        opmode='install'
+        sync_mode='build'
+        ;;
+      -Sd)
+        opmode='install'
+        sync_mode='download'
+        ;;
+      -Su) opmode='upgrade' ;;
+      -Syu | -Suy)
+        opmode='upgrade'
+        sync_mode='install'
+        ;;
+      -Sbu | -Sub)
+        opmode='upgrade'
+        sync_mode='build'
+        ;;
+      -Sdu | -Sud)
+        opmode='upgrade'
+        sync_mode='download'
+        ;;
+      -Ss)
+        opmode='search'
+        search_mode='search'
+        ;;
+      -Ssq | -Sqs)
+        opmode='search'
+        search_mode='quiet'
+        ;;
+      -Si | -Ssi | -Sis)
+        opmode='search'
+        search_mode='info'
+        ;;
+      -Sp | -Ssp | -Sps)
+        opmode='search'
+        search_mode='print'
+        ;;
+      --aur4) warn "deprecated --aur4 option, ignoring..." ;;
+      --builddir)
+        shift
+        build_directory="$1"
+        ;;
+      --ignore)
+        shift
+        ignore_packages+=" $1"
+        ;;
+      --noconfirm)
+        noconfirm=true
+        makepkg_options+=' --noconfirm'
+        ;;
+      --devel) devels=true ;;
+      --deps) resolve_dependencies=true ;;
+      --nodeps) resolve_dependencies=false ;;
+      --edit) edit_pkgbuilds='always' ;;
+      --noedit) edit_pkgbuilds='never' ;;
+      --discard) discard_sources=true ;;
+      --nodiscard) discard_sources=false ;;
+      --silent) silent=true ;;
+      --sort)
+        shift
+        sort_mode="$1"
+        ;;
+      -h | --help)
+        message
+        exit
+        ;;
+      --)
+        shift
+        arguments+=("$@")
+        return
+        ;;
+      --debug) : ;;
+      --nocolor) : ;;
+      --config)
+        :
+        shift
+        ;;
+      -*)
+        warn "unknown option $1, treating as makepkg argument..."
+        makepkg_options+=" $1"
+        ;;
+      *) arguments+=("$1") ;;
     esac
 
     shift
   done
 
-  [[ -z "$opmode" ]] && { message; exit 1; }
+  [[ -z "$opmode" ]] && {
+    message
+    exit 1
+  }
 }
 
 set_defaults() {
@@ -397,9 +464,9 @@ perform_search() {
 
   case "$search_mode" in
     search) rpc_search "$*" | print_search ;;
-    info)   rpc_info   "$@" | print_info   ;;
-    quiet)  rpc_search "$*" | cut -d '|' -f 1 ;;
-    print)  for name; do pkgbuild "$name"; done ;;
+    info) rpc_info "$@" | print_info ;;
+    quiet) rpc_search "$*" | cut -d '|' -f 1 ;;
+    print) for name; do pkgbuild "$name"; done ;;
   esac
 }
 
@@ -409,7 +476,7 @@ print_search() {
   while IFS='|' read -r name _ version description _ _ outofdate; do
     ood=''
 
-    (( outofdate )) && ood="$colorR[out of date]$nocolor"
+    ((outofdate)) && ood="$colorR[out of date]$nocolor"
 
     printf "${colorM}aur/$colorW$name $colorG$version$nocolor $ood\n"
     printf "    $description\n"
@@ -422,12 +489,12 @@ print_info() {
   while IFS='|' read -r name pkgbase version description url votes outofdate; do
     ood='No'
 
-    (( outofdate )) && ood="${colorR}Yes$nocolor"
+    ((outofdate)) && ood="${colorR}Yes$nocolor"
 
     printf "${colorW}Repository  : ${colorM}aur$nocolor\n"
     printf "${colorW}Name        : $name$nocolor\n"
-    [[ "$name" != "$pkgbase" ]] && \
-    printf "${colorW}Base        : $colorB$pkgbase$nocolor\n"
+    [[ "$name" != "$pkgbase" ]] &&
+      printf "${colorW}Base        : $colorB$pkgbase$nocolor\n"
     printf "${colorW}Version     : $colorG$version$nocolor\n"
     printf "${colorW}URL         : $colorC$url$nocolor\n"
     printf "${colorW}Out of date : $nocolor$ood\n"
@@ -440,9 +507,9 @@ print_info() {
 # Add available upgrades {{{
 add_available_upgrades() {
   info 'Starting AUR upgrade...'
-  arguments=( $(available_upgrades) "${arguments[@]}" )
+  arguments=($(available_upgrades) "${arguments[@]}")
 
-  (( "${#arguments[@]}" )) || nothing_to_do
+  (("${#arguments[@]}")) || nothing_to_do
 }
 
 available_upgrades() {
@@ -468,8 +535,8 @@ available_upgrades() {
 
     debug "checking $colorG$name$nocolor ($vers => $versN)"
 
-    (( check > 0 )) && warn "$name: local ($vers) is newer than aur ($versN)"
-    (( check < 0 )) && output_upgrade "$name" "$vers => $versN"
+    ((check > 0)) && warn "$name: local ($vers) is newer than aur ($versN)"
+    ((check < 0)) && output_upgrade "$name" "$vers => $versN"
   done < <(rpc_info "${!versions[@]}")
 }
 
@@ -502,7 +569,7 @@ resolve() {
       if [[ " ${arguments[*]} " =~ " $name " ]]; then
         debug "skipping (already in argument list)"
       else
-        dependencies=( "$name" "${dependencies[@]}" )
+        dependencies=("$name" "${dependencies[@]}")
         debug "added dependency $colorG$name$nocolor"
         debug "current set: $colorG${dependencies[*]}$nocolor"
       fi
@@ -523,7 +590,7 @@ source_pkgbuild() {
   local name="$1" pkgbuild="$temp_directory/${1}_PKGBUILD"
 
   if [[ ! -f "$pkgbuild" ]]; then
-    if pkgbuild "$name" > "$pkgbuild"; then
+    if pkgbuild "$name" >"$pkgbuild"; then
       debug "PKGBUILD found for $colorG$name$nocolor"
 
       if prompt_to_edit "$name" "$pkgbuild"; then
@@ -552,10 +619,10 @@ setup_targets() {
 
   set -- "${dependencies[@]}" "${arguments[@]}"
 
-  (( "$#" )) || die 'no targets specified (use -h for help)'
+  (("$#")) || die 'no targets specified (use -h for help)'
 
   for name in "${dependencies[@]}"; do deps[$name]=1; done
-  for name in "${arguments[@]}";    do deps[$name]=0; done
+  for name in "${arguments[@]}"; do deps[$name]=0; done
 
   debug "setting up $colorG$#$nocolor targets for processing"
 
@@ -579,7 +646,7 @@ setup_targets() {
         debug "legacy PKGBUILD: $colorG$pkgbuild$nocolor"
 
         # let makepkg deal with it
-        (( ${deps[$name]} )) && continue
+        ((${deps[$name]})) && continue
       fi
 
       die "target not found: $name"
@@ -595,19 +662,19 @@ setup_targets() {
     if [[ -z "${target_versions[$name]}" ]]; then
       if [[ -z "${targets[$pkgbase]}" ]]; then
         targets[$pkgbase]=''
-        target_pkgbases+=( "$pkgbase" )
+        target_pkgbases+=("$pkgbase")
       else
         targets[$pkgbase]+=','
       fi
 
       targets[$pkgbase]+="$name"
-      target_names+=( "$name" )
+      target_names+=("$name")
       target_versions[$name]=$version
     fi
     target_deps[$pkgbase]=${deps[$name]}
   done
 
-  (( "${#target_names[@]}" )) || nothing_to_do
+  (("${#target_names[@]}")) || nothing_to_do
 
   prompt_to_install "${target_names[@]}"
 }
@@ -631,7 +698,7 @@ process_targets() {
     if downloading; then
       debug "downloading $colorG$pkgbase$nocolor to filesystem"
 
-      if ! taurball "$pkgbase" > "${pkgbase}.tar.gz"; then
+      if ! taurball "$pkgbase" >"${pkgbase}.tar.gz"; then
         ret=1
         warn "$pkgbase: failed to retrieve aur sources"
         continue
@@ -640,7 +707,7 @@ process_targets() {
       debug "extracting $colorG$pkgbase$nocolor directly"
 
       if ! taurball "$pkgbase" | tar xfz -; then
-        if (( ${target_deps[$pkgbase]} )); then
+        if ((${target_deps[$pkgbase]})); then
           die "dependency package $pkgbase failed to download, aborting"
         else
           ret=1
@@ -670,10 +737,13 @@ build_target() {
   invoke_customizepkg "$pkgbase"
 
   if prompt_to_edit "$pkgbase" './PKGBUILD' 'building'; then
-    if (( ${target_deps[$pkgbase]} )); then
+    if ((${target_deps[$pkgbase]})); then
       buildpkg --asdeps || die "dependency package $pkgbase failed to build, aborting"
     else
-      buildpkg || { ret=1; warn "package $pkgbase failed to build, skipping"; }
+      buildpkg || {
+        ret=1
+        warn "package $pkgbase failed to build, skipping"
+      }
     fi
   fi
 
