@@ -122,7 +122,7 @@ parse_rpc() {
   awk -F '[^\\\\]"' -v RS='{"|,"|"}' '
     function unstring(str) {
       sub(/[^:]+:/, ""  , str) # remove prefix
-      gsub(/\\\"/ , "\"", str) # un-escape quotes
+      gsub(/\\\x22/ , "\x22", str) # un-escape quotes
       gsub(/\\\// , "/" , str) # un-escape urls
       gsub(/%/    , "%%", str) # escape percents for printf
       gsub(/\|/   , "/" , str) # replace pipe (our own field sep)
