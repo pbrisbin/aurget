@@ -79,3 +79,15 @@ Searching for info on chruby and aurget
   Votes       : 21
   Description : Changes the current ruby. Supports both zsh and bash.
   
+
+Searching for info with "s
+
+  $ aurget -Ssi --nocolor 3dsconv
+  Repository  : aur
+  Name        : 3dsconv
+  Version     : 4.1-0
+  URL         : https://github.com/ihaveamac/3dsconv
+  Out of date : Yes
+  Votes       : 2
+  Description : Tool to convert Nintendo 3DS CTR Cart Image files (CCI, ".3ds") to the CTR Importable Archive format (CIA).
+  
