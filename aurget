@@ -37,6 +37,8 @@ Usage: aurget [ -h | -S* [ --options ] [ -- ] <arguments> ]
                         build in <directory>
 
         --devel         only affects -Su, add all development packages
+        
+        --clean         Removes pkgbuild files
 
         --deps          resolve dependencies
         --nodeps        don't resolve dependencies
@@ -166,14 +168,20 @@ searching() { [[ "$opmode" == 'search' ]]; }
 
 upgrading() { [[ "$opmode" == 'upgrade' ]]; }
 
+clean() { [[ "$opmode" == 'clean' ]]; }
+
 resolving() { $resolve_dependencies; }
 
 eager_sudo() { $eager_sudo; }
 
-create_temp_directory() {
-  debug "storing temporary files in $colorM$temp_directory$nocolor"
-  mkdir -p "$temp_directory" || die 'unable to create temp directory'
-  rm -rf "${temp_directory:?}"/*
+create_package_directory() {
+  if [[ ! -d $cache_directory ]]; then
+  mkdir "$cache_directory" || die 'unable to create package directory' 
+  fi
+}
+
+clean_package_directory() {
+  rm -rf "${cache_directory:?}"/*
 }
 
 enter_build_directory() {
@@ -288,6 +296,7 @@ initialize() {
       --ignore)      shift; ignore_packages+=" $1"                   ;;
       --noconfirm)   noconfirm=true; makepkg_options+=' --noconfirm' ;;
       --devel)       devels=true                                     ;;
+      --clean)       opmode='clean'                                  ;;
       --deps)        resolve_dependencies=true                       ;;
       --nodeps)      resolve_dependencies=false                      ;;
       --edit)        edit_pkgbuilds='always'                         ;;
@@ -331,7 +340,8 @@ set_defaults() {
   silent=false
   sort_mode='name'
   sync_mode='install'
-  temp_directory='/tmp/aurget'
+  cache_directory="${XDG_CACHE_HOME:-$HOME/.cache}/aurget"
+  temp_directory="/tmp/aurget"
   user_config="${XDG_CONFIG_HOME:-$HOME/.config}/aurgetrc"
 
   EDITOR="${EDITOR:-$VISUAL}"
@@ -470,7 +480,7 @@ output_upgrade() {
 # Resolve dependencies {{{
 resolve_dependencies() {
   info 'Resolving dependencies...'
-  create_temp_directory
+  create_package_directory
   resolve "${arguments[@]}"
 }
 
@@ -503,7 +513,9 @@ resolve() {
 
 source_pkgbuild() {
   local name="$1" pkgbuild="$temp_directory/${1}_PKGBUILD"
-
+rpc_info "$@" 
+mv $tmp_directory/${1}_PKGBUILD $cache/$name/$version/PKGBUILD
+pkgbuild="$cache/$name/$version/PKGBUILD"
   if [[ ! -f "$pkgbuild" ]]; then
     if pkgbuild "$name" > "$pkgbuild"; then
       debug "PKGBUILD found for $colorG$name$nocolor"
@@ -554,7 +566,7 @@ setup_targets() {
     version="${versions[$name]}"
 
     if [[ -z "$version" ]]; then
-      pkgbuild="$temp_directory/${name}_PKGBUILD"
+      pkgbuild="$cache_directory/${name}_PKGBUILD"
 
       if [[ -f "$pkgbuild" ]]; then
         debug "target $colorG$name$nocolor may have moved to repos"
@@ -717,8 +729,10 @@ declare -A target_versions # name->version
 declare -A target_deps     # pkgbase->is-dep?
 
 initialize "$@"
-
-if searching; then
+if clean; then
+clean_package_directory
+elif
+searching; then
   perform_search
 else
   eager_sudo && sudo_upfront
