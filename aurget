@@ -70,14 +70,14 @@ die() {
   exit 1
 }
 
-info() { printf "${colorB}:: $colorW$*$nocolor\n"; }
+info() { printf "%b:: %b%b%b\n" "${colorB}" "${colorW}" "$*" "${nocolor}"; }
 
-warn() { printf "${colorY}warning:$nocolor $*\n" >&2; }
+warn() { printf "%bwarning:%b %b\n" "${colorY}" "${nocolor}" "$*" >&2; }
 
-error() { printf "${colorR}error:$nocolor $*\n" >&2; }
+error() { printf "%berror:%b %b\n" "${colorR}" "${nocolor}" "$*" >&2; }
 
 debug() {
-  $debug && printf "$colorW[${colorC}DEBUG$colorW]$nocolor ${*//%/%%}\n" >&2
+  $debug && printf "%b[%bDEBUG%b]%b %b\n" "${colorW}" "${colorC}" "${colorW}" "${nocolor}" "${*//%/%%}" >&2
 }
 
 # thanks Irm
@@ -158,10 +158,13 @@ sort_rpc() {
   esac
 }
 
+# For more details on the matching see https://stackoverflow.com/a/15394738
+# shellcheck disable=SC2076
 keep_sources() { [[ " $keep_source_packages " =~ " $1 " ]]; }
 
 is_devel() { [[ "$1" =~ -(git|hg|svn|darcs|csv|bzr)$ ]]; }
 
+# shellcheck disable=SC2076
 is_ignored() { [[ " $ignore_packages " =~ " $1 " ]]; }
 
 downloading() { [[ "$sync_mode" == 'download' ]]; }
@@ -193,16 +196,16 @@ buildpkg() {
 
   if $silent; then
     debug 'building silently...'
-    $makepkg "${makepkg_options[@]}" "$@" --noconfirm &>/dev/null
+    "$makepkg" "${makepkg_options[@]}" "$@" --noconfirm &>/dev/null
   else
-    $makepkg "${makepkg_options[@]}" "$@"
+    "$makepkg" "${makepkg_options[@]}" "$@"
   fi
 }
 
 prompt() {
   local a
 
-  printf "$*? [Y/n] "
+  printf "%s? [Y/n] " "$*"
 
   $noconfirm && {
     printf "Y\n"
@@ -238,10 +241,10 @@ prompt_to_edit() {
 prompt_to_install() {
   local name
 
-  printf "\n${colorY}Targets ($#):$nocolor "
+  printf "\n%bTargets ($#):%b " "${colorY}" "$nocolor"
 
   for name; do
-    printf "${name}-${target_versions[$name]} "
+    printf "%s-%s " "${name}" "${target_versions[$name]}"
   done
 
   printf "\n\n"
@@ -458,10 +461,10 @@ print_search() {
   while IFS='|' read -r name _ version description _ _ outofdate; do
     ood=''
 
-    ((outofdate)) && ood="$colorR[out of date]$nocolor"
+    ((outofdate)) && ood="${colorR}[out of date]${nocolor}"
 
-    printf "${colorM}aur/$colorW$name $colorG$version$nocolor $ood\n"
-    printf "    $description\n"
+    printf "%baur/%b%s %b%s%b %b\n" "${colorM}" "${colorW}" "${name}" "${colorG}" "${version}" "${nocolor}" "${ood}"
+    printf "    %s\n" "${description}"
   done
 }
 
@@ -473,23 +476,26 @@ print_info() {
 
     ((outofdate)) && ood="${colorR}Yes$nocolor"
 
-    printf "${colorW}Repository  : ${colorM}aur$nocolor\n"
-    printf "${colorW}Name        : $name$nocolor\n"
+    printf "%bRepository  : %baur%b\n" "${colorW}" "${colorM}" "${nocolor}"
+    printf "%bName        : %s%b\n" "${colorW}" "${name}" "${nocolor}"
     [[ "$name" != "$pkgbase" ]] &&
-      printf "${colorW}Base        : $colorB$pkgbase$nocolor\n"
-    printf "${colorW}Version     : $colorG$version$nocolor\n"
-    printf "${colorW}URL         : $colorC$url$nocolor\n"
-    printf "${colorW}Out of date : $nocolor$ood\n"
-    printf "${colorW}Votes       : $nocolor$votes\n"
-    printf "${colorW}Description : $nocolor$description\n\n"
+      printf "%bBase        : %b%s%b\n" "${colorW}" "${colorB}" "${pkgbase}" "${nocolor}"
+    printf "%bVersion     : %b%s%b\n" "${colorW}" "${colorG}" "${version}" "${nocolor}"
+    printf "%bURL         : %b%s%b\n" "${colorW}" "${colorC}" "${url}" "${nocolor}"
+    printf "%bOut of date : %b%b%b\n" "${colorW}" "${nocolor}" "${ood}" "${nocolor}"
+    printf "%bVotes       : %b$votes\n" "${colorW}" "${nocolor}"
+    printf "%bDescription : %b%s\n\n" "${colorW}" "${nocolor}" "${description}"
   done
 }
 # }}}
 
 # Add available upgrades {{{
 add_available_upgrades() {
+  local update_packages
   info 'Starting AUR upgrade...'
-  arguments=($(available_upgrades) "${arguments[@]}")
+
+  mapfile -t update_packages < <(available_upgrades)
+  arguments=("${update_packages[@]}" "${arguments[@]}")
 
   (("${#arguments[@]}")) || nothing_to_do
 }
@@ -529,7 +535,7 @@ output_upgrade() {
     warn "$name: ignoring package upgrade ($reason)"
   else
     debug "will upgrade $colorG$name$nocolor ($reason)"
-    printf "$name\n"
+    printf "%s\n" "$name"
   fi
 }
 # }}}
@@ -548,6 +554,7 @@ resolve() {
 
   for name; do
     if source_pkgbuild "$name"; then
+      # shellcheck disable=SC2076
       if [[ " ${arguments[*]} " =~ " $name " ]]; then
         debug "skipping (already in argument list)"
       else
@@ -556,7 +563,9 @@ resolve() {
         debug "current set: $colorG${dependencies[*]}$nocolor"
       fi
 
-      depends=($(pacman -T -- "${depends[@]}" "${makedepends[@]}"))
+      # See https://github.com/koalaman/shellcheck/wiki/SC2154#exceptions
+      # shellcheck disable=SC2154
+      mapfile -t depends < <(pacman -T -- "${depends[@]}" "${makedepends[@]}")
       depends=("${depends[@]%>*}")
       depends=("${depends[@]%=*}")
       depends=("${depends[@]%<*}")
