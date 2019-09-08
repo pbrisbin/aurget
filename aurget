@@ -189,13 +189,13 @@ enter_build_directory() {
 }
 
 buildpkg() {
-  debug "executing $colorY$makepkg $makepkg_options $*$nocolor"
+  debug "executing $colorY$makepkg ${makepkg_options[*]} $*$nocolor"
 
   if $silent; then
     debug 'building silently...'
-    $makepkg $makepkg_options "$@" --noconfirm &>/dev/null
+    $makepkg "${makepkg_options[@]}" "$@" --noconfirm &>/dev/null
   else
-    $makepkg $makepkg_options "$@"
+    $makepkg "${makepkg_options[@]}" "$@"
   fi
 }
 
@@ -334,7 +334,7 @@ initialize() {
         ;;
       --noconfirm)
         noconfirm=true
-        makepkg_options+=' --noconfirm'
+        makepkg_options+=('--noconfirm')
         ;;
       --devel) devels=true ;;
       --deps) resolve_dependencies=true ;;
@@ -365,7 +365,7 @@ initialize() {
         ;;
       -*)
         warn "unknown option $1, treating as makepkg argument..."
-        makepkg_options+=" $1"
+        makepkg_options+=("$1")
         ;;
       *) arguments+=("$1") ;;
     esac
@@ -390,7 +390,7 @@ set_defaults() {
   keep_devels=true
   keep_source_packages=''
   makepkg='makepkg'
-  makepkg_options='--syncdeps'
+  makepkg_options=('--syncdeps')
   noconfirm=false
   opmode=''
   resolve_dependencies=false
@@ -433,7 +433,7 @@ setup_colors() {
     colorW=''
     nocolor=''
 
-    makepkg_options+=' --nocolor'
+    makepkg_options+=('--nocolor')
   fi
 }
 # }}}
@@ -668,7 +668,7 @@ process_targets() {
 
   set -- "${target_pkgbases[@]}"
 
-  installing && makepkg_options+=' --install'
+  installing && makepkg_options+=('--install')
 
   debug "processing $colorG$#$nocolor targets"
 
