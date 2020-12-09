@@ -795,6 +795,9 @@ declare -A targets         # pkgbase->name(s)
 declare -A target_versions # name->version
 declare -A target_deps     # pkgbase->is-dep?
 
+warn "aurget is no longer being maintained, if you would like to volunteer please communicate your interest under this gitlab ticket: https://github.com/pbrisbin/aurget/issues/66"
+sleep 1
+
 initialize "$@"
 
 if searching; then
