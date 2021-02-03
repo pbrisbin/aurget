@@ -3,6 +3,7 @@
 Building the package for aurget
 
   $ aurget -Sb --builddir "$PWD" --noedit --nodeps --noconfirm --nodiscard aurget
+  warning: * (glob)
   :: Searching AUR...
   
   Targets (1): aurget-4.6.0-1 

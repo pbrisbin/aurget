@@ -3,6 +3,7 @@
 Downloading the taurball for aurget
 
   $ aurget -Sd --builddir "$PWD" --noedit --nodeps --noconfirm aurget
+  warning: * (glob)
   :: Searching AUR...
   
   Targets (1): aurget-4.6.0-1 
@@ -18,6 +19,7 @@ Downloading the taurball for aurget
 Downloading a taurball with special characters
 
   $ aurget -Sd --builddir "$PWD" --noedit --nodeps --noconfirm bisonc++
+  warning: * (glob)
   :: Searching AUR...
   
   Targets (1): bisonc++-4.13.00-1 
