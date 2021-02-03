@@ -1,3 +1,6 @@
+**NOTE**: This project is not actively maintained. I'm happy to accept PRs and
+cut releases, but I am no longer working on it. See https://github.com/pbrisbin/aurget/issues/66.
+
 # Aurget
 
 A safe and simple, pacman-like interface to the AUR.
