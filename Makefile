@@ -30,4 +30,12 @@ uninstall:
 	  $(DESTDIR)/$(PREFIX)/share/bash-completion/completions/aurget \
 	  $(DESTDIR)/$(PREFIX)/share/zsh/site-functions/_aurget
 
-.PHONY: test install uninstall
+RELEASE_BUMP ?= patch
+RELEASE_TAG  ?= $(shell git tag | vbump $(RELEASE_BUMP))
+
+release: test
+	git tag -s -m "$(RELEASE_TAG)" "$(RELEASE_TAG)"
+	git push --follow-tags
+	aur-release aurget "$(RELEASE_TAG)"
+
+.PHONY: test install uninstall release
