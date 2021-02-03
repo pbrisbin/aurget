@@ -3,6 +3,7 @@
 Resolving dependencies for aws-cli
 
   $ echo n | aurget -Sb --builddir "$PWD" --noedit --deps aws-cli
+  warning: * (glob)
   :: Resolving dependencies...
   :: Searching AUR...
   

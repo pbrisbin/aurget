@@ -3,6 +3,7 @@
 Searching for "aur helper"
 
   $ aurget -Ss --nocolor aur helper
+  warning: * (glob)
   aur/aurget 4.6.0-1 
       A simple, Pacman-like AUR helper
   aur/burgaur-git 2.2-2 
@@ -31,6 +32,7 @@ Searching for "aur helper"
 Searching quietly for "aur helper"
 
   $ aurget -Ssq --nocolor aur helper
+  warning: * (glob)
   aurget
   burgaur-git
   burgaur
@@ -47,6 +49,7 @@ Searching quietly for "aur helper"
 Sorting by votes
 
   $ aurget -Ssq --nocolor --sort votes aur helper
+  warning: * (glob)
   pacaur
   aurget
   pkgbuilder
@@ -63,6 +66,7 @@ Sorting by votes
 Searching for info on chruby and aurget
 
   $ aurget -Ssi --nocolor chruby aurget
+  warning: * (glob)
   Repository  : aur
   Name        : aurget
   Version     : 4.6.0-1
@@ -83,6 +87,7 @@ Searching for info on chruby and aurget
 Searching for info with "s
 
   $ aurget -Ssi --nocolor 3dsconv
+  warning: * (glob)
   Repository  : aur
   Name        : 3dsconv
   Version     : 4.1-0

@@ -6,6 +6,7 @@ Available upgrades are found
 specs with real network.)
 
   $ echo 'no' | aurget '-Syu' --nodeps
+  warning: * (glob)
   :: Starting AUR upgrade...
   :: Searching AUR...
   
@@ -16,6 +17,7 @@ specs with real network.)
 Upgrades with some additional packages
 
   $ echo 'no' | aurget '-Syu' --nodeps cram vips
+  warning: * (glob)
   :: Starting AUR upgrade...
   :: Searching AUR...
   
