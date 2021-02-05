@@ -32,6 +32,7 @@ if [[ ! -d "$fixtures" ]]; then
   echo $? >"$fixtures/exit_code"
 fi
 
+date >"$fixtures"/last-access
 cat "$fixtures/stdout"
 cat "$fixtures/stderr" >&2
 
