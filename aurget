@@ -501,11 +501,13 @@ add_available_upgrades() {
 }
 
 available_upgrades() {
-  local versions name pkgbase version vers versN check
+  local names versions name pkgbase version vers versN check
 
+  declare -a names
   declare -A versions
 
   while read -r name version; do
+    names+=("$name")
     versions[$name]=$version
   done < <(pacman -Qm)
 
@@ -525,7 +527,7 @@ available_upgrades() {
 
     ((check > 0)) && warn "$name: local ($vers) is newer than aur ($versN)"
     ((check < 0)) && output_upgrade "$name" "$vers => $versN"
-  done < <(rpc_info "${!versions[@]}")
+  done < <(rpc_info "${names[@]}")
 }
 
 output_upgrade() {
