@@ -1,18 +1,33 @@
 #!/usr/bin/env bash
+debug() {
+  if ((!FIXTURES_DEBUG)); then
+    return 0
+  fi
+
+  echo "DEBUG [fixtures]: $*" >&2
+}
+
 program="$1"
 shift
 base="${program##*/}"
+args="$*"
+sha=$(echo "$args" | md5sum | cut -d ' ' -f 1)
+fixtures="${TESTDIR:-test}/fixtures/$base/$sha"
 
-fixtures="${TESTDIR:-test}/fixtures/$base/$(echo $* | md5sum | cut -d ' ' -f 1)"
+debug "Call for $base fixture ($sha)"
+debug "  $args"
 
 if [[ ! -d "$fixtures" ]]; then
+  debug "  !! Recording new"
+  debug ""
+
   if ((FIXTURES_NO_RECORD)); then
     echo "No fixture found for $* and recording is disabled" >&2
     exit 100
   fi
 
   mkdir -p "$fixtures"
-  echo $* >"$fixtures"/arguments
+  echo "$args" >"$fixtures"/arguments
   $program "$@" >"$fixtures/stdout" 2>"$fixtures/stderr"
   echo $? >"$fixtures/exit_code"
 fi
