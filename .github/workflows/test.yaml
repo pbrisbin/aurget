@@ -1,0 +1,26 @@
+name: Test
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+          architecture: 'x64'
+
+      - name: Install bsdmainutils (hexdump) and cram
+        run: |
+          sudo apt-get install -y bsdmainutils
+          pip install cram
+
+      - name: Clone
+        uses: actions/checkout@v2
+
+      - name: Test
+        run: make test
