@@ -70,6 +70,10 @@ An example can be found at `/usr/share/doc/aurget/samples/aurgetrc`.
 `temp_directory` *DIRECTORY*
   Where to place temporary files. Default is `/tmp/aurget`.
 
+`disable_maintenance_warning` *true*|*false*
+   Disable warning that aurget is no longer maintained. Default is 
+  `false`.
+
 ## COLORS
 
 `colorR` *ANSI ESCAPE*
