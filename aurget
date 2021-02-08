@@ -402,6 +402,7 @@ set_defaults() {
   sort_mode='name'
   sync_mode='install'
   temp_directory='/tmp/aurget'
+  disable_maintenance_warning=false
   user_config="${XDG_CONFIG_HOME:-$HOME/.config}/aurgetrc"
 
   EDITOR="${EDITOR:-$VISUAL}"
@@ -797,10 +798,12 @@ declare -A targets         # pkgbase->name(s)
 declare -A target_versions # name->version
 declare -A target_deps     # pkgbase->is-dep?
 
-warn "aurget is no longer being maintained, if you would like to volunteer please communicate your interest on this GitHub Issue: https://github.com/pbrisbin/aurget/issues/66"
-sleep 1
-
 initialize "$@"
+
+if [[ ! "$disable_maintenance_warning" == "true" ]]; then
+  warn "aurget is no longer being maintained, if you would like to volunteer please communicate your interest on this GitHub Issue: https://github.com/pbrisbin/aurget/issues/66. You can disable this warning by setting disable_maintenance_warning=true in your aurgetrc."
+  sleep 1
+fi
 
 if searching; then
   perform_search

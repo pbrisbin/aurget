@@ -55,6 +55,9 @@ sync_mode='install'
 # directory is created and cleared when aurget starts.
 temp_directory='/tmp/aurget'
 
+# Disable warning that aurget is no longer maintained
+disable_maintenance_warning=false
+
 # Colors
 colorR="\e[1;31m"
 colorG="\e[1;32m"
