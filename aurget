@@ -125,29 +125,9 @@ rpc_search() { get "$(aur_search_url "$1")" | parse_rpc | sort_rpc; }
 rpc_info() { get "$(aur_info_url "$@")" | parse_rpc | sort_rpc; }
 
 parse_rpc() {
-  awk -F '[^\\\\]"' -v RS='{"|,"|"}' '
-    function unstring(str) {
-      sub(/[^:]+:/, ""  , str) # remove prefix
-      gsub(/\\"/  , "\"", str) # un-escape quotes
-      gsub(/\\\// , "/" , str) # un-escape urls
-      gsub(/%/    , "%%", str) # escape percents for printf
-      gsub(/\|/   , "/" , str) # replace pipe (our own field sep)
-      gsub(/"$/   , ""  , str) # remove extra trailing quote
-
-      if(substr(str, 1, 1) == "\"")
-        return substr(str, 2, length(str)) # unquote value
-      else
-        return str
-    }
-
-    /Name":/        { printf "%s",    unstring($0) }
-    /PackageBase":/ { printf "|%s",   unstring($0) }
-    /Version":/     { printf "|%s",   unstring($0) }
-    /Description":/ { printf "|%s",   unstring($0) }
-    /URL":/         { printf "|%s",   unstring($0) }
-    /NumVotes":/    { printf "|%s",   unstring($0) }
-    /OutOfDate":/   { printf "|%s\n", unstring($0) }
-  '
+    jq -r ".results | \
+        map(\"\(.Name)|\(.PackageBase)|\(.Version)|\(.Description)|\(.URL)|\(.NumVotes)|\(.OutOfDate)\") | \
+        join(\"\n\")"
 }
 
 sort_rpc() {
