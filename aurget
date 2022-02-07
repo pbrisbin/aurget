@@ -125,7 +125,7 @@ rpc_search() { get "$(aur_search_url "$1")" | parse_rpc | sort_rpc; }
 rpc_info() { get "$(aur_info_url "$@")" | parse_rpc | sort_rpc; }
 
 parse_rpc() {
-    jq -r ".results | \
+  jq -r ".results | \
         map(\"\(.Name)|\(.PackageBase)|\(.Version)|\(.Description)|\(.URL)|\(.NumVotes)|\(.OutOfDate)\") | \
         join(\"\n\")"
 }
