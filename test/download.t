@@ -6,7 +6,7 @@ Downloading the taurball for aurget
   warning: * (glob)
   :: Searching AUR...
   
-  Targets (1): aurget-4.6.0-1 
+  Targets (1): aurget-4.7.5-1 
   
   Proceed with installation? [Y/n] Y
   :: Retrieving taurball from AUR...
@@ -22,7 +22,7 @@ Downloading a taurball with special characters
   warning: * (glob)
   :: Searching AUR...
   
-  Targets (1): bisonc++-4.13.00-1 
+  Targets (1): bisonc++-6.04.02-1 
   
   Proceed with installation? [Y/n] Y
   :: Retrieving taurball from AUR...

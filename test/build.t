@@ -6,7 +6,7 @@ Building the package for aurget
   warning: * (glob)
   :: Searching AUR...
   
-  Targets (1): aurget-4.6.0-1 
+  Targets (1): aurget-4.7.5-1 
   
   Proceed with installation? [Y/n] Y
   :: Retrieving taurball from AUR...
