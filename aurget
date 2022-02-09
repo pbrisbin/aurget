@@ -84,7 +84,6 @@ debug() {
 url_encode() {
   hexdump -v -e '1/1 "%02x\t"' -e '1/1 "%_c\n"' <<<"$*" |
     LANG=C awk '
-      $1 == "20"                    { printf("%s", "+"); next }
       $1 ~  /0[adAD]/               {                    next }
       $2 ~  /^[a-zA-Z0-9.*()\/_-]$/ { printf("%s", $2);  next }
                                     { printf("%%%s", $1)      }
@@ -451,7 +450,7 @@ perform_search() {
   case "$search_mode" in
     search) rpc_search "$*" | print_search ;;
     info) rpc_info "$@" | print_info ;;
-    quiet) rpc_search "$*" | cut -d '|' -f 1 ;;
+    quiet) rpc_search "$*" | cut -d '|' -f 2 ;;
     print) for name; do pkgbuild "$name"; done ;;
   esac
 }
@@ -507,7 +506,7 @@ available_upgrades() {
   declare -a names
   declare -A versions
 
-  while read -r _ name _ _ _ _ version; do
+  while read -r name version; do
     names+=("$name")
     versions[$name]=$version
   done < <(pacman -Qm)
