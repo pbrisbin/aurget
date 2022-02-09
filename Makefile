@@ -1,6 +1,8 @@
 PREFIX    ?= /usr/local
 MANPREFIX ?= $(PREFIX)/share/man
 
+PERC = '%'
+
 doc/aurget.1: doc/aurget.1.md
 	kramdown-man < doc/aurget.1.md > doc/aurget.1
 	[ -s doc/aurget.1 ]
@@ -13,6 +15,21 @@ man: doc/aurget.1 doc/aurgetrc.5
 
 test:
 	FIXTURES_NO_RECORD=1 cram test
+
+fixtures.reset:
+	@echo "Running tests with fixture updates..."
+	cram test
+	@echo "Cleaning up any fixtures not recently accessed..."
+	for x in test/fixtures/*/*/last-access; do \
+	  now=$$(date +'$(PERC)s'); \
+	  last_access=$$(date --date="$$(cat $$x)" +'$(PERC)s'); \
+	  age=$$((now - $$last_access)); \
+	  if ((age > 60)); then \
+	    echo "$$x is $${age}s old, removing"; \
+	    rm "$$x"; \
+	  fi; \
+	done
+
 
 install:
 	install -Dm755 aurget $(DESTDIR)/$(PREFIX)/bin/aurget
@@ -38,4 +55,4 @@ release: test
 	git push --follow-tags
 	aur-release aurget "$(RELEASE_TAG)"
 
-.PHONY: test install uninstall release
+.PHONY: test fixtures.reset install uninstall release
