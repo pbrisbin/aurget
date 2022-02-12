@@ -84,7 +84,6 @@ debug() {
 url_encode() {
   hexdump -v -e '1/1 "%02x\t"' -e '1/1 "%_c\n"' <<<"$*" |
     LANG=C awk '
-      $1 == "20"                    { printf("%s", "+"); next }
       $1 ~  /0[adAD]/               {                    next }
       $2 ~  /^[a-zA-Z0-9.*()\/_-]$/ { printf("%s", $2);  next }
                                     { printf("%%%s", $1)      }
@@ -140,13 +139,13 @@ parse_rpc() {
         return str
     }
 
-    /Name":/        { printf "%s",    unstring($0) }
-    /PackageBase":/ { printf "|%s",   unstring($0) }
-    /Version":/     { printf "|%s",   unstring($0) }
-    /Description":/ { printf "|%s",   unstring($0) }
-    /URL":/         { printf "|%s",   unstring($0) }
+    /Description":/ { printf "%s",    unstring($0) }
+    /Name":/        { printf "|%s",   unstring($0) }
     /NumVotes":/    { printf "|%s",   unstring($0) }
-    /OutOfDate":/   { printf "|%s\n", unstring($0) }
+    /OutOfDate":/   { printf "|%s", unstring($0) }
+    /PackageBase":/ { printf "|%s",   unstring($0) }
+    /URL":/         { printf "|%s",   unstring($0) }
+    /Version":/     { printf "|%s\n",   unstring($0) }
   '
 }
 
@@ -451,7 +450,7 @@ perform_search() {
   case "$search_mode" in
     search) rpc_search "$*" | print_search ;;
     info) rpc_info "$@" | print_info ;;
-    quiet) rpc_search "$*" | cut -d '|' -f 1 ;;
+    quiet) rpc_search "$*" | cut -d '|' -f 2 ;;
     print) for name; do pkgbuild "$name"; done ;;
   esac
 }
@@ -459,7 +458,7 @@ perform_search() {
 print_search() {
   local name version description outofdate ood
 
-  while IFS='|' read -r name _ version description _ _ outofdate; do
+  while IFS='|' read -r description name _ outofdate _ _ version; do
     ood=''
 
     ((outofdate)) && ood="${colorR}[out of date]${nocolor}"
@@ -472,7 +471,7 @@ print_search() {
 print_info() {
   local name version description url votes outofdate ood
 
-  while IFS='|' read -r name pkgbase version description url votes outofdate; do
+  while IFS='|' read -r description name votes outofdate pkgbase url version; do
     ood='No'
 
     ((outofdate)) && ood="${colorR}Yes$nocolor"
@@ -514,7 +513,7 @@ available_upgrades() {
 
   debug "found $colorG${#versions[@]}$nocolor foreign packages to check"
 
-  while IFS='|' read -r name pkgbase versN _; do
+  while IFS='|' read -r _ name _ _ pkgbase _ versN; do
     if is_devel "$name"; then
       $devels && output_upgrade "$name" 'development package'
       continue
@@ -622,7 +621,7 @@ setup_targets() {
 
   info 'Searching AUR...'
 
-  while IFS='|' read -r name pkgbase version _; do
+  while IFS='|' read -r _ name _ _ pkgbase _ version; do
     debug "found $colorG$name$nocolor in the AUR at version $colorG$version$nocolor"
     pkgbases[$name]=$pkgbase
     versions[$name]=$version

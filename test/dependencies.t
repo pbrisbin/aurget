@@ -1,12 +1,12 @@
   $ source "$TESTDIR/helper.sh"
 
-Resolving dependencies for aws-cli
+Resolving dependencies for aws-cli-v2
 
-  $ echo n | aurget -Sb --builddir "$PWD" --noedit --deps aws-cli
+  $ echo n | aurget -Sb --builddir "$PWD" --noedit --deps aws-cli-v2
   warning: * (glob)
   :: Resolving dependencies...
   :: Searching AUR...
   
-  Targets (2): python-botocore-1.3.30-1 aws-cli-1.10.8-1 
+  Targets (2): python-botocore-v2-git-r7659.1a4caa8d1-1 aws-cli-v2-2.0.60-1 
   
   Proceed with installation? [Y/n]  (no-eol)

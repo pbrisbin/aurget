@@ -1,0 +1,1 @@
+--silent --fail https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=python-ruamel-yaml

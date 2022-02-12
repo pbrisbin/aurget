@@ -1,0 +1,1 @@
+--silent --fail https://aur.archlinux.org/rpc/?v=5&type=info&arg\[\]=python-wcwidth&arg\[\]=python-prompt_toolkit&arg\[\]=python-botocore-v2-git&arg\[\]=aws-cli-v2
