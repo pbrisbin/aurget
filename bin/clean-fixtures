@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+now=$(date '+%s')
+
+for x in test/fixtures/*/*/last-access; do
+  last_access=$(date --date="$(cat "$x")" '+%s')
+  age=$((now - last_access))
+
+  if ((age > 60)); then
+    printf '%s is %ds old, removing\n' "$x" "$age"
+    rm "$x"
+  fi
+done
