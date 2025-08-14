@@ -1,0 +1,15 @@
+name: CI
+
+on:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+      - run: sudo apt-get install -y bsdmainutils
+      - run: pip install cram
+      - uses: extractions/setup-just@v2
+      - run: just test
