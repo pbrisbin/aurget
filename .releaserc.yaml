@@ -1,0 +1,16 @@
+plugins:
+  - - "@semantic-release/commit-analyzer"
+    - preset: "conventionalcommits"
+  - - "@semantic-release/release-notes-generator"
+    - preset: "conventionalcommits"
+  - - "@semantic-release/github"
+    - assets: "aurget-*.tar.gz"
+      successCommentCondition: false
+      failCommentCondition: false
+  - - "@semantic-release/exec"
+    - prepareCmd: "just dist ${nextRelease.version}"
+
+branches:
+  - main
+  - name: rc/*
+    prerelease: '${name.replace(/^rc\//, "rc-")}'
