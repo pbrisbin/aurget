@@ -25,9 +25,20 @@ man 5 aurgetrc
 Install cram: https://aur.archlinux.org/packages/cram/
 
 ```
-make test
+just test
 ```
+
+### Release
+
+To trigger automated release, push a [conventionally-formatted commit][cc] to
+`main`. In short,
+
+- `fix: ...` to trigger a patch release
+- `feat: ...` to trigger a minor release
+- `<type>!:` or a `BREAKING CHANGE: ...` footer to trigger a major release
+
+[cc]: https://www.conventionalcommits.org/en/v1.0.0/#summary
 
 ---
 
-[CHANGELOG](./CHANGELOG.md) | [LICENSE](./LICENSE)
+[CHANGELOG](https://github.com/pbrisbin/aurget/releases) | [LICENSE](./LICENSE)
