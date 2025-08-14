@@ -16,8 +16,8 @@ dist version:
 # Create dist/doc/ from doc/
 dist-manpages:
   #TODO ronn --roff doc/*.ronn
-  kramdown-man < doc/aurget.1.md > doc/aurget.1
-  kramdown-man < doc/aurgetrc.5.md > doc/aurgetrc.5
+  kramdown-man doc/aurget.1.md > doc/aurget.1
+  kramdown-man doc/aurgetrc.5.md > doc/aurgetrc.5
   mkdir -p dist/doc
   find doc \
     -type f \

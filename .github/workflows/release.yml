@@ -1,0 +1,56 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+      - rc/*
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install just as task-runner
+        uses: extractions/setup-just@v3
+
+      - name: Install ronn-ng for manpages
+        run: |
+          # TODO gem install --user ronn-ng
+          gem install --user kramdown-man
+          for bin in "$HOME"/.local/share/gem/ruby/*/bin; do
+            echo "$bin"
+          done >>"$GITHUB_PATH"
+
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - id: release
+        uses: cycjimmy/semantic-release-action@v4
+        with:
+          extra_plugins: |
+            conventional-changelog-conventionalcommits
+            @semantic-release/exec
+        env:
+          FORCE_COLOR: 1
+          GITHUB_TOKEN: ${{ github.token }}
+
+    outputs:
+      published: ${{ steps.release.outputs.new_release_published }}
+      version: ${{ steps.release.outputs.new_release_version}}
+
+  # pkgbuild:
+  #   needs: [release]
+  #   if: ${{ needs.release.outputs.published == 'true' }}
+
+  #   runs-on: ubuntu-latest
+
+  #   steps:
+  #     - uses: archlinux-downgrade/aur-publish-action@v1
+  #       with:
+  #         package: aurget
+  #         version: ${{ needs.release.outputs.version }}
+  #         publish: ${{ github.ref_name == 'main' }}
+  #       env:
+  #         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
