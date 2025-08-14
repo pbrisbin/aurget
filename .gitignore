@@ -1,2 +1,8 @@
-!test/bin
-test/*.t.err
+dist/doc
+
+doc/*
+!doc/*.md
+!doc/*.ronn
+!doc/index.txt
+
+test/**/*.t.err

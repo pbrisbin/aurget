@@ -1,1 +1,1 @@
-export PATH="$TESTDIR/..:$TESTDIR/bin:$PATH"
+export PATH="$TESTDIR/../dist:$TESTDIR/bin:$PATH"
