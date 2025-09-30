@@ -1,3 +1,13 @@
+> [!NOTE]
+> All of my GitHub repositories have been **archived** and will be migrated to
+> Codeberg as I next work on them. This repository either now lives, or will
+> live, at:
+>
+> https://codeberg.org/pbrisbin/aurget
+>
+> If you need to report an Issue or raise a PR, and this migration hasn't
+> happened yet, send an email to me@pbrisbin.com.
+
 **NOTE**: This project is not actively maintained. I'm happy to accept PRs and
 cut releases, but I am no longer working on it. See https://github.com/pbrisbin/aurget/issues/66.
 
